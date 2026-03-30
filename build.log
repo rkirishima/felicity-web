@@ -1,0 +1,52 @@
+
+> felicity-web@0.1.0 build
+> next build
+
+▲ Next.js 16.2.1 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.4s
+  Running TypeScript ...
+  Finished TypeScript in 1797ms ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/24) ...
+  Generating static pages using 9 workers (6/24) 
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+  Generating static pages using 9 workers (12/24) 
+  Generating static pages using 9 workers (18/24) 
+✓ Generating static pages using 9 workers (24/24) in 261ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /about
+├ ƒ /api/process-payment
+├ ○ /checkout
+├ ○ /en
+├ ○ /en/about
+├ ○ /en/checkout
+├ ● /en/products/[slug]
+│ ├ /en/products/brazil-santa-alina
+│ ├ /en/products/ethiopia-yirgacheffe-g1
+│ └ /en/products/papua-new-guinea-sucafina
+├ ○ /ja
+├ ○ /ja/about
+├ ○ /ja/disclosure
+├ ● /ja/products/[slug]
+│ ├ /ja/products/brazil-santa-alina
+│ ├ /ja/products/ethiopia-yirgacheffe-g1
+│ └ /ja/products/papua-new-guinea-sucafina
+├ ● /products/[slug]
+│ ├ /products/brazil-santa-alina
+│ ├ /products/ethiopia-yirgacheffe-g1
+│ └ /products/papua-new-guinea-sucafina
+├ ○ /robots.txt
+└ ○ /sitemap.xml
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

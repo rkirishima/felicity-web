@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+:root {
+  --background: #F4EFE4;
+  --foreground: #2C2416;
+}
+
+@theme inline {
+  /* Felicity — Hayama Coastal Palette (FOAM-warmed) */
+  --color-felicity-cream:  #F4EFE4;   /* 砂浜 — base background, warm sand */
+  --color-felicity-beige:  #EDE5D8;   /* 砂岩 — cards, sections, warmer */
+  --color-felicity-grey:   #DDD5C5;   /* 霞む空 — dividers, borders, driftwood-like */
+  --color-felicity-brown:  #C8B89A;   /* 流木 — driftwood, light accents */
+  --color-felicity-mid:    #8C7B6B;   /* キャプション — muted text */
+  --color-felicity-dark:   #2C2416;   /* 温かい黒 — headings, body */
+  --color-felicity-blue:   #7AAFC4;   /* 葉山の海 — primary accent */
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 18px; /* Increase base body font from default 16px to 18px */
+}

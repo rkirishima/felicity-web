@@ -1,0 +1,352 @@
+{
+  "experiences": {
+    "title": "Experiences",
+    "heading": "Connect Through Experience",
+    "explanation": "Felicity exists to bring people together. Coffee is where we start, but we believe happiness comes from doing things with others — learning a new skill, moving your body, creating something with your hands. Whether you're roasting beans, paddling on the water, or shaping silver, these experiences are invitations to slow down, connect with place, and discover what makes life feel full.",
+    "cta": "For upcoming workshops, events & activities, follow us on Instagram.",
+    "workshops": [
+      {
+        "name": "Roasting",
+        "desc": "Learn direct roasting on our Probat. Discover origin & process."
+      },
+      {
+        "name": "Pilates",
+        "desc": "Strengthen your core with coastal air and intention."
+      },
+      {
+        "name": "Knitting",
+        "desc": "Create by hand. Slow craft, fast conversation."
+      },
+      {
+        "name": "Photography",
+        "desc": "Capture light, motion, and moments. Technique meets play."
+      },
+      {
+        "name": "Silver",
+        "desc": "Shape metal. Make something that becomes part of you."
+      },
+      {
+        "name": "Mountain Biking",
+        "desc": "Ride the Shonan hills. Then return for coffee."
+      },
+      {
+        "name": "SUP",
+        "desc": "Paddle the Hayama coast. Water, sky, balance."
+      },
+      {
+        "name": "Flower Arrangement",
+        "desc": "Arrange intention. Transform stems into stillness."
+      },
+      {
+        "name": "Yoga",
+        "desc": "Breathe with the wind. Return to your center."
+      }
+    ]
+  },
+  "homepage": {
+    "title": "Specialty Coffee",
+    "tagline": "Hayama, Japan — Est. 2024",
+    "scrollAriaLabel": "Scroll down",
+    "coffee": {
+      "label": "Single Origin / Current Offerings",
+      "beans": {
+        "brazilSantaAlina": {
+          "name": "Brazil Santa Alina",
+          "shortDesc": "Heavy body, low acidity with hazelnut & dark chocolate",
+          "description": "From the renowned BSCA/Monte Alegre region in Brazil's coffee heartland, Santa Alina showcases the classic Brazilian profile with stunning clarity. This natural processed bean delivers a heavy, syrupy body with the distinctive sweetness Brazilian coffees are celebrated for. The cup presents rich notes of roasted hazelnut, dark chocolate, and subtle citrus undertones. The low acidity makes it exceptionally approachable, whether enjoyed as a long espresso shot or the foundation of a smooth milk-based drink. Santa Alina exemplifies the balance and reliability that makes Brazilian coffee a global standard.",
+          "roastLevel": {
+            "level": "dark",
+            "dots": 3,
+            "label": "Full City (Dark)"
+          }
+        },
+        "guatemalaFincaGualvador": {
+          "name": "Guatemala Finca Gualvador (Anaerobic)",
+          "shortDesc": "Wine-like acidity, dark berries, syrupy cacao",
+          "description": "Finca Gualvador from La Cupula Estate in Guatemala employs an innovative anaerobic fermentation process that transforms the bean into a complex, wine-like experience. During fermentation in sealed conditions, enzymes work without oxygen, creating intense fruit-forward aromatics and layered flavors. This process elevates naturally occurring acidity into a refined, wine-like quality with dark berry notes—blackberry and blueberry—complimented by syrupy cacao and subtle spice. The cup is bright yet balanced, with body that feels full without heaviness. Perfect for those seeking adventurous, experimental coffee that challenges conventional flavor profiles.",
+          "roastLevel": {
+            "level": "medium",
+            "dots": 2,
+            "label": "City+ (Medium)"
+          }
+        },
+        "colombiaDecaf": {
+          "name": "Colombia Decaf",
+          "shortDesc": "Smooth caramel sweetness, medium body, caffeine-free",
+          "description": "Colombian decaf beans from OMW Café represent the growing world of specialty decaf—proving that removing caffeine doesn't mean sacrificing flavor. This 100% organic, ethically sourced bean retains the classic Colombian character while achieving remarkable complexity post-decaffeination. The cup reveals smooth caramel sweetness complemented by subtle chocolate and nutty undertones. The medium body provides satisfying structure without the heaviness sometimes associated with decaffeinated coffees. Whether enjoyed in the evening or for those sensitive to caffeine, Colombia Decaf proves that specialty coffee's virtues extend beyond caffeine content. An elegant choice that respects both taste and well-being.",
+          "roastLevel": {
+            "level": "dark",
+            "dots": 3,
+            "label": "Full City (Dark)"
+          }
+        },
+        "ethiopiaYirgacheffe": {
+          "name": "Ethiopia Yirgacheffe",
+          "shortDesc": "Floral jasmine aromatics, tea-like body, bright citrus",
+          "description": "Yirgacheffe from the SEH Coffee House represents the soul of Ethiopian coffee—a natural sundried Grade 1 bean from the birthplace of coffee cultivation. This single-origin showcases the delicate floral characteristics Ethiopian coffees are prized for, with pronounced jasmine aromatics that perfume the cup before the first sip. The flavor profile unfolds with bright citrus notes—lemon and bergamot—balanced against a surprisingly tea-like body that's elegant rather than heavy. Natural processing imparts subtle fruity undertones, creating a complex yet harmonious cup. Yirgacheffe exemplifies the refined, high-altitude coffee culture of its origin, making it perfect for those seeking an authentic Ethiopian experience.",
+          "roastLevel": {
+            "level": "light",
+            "dots": 1,
+            "label": "City (Light)"
+          }
+        },
+        "panamaGeisha": {
+          "name": "Panama Geisha",
+          "shortDesc": "Ultra-premium variety with intense bergamot & jasmine",
+          "description": "Panama Geisha from Esmeralda Estate is coffee's equivalent to fine wine—a collector's bean and origin story worth experiencing. This ultra-premium variety originated in Ethiopia but thrives in Panama's unique terroir, commanding prices that reflect its rarity and excellence. The cup bursts with intense floral notes, particularly bergamot and jasmine, followed by delicate layers of tropical fruit—passion fruit, pineapple—and subtle honey sweetness. The body is refined and silky, with an ethereal quality that justifies its legendary status. Geisha requires respect in preparation; pour-over or light espresso extraction reveals its full complexity. A once-in-a-lifetime cup for serious coffee enthusiasts.",
+          "roastLevel": {
+            "level": "light",
+            "dots": 1,
+            "label": "City (Light)"
+          }
+        },
+        "yemenWhiteCamel": {
+          "name": "Yemen White Camel",
+          "shortDesc": "Exotic spice notes, deep earthy tones, dried fruit",
+          "description": "Yemen White Camel represents one of the world's most legendary and complex coffee origins. This naturally processed bean carries the ancient heritage of Yemeni coffee culture, where coffee was first cultivated over five centuries ago. The cup presents a sophisticated balance of exotic spice notes—cardamom, cinnamon—grounded by deep, earthy undertones reminiscent of leather and cedar. Dried fruit characteristics emerge as secondary notes, adding nuance and complexity. The body is wine-like and weighted, with a finish that lingers with spice warmth. Yemen White Camel demands slow appreciation; this is contemplative coffee for those seeking to explore coffee's historical and cultural roots.",
+          "roastLevel": {
+            "level": "dark",
+            "dots": 3,
+            "label": "Full City (Dark)"
+          }
+        },
+        "papuaNewGuinea": {
+          "name": "Papua New Guinea",
+          "shortDesc": "Wild syrupy body, savory edge, tropical fruit notes",
+          "description": "Papua New Guinea from SUCAFINA is a washed raw arabica that captures the untamed character of its mountainous origin. Grown at high altitude in volcanic soil, these beans develop a distinctly wild profile—a syrupy, full body with an intriguing savory edge that sets PNG apart from more conventional origins. Tropical fruit notes of passion fruit and mango emerge beneath the surface, creating an unconventional flavor journey. The acidity is pronounced yet harmonious, cutting through the richness with vibrancy. This is coffee for adventurous palates seeking something distinctly different; PNG offers terroir-driven complexity that rewards exploration and experimentation.",
+          "roastLevel": {
+            "level": "medium",
+            "dots": 2,
+            "label": "City+ to Full City"
+          }
+        },
+        "jamaicaBlueMountain": {
+          "name": "Jamaica Blue Mountain No. 1",
+          "shortDesc": "Perfect balance, mild character, zero bitterness",
+          "description": "Jamaica Blue Mountain stands as one of the world's most sought-after and expensive coffees, cultivated exclusively in the Blue Mountains of Jamaica. This Grade 1 bean grows at elevation in ideal conditions, producing a cup of remarkable smoothness and balance. The flavor profile is refined and mild, with subtle chocolate and nutty characteristics that never overshadow the pure, clean cup. Acidity is gentle and measured; bitterness is completely absent. The body is medium yet full-flavored, making Blue Mountain an exemplary example of how great terroir requires minimal intervention. This is 'dreaming coffee'—smooth, enveloping, and perfect for meditative morning rituals or simple, unadulterated enjoyment.",
+          "roastLevel": {
+            "level": "medium",
+            "dots": 2,
+            "label": "City+ (Medium)"
+          }
+        },
+        "elSalvadorFincaLaFany": {
+          "name": "El Salvador Finca La Fany",
+          "shortDesc": "Sweet and creamy with plum notes and honeyed chocolate",
+          "description": "El Salvador Finca La Fany represents the growing excellence of Central American specialty coffee, cultivated on a family farm dedicated to sustainable, high-quality production. This washed arabica develops a distinctly sweet profile with creamy mouthfeel that makes it exceptionally approachable. Flavor notes of ripe plum emerge alongside honeyed chocolate and subtle caramel, creating a naturally sweet cup that rarely requires additional sweetening. The medium body provides structure without heaviness, making it versatile across brewing methods. El Salvador continues to earn recognition for producing coffees of character and quality, and Finca La Fany exemplifies this upward trajectory. Perfect for those seeking balance between approachability and complexity.",
+          "roastLevel": {
+            "level": "medium",
+            "dots": 2,
+            "label": "City+ (Medium)"
+          }
+        }
+      }
+    },
+    "merch": {
+      "label": "Apparel & Goods",
+      "apparel": {
+        "tshirts": [
+          {
+            "id": "tshirt-drive-date",
+            "name": "Drive Date",
+            "nameJa": "Drive Date",
+            "basePrice": 4500,
+            "description": "An owner's tribute to their beloved VW Thing—the vehicle that carries memories of coastal drives with Doug & Julie through Hayama's winding roads. This white tee captures the spirit of those unhurried journeys, where every turn reveals new light on familiar paths. Inspired by conversations under Hayama sky, with gratitude to Hanna Kirishima for the story these moments tell. Medium weight, 100% cotton—a piece for those who understand that the best drives aren't about the destination.",
+            "descriptionJa": "オーナーが愛してやまないVW Thing—葉山の曲がりくねった道を、Doug & Julieとドライブした思い出を乗せた一台。この白いTシャツは、馴染みの道を走るたびに新しい光が見える、その悠々とした時間を映し出している。葉山の空の下での会話に着想を得、桐島ハンナへの感謝を込めて。この瞬間が語る物語に捧ぐ一枚。100%コットン素材—目的地よりも、ドライブそのものの価値を知る人のための逸品。",
+            "color": "White",
+            "sizes": ["M", "L", "XL"],
+            "images": ["/apparel/drive-date.jpg"],
+            "variants": [
+              { "id": "tshirt-drive-date-m", "productId": "tshirt-drive-date", "name": "Drive Date on Thing", "basePrice": 4500, "color": "White", "size": "M" },
+              { "id": "tshirt-drive-date-l", "productId": "tshirt-drive-date", "name": "Drive Date on Thing", "basePrice": 4500, "color": "White", "size": "L" },
+              { "id": "tshirt-drive-date-xl", "productId": "tshirt-drive-date", "name": "Drive Date on Thing", "basePrice": 4500, "color": "White", "size": "XL" }
+            ]
+          },
+          {
+            "id": "tshirt-peace-biker",
+            "name": "Peace Biker",
+            "nameJa": "Peace Biker",
+            "basePrice": 4500,
+            "description": "Illustrated by Kirishima Hanna, this peaceful chopper design captures the essence of the open road. 100% cotton, comfortable fit.",
+            "descriptionJa": "桐島ハンナのイラストによる穏やかなチョッパーライダー。シンプルで素朴な一枚。100%コットン。",
+            "color": "White",
+            "sizes": ["M", "L", "XL", "XXL"],
+            "images": ["/apparel/peace-biker.jpg"],
+            "variants": [
+              { "id": "tshirt-peace-biker-m", "productId": "tshirt-peace-biker", "name": "Peace Biker", "basePrice": 4500, "color": "White", "size": "M" },
+              { "id": "tshirt-peace-biker-l", "productId": "tshirt-peace-biker", "name": "Peace Biker", "basePrice": 4500, "color": "White", "size": "L" },
+              { "id": "tshirt-peace-biker-xl", "productId": "tshirt-peace-biker", "name": "Peace Biker", "basePrice": 4500, "color": "White", "size": "XL" },
+              { "id": "tshirt-peace-biker-xxl", "productId": "tshirt-peace-biker", "name": "Peace Biker", "basePrice": 4500, "color": "White", "size": "XXL" }
+            ]
+          },
+          {
+            "id": "tshirt-la-motarde",
+            "name": "La Motarde",
+            "nameJa": "La Motarde",
+            "basePrice": 4500,
+            "description": "Inspired by Marianne Faithfull, illustrated by world-renowned fashion illustrator Hiroshi Tanabe. Features a Triumph racer in bold, timeless design.",
+            "descriptionJa": "マリアンヌ・フェイスフルに着想を得て、ファッション・イラストレーター・田辺ヒロシが描いたトリアンフ・レーサー。クラシカルで大胆なデザイン。100%コットン。",
+            "color": "Grey",
+            "sizes": ["M", "L", "XL", "XXL"],
+            "images": ["/apparel/tshirt-la-motarde.jpg"],
+            "variants": [
+              { "id": "tshirt-la-motarde-m", "productId": "tshirt-la-motarde", "name": "La Motarde", "basePrice": 4500, "color": "Grey", "size": "M" },
+              { "id": "tshirt-la-motarde-l", "productId": "tshirt-la-motarde", "name": "La Motarde", "basePrice": 4500, "color": "Grey", "size": "L" },
+              { "id": "tshirt-la-motarde-xl", "productId": "tshirt-la-motarde", "name": "La Motarde", "basePrice": 4500, "color": "Grey", "size": "XL" },
+              { "id": "tshirt-la-motarde-xxl", "productId": "tshirt-la-motarde", "name": "La Motarde", "basePrice": 4500, "color": "Grey", "size": "XXL" }
+            ]
+          }
+        ],
+        "caps": [
+          {
+            "id": "cap-grey",
+            "name": "Staff Cap",
+            "nameJa": "スタッフキャップ",
+            "basePrice": 3000,
+            "description": "The Felicity staff cap is a functional piece born from necessity: protection from sun and salt spray while working the espresso bar, mixing coffee, or serving guests outdoors. Unstructured, breathable, and minimal—it carries the aesthetic of working culture. Available in grey, black, and beige.",
+            "descriptionJa": "Felicityのスタッフキャップは、必要性から生まれた実用的なピース。エスプレッソバーでの作業、コーヒーのブレンド、屋外でのサービス—日差しと塩水の影響から身を守る。アンストラクチャード、通気性、最小限のデザイン。ワーキングカルチャーの美学を体現しています。グレー、ブラック、ベージュ3色展開。",
+            "color": "Grey",
+            "images": ["/apparel/cap-grey.jpg"],
+            "variants": [
+              { "id": "cap-grey-regular", "productId": "cap-grey", "name": "Staff Cap Grey", "basePrice": 3000, "color": "Grey", "size": "Regular" }
+            ]
+          },
+          {
+            "id": "cap-black",
+            "name": "Staff Cap",
+            "nameJa": "スタッフキャップ",
+            "basePrice": 3000,
+            "description": "The Felicity staff cap is a functional piece born from necessity: protection from sun and salt spray while working the espresso bar, mixing coffee, or serving guests outdoors. Unstructured, breathable, and minimal—it carries the aesthetic of working culture. Available in grey and black.",
+            "descriptionJa": "Felicityのスタッフキャップは、必要性から生まれた実用的なピース。エスプレッソバーでの作業、コーヒーのブレンド、屋外でのサービス—日差しと塩水の影響から身を守る。アンストラクチャード、通気性、最小限のデザイン。ワーキングカルチャーの美学を体現しています。グレー、ブラック両色展開。",
+            "color": "Black",
+            "images": ["/apparel/cap-black.jpg"],
+            "variants": [
+              { "id": "cap-black-regular", "productId": "cap-black", "name": "Staff Cap Black", "basePrice": 3000, "color": "Black", "size": "Regular" }
+            ]
+          },
+          {
+            "id": "cap-beige",
+            "name": "Staff Cap",
+            "nameJa": "スタッフキャップ",
+            "basePrice": 3000,
+            "description": "The Felicity staff cap is a functional piece born from necessity: protection from sun and salt spray while working the espresso bar, mixing coffee, or serving guests outdoors. Unstructured, breathable, and minimal—it carries the aesthetic of working culture. Available in grey, black, and beige.",
+            "descriptionJa": "Felicityのスタッフキャップは、必要性から生まれた実用的なピース。エスプレッソバーでの作業、コーヒーのブレンド、屋外でのサービス—日差しと塩水の影響から身を守る。アンストラクチャード、通気性、最小限のデザイン。ワーキングカルチャーの美学を体現しています。グレー、ブラック、ベージュ3色展開。",
+            "color": "Beige",
+            "images": ["/apparel/cap-beige.jpg"],
+            "variants": [
+              { "id": "cap-beige-regular", "productId": "cap-beige", "name": "Staff Cap Beige", "basePrice": 3000, "color": "Beige", "size": "Regular" }
+            ]
+          }
+        ],
+        "hoodie": {
+          "id": "hoodie",
+          "name": "Pullover Hoodie",
+          "nameJa": "プルオーバーパーカー",
+          "basePrice": 11000,
+          "description": "A substantial piece for coastal living. The pullover hoodie is engineered for layering in Hayama's temperamental weather—wind, rain, salt air. Premium heavyweight cotton-blend construction, thoughtfully sized for comfortable wearing over long-sleeves or tees. The muted color palette and understated branding position it as a versatile essential.",
+          "descriptionJa": "沿岸生活のための実質的なピース。プルオーバーパーカーは、葉山の気まぐれな気候—風、雨、塩を含む空気—でのレイヤリングを想定した設計。プレミアムなヘビーウェイト綿混素材、長袖やTシャツの上に快適に着用できるサイジング。控えめな色合いと目立たないブランディングが、万能な必需品として機能します。",
+          "sizes": ["M", "L", "XL", "XXL"],
+          "images": ["/apparel/hoodie-pullover.jpg"],
+          "variants": [
+            { "id": "hoodie-m", "productId": "hoodie", "name": "Pullover Hoodie", "basePrice": 11000, "size": "M" },
+            { "id": "hoodie-l", "productId": "hoodie", "name": "Pullover Hoodie", "basePrice": 11000, "size": "L" },
+            { "id": "hoodie-xl", "productId": "hoodie", "name": "Pullover Hoodie", "basePrice": 11000, "size": "XL" },
+            { "id": "hoodie-xxl", "productId": "hoodie", "name": "Pullover Hoodie", "basePrice": 11000, "size": "XXL" }
+          ]
+        },
+        "sweatshirt": {
+          "id": "sweatshirt",
+          "name": "College Sweatshirt",
+          "nameJa": "カレッジスウェットシャツ",
+          "basePrice": 8000,
+          "description": "Inspired by the heritage of American college culture and the nostalgia of shared identity, this sweatshirt is a statement of belonging. Built from durable, brushed-back cotton-blend fabric designed to feel softer with each wash. Roomier cut, perfect for layering or wearing solo.",
+          "descriptionJa": "アメリカのカレッジ文化と共有のノスタルジアにインスパイアされたスウェット。ブラッシュバック綿混素材で、洗うたびに柔らかくなるように設計。ゆったりとしたカット、レイヤリングでも単品でも。",
+          "sizes": ["M", "L", "XL", "XXL"],
+          "images": ["/apparel/sweatshirt-college.jpg"],
+          "variants": [
+            { "id": "sweatshirt-m", "productId": "sweatshirt", "name": "College Sweatshirt", "basePrice": 8000, "size": "M" },
+            { "id": "sweatshirt-l", "productId": "sweatshirt", "name": "College Sweatshirt", "basePrice": 8000, "size": "L" },
+            { "id": "sweatshirt-xl", "productId": "sweatshirt", "name": "College Sweatshirt", "basePrice": 8000, "size": "XL" },
+            { "id": "sweatshirt-xxl", "productId": "sweatshirt", "name": "College Sweatshirt", "basePrice": 8000, "size": "XXL" }
+          ]
+        },
+        "beanie": {
+          "id": "beanie-staff",
+          "name": "Staff Beanie — Grey Only",
+          "nameJa": "スタッフビーニー",
+          "basePrice": 5000,
+          "description": "The essentials of winter at the coast: a warm, functional beanie born from staff experience. Timeless grey, knit from soft merino-wool blend for temperature regulation and comfort. Minimal branding, maximum utility.",
+          "descriptionJa": "冬の海岸生活に必須なビーニー。スタッフの日常から生まれた、暖かく実用的な一枚。タイムレスなグレー。ソフトなメリノウール混で、温度調整と快適性を実現。最小限のブランディング、最大限の実用性。",
+          "colors": ["Grey"],
+          "images": ["/apparel/beanie-staff.jpg"],
+          "variants": [
+            { "id": "beanie-staff-grey", "productId": "beanie-staff", "name": "Staff Beanie — Grey Only", "basePrice": 5000, "color": "Grey" }
+          ]
+        },
+        "tumbler": {
+          "id": "tumbler",
+          "name": "Rivers Tumbler",
+          "nameJa": "Rivers タンブラー",
+          "basePrice": 3300,
+          "description": "Rivers stainless steel tumbler. Excellent heat retention and cooling performance. Easy to drink from, doesn't spill, easy to wash.",
+          "descriptionJa": "コーヒー文化のためのステンレスタンブラー。Felicityラテを山道へ、朝のコーヒーを静かな時間へ。熱効率を設計の中心に、ホットはホットに、冷たいは冷たく保ちます。葉山の風景を潤す川にちなんだ名前。走行の瞬間にも、静寂の時間にも、相応しいコンパニオン。",
+          "images": ["/apparel/tumbler.jpg"],
+          "variants": [
+            { "id": "tumbler-regular", "productId": "tumbler", "name": "Rivers Tumbler", "basePrice": 3300 }
+          ]
+        }
+      }
+    },
+    "visit": {
+      "label": "Find Us",
+      "address": "2432-3 Kamiyamaguchi, Hayama-cho, Miura-gun, Kanagawa",
+      "hours": [
+        {
+          "day": "Mon, Tue, Fri",
+          "hours": "11:00 – 17:00"
+        },
+        {
+          "day": "Sat, Sun",
+          "hours": "9:00 – 17:00"
+        },
+        {
+          "day": "Closed",
+          "hours": "Wed, Thu"
+        }
+      ]
+    },
+    "nav": {
+      "coffee": "Coffee",
+      "merch": "Goods",
+      "workshop": "Workshop",
+      "visit": "Visit",
+      "contact": "Contact"
+    },
+    "footer": {
+      "copyright": "Felicity © 2026 Hayama, Japan",
+      "about": "About",
+      "contact": "Contact",
+      "instagram": "Instagram",
+      "line": "LINE",
+      "disclosure": "Disclosure"
+    }
+  },
+  "checkout": {
+    "shippingAddress": "Shipping Address",
+    "fullName": "Full Name",
+    "phone": "Phone Number",
+    "postalCode": "Postal Code",
+    "postalCodeFormat": "Postal Code (XXX-XXXX)",
+    "prefecture": "Prefecture",
+    "city": "City",
+    "streetAddress": "Street Address",
+    "building": "Building/Apartment (Optional)",
+    "postalCodeInvalid": "Invalid postal code format. Please use XXX-XXXX format.",
+    "allFieldsRequired": "Please fill in all required fields."
+  },
+  "about": {
+    "title": "Why Coffee, Why Hayama",
+    "subtitle": "Our Philosophy",
+    "content": "Why coffee? For me, it begins in New York in 1987.\n\nWhile I was at NYU, I had my first truly memorable café latte at Caffè Dante on Greenwich Village.\nIt was not just something to wake me up, but something to be savored.\nFor the first time, I felt that coffee could be more than a drink — it could be an experience, shaped by aroma, temperature, and even the pause before the first sip.\n\nToday, espresso and lattes feel completely familiar, but in Japan at that time, they were still far from everyday culture.\nThat is why the experience stayed with me so strongly.\nIt was the moment coffee became more than something to consume. It became something to appreciate with time, atmosphere, and attention.\n\nOf course, I did not immediately think I would one day open a coffee shop.\nLife moved in other directions. I spent many years working as a photographer, traveling, and living a life shaped by motion.\nMotorcycles were an important part of that.\nBy the age of thirty, I had ridden through all forty-seven prefectures of Japan, and I also took on the Dakar Rally.\nFor me, motorcycles were never just a way to get around. They were a way of getting closer to the world — of feeling distance, weather, texture, and place more directly.\n\nBut knowing the joy of movement also teaches you the value of stopping.\nThere are things you cannot see at speed, and certain feelings only return when you slow down.\nI think coffee has the power to create that kind of time.\n\nAfter moving to Hayama, that feeling became even more natural.\nHayama carries a rhythm that is very different from the city.\nThe sea, the mountains, the wind, and the changing light are always close.\nRather than pushing through the day, life here seems to move with the weather, the waves, and the air itself.\nPlay and daily life exist side by side, and there is room to breathe without feeling that time is being lost.\nThat sense of place is an important part of what FELICITY is.\n\nHayama is not only where we live. It is also a field for play and discovery.\nOn the way to the sea, before heading into the hills, setting out on a motorcycle or bicycle, or coming back from a day outdoors — I wanted FELICITY to feel like a kind of gateway to that rhythm of Hayama.\n\nThe name FELICITY comes from kofuku — happiness — taken from Koufuku-Shokai, a well-known vintage motorcycle shop that once stood here.\nIt is a small gesture of respect to the memory already rooted in this place, while also marking the beginning of something new.\n\nWhat we hope to offer is coffee that creates a little space in everyday life.\nInspired by the richness of espresso culture I first encountered in New York, and by the quiet care of the Japanese kissaten, we aim for a cup with depth, balance, and calm.\n\nCoffee may not change a life in some dramatic way.\nBut it can change the course of a day.\nIt can reset your mind, deepen your breath, or create a moment to share with someone else.\nSometimes, simply pausing for a moment lets you see things differently.\n\nIf FELICITY can become that kind of place within the air and rhythm of Hayama, then that would mean everything to us.\nAnd if each cup can lead, in its own way, to \"a cup full of happiness,\" then all the better.\n\n— Rowland Kirishima"
+  }
+}

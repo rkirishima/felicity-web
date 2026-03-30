@@ -1,0 +1,553 @@
+{
+  "experiences": {
+    "title": "Experiences",
+    "heading": "体験を通じて、つながる",
+    "explanation": "Felicityは、人がつながる場所です。コーヒーはきっかけに過ぎません。本当の幸福は、誰かと一緒に何かを学び、何かを作り、時間を過ごすことから生まれます。焙煎、パドリング、シルバークラフト。どの体験でも、それは立ち止まり、人とつながり、人生が豊かになる瞬間への招待です。",
+    "cta": "ワークショップ、イベント、アクティビティの最新情報はInstagramをフォローしてください。",
+    "workshops": [
+      {
+        "name": "焙煎",
+        "desc": "当店のプロバットで直火焙煎を学ぶ。豆の産地とプロセスを発見する。"
+      },
+      {
+        "name": "ピラティス",
+        "desc": "海風の中で、意図を持ってコアを鍛える。"
+      },
+      {
+        "name": "編み物",
+        "desc": "手で作る。ゆっくりなクラフト、速い会話。"
+      },
+      {
+        "name": "写真",
+        "desc": "光、動き、瞬間を撮る。テクニックと遊び。"
+      },
+      {
+        "name": "シルバー",
+        "desc": "金属を形づくる。自分の一部になるものをつくる。"
+      },
+      {
+        "name": "マウンテンバイク",
+        "desc": "湘南の山々を走る。そしてコーヒーで帰る。"
+      },
+      {
+        "name": "SUP",
+        "desc": "葉山の海をパドリング。水、空、バランス。"
+      },
+      {
+        "name": "フラワーアレンジメント",
+        "desc": "意図を花に。茎を静寂に変える。"
+      },
+      {
+        "name": "ヨガ",
+        "desc": "風とともに呼吸する。自分の中心へ戻る。"
+      }
+    ]
+  },
+  "homepage": {
+    "title": "スペシャルティコーヒー",
+    "tagline": "葉山、日本 — 2024年設立",
+    "scrollAriaLabel": "下にスクロール",
+    "coffee": {
+      "label": "シングルオリジン / 現在のオファリング",
+      "beans": {
+        "brazilSantaAlina": {
+          "name": "Brazil Santa Alina",
+          "shortDesc": "ボディ厚め、低酸度 / ヘーゼルナッツ、ダークチョコレート",
+          "description": "ブラジルコーヒーの中心地であるBSCA/モンテアレグレ地域から生まれたサンタアリーナは、ブラジルコーヒーの古典的なプロファイルを最高の透明感で表現しています。ナチュラル精製されたこの豆は、ブラジルコーヒーで珍重される独特の甘さとともに、重厚でシロップ状のボディをもたらします。カップには焙煎ヘーゼルナッツ、ダークチョコレート、微かなシトラスのアンダートーンが表現されます。低酸度のため非常に飲みやすく、ロングエスプレッソからミルク系ドリンクまで幅広く対応します。サンタアリーナはブラジルコーヒーが世界的基準として認識される理由—バランスと信頼性—を見事に体現しています。",
+          "roastLevel": {
+            "level": "dark",
+            "dots": 3,
+            "label": "フルシティ（ダーク）"
+          }
+        },
+        "guatemalaFincaGualvador": {
+          "name": "Guatemala Finca Gualvador (Anaerobic)",
+          "shortDesc": "アナエロビック・ナチュラル。ワインのような酸度、ダークベリー、シロップ状のカカオ。",
+          "description": "グアテマラのラクプラエステートのフィンカグアルバドルは、革新的なアナエロビック（嫌気性）発酵プロセスを採用し、豆を複雑でワイン的な体験へと変容させます。密閉条件での発酵中、酵素は酸素なしで機能し、強烈なフルーティーな香気と層状のフレーバープロファイルを生み出します。このプロセスは自然に存在する酸度を洗練されたワイン的な質感に昇華させ、ブラックベリーやブルーベリーのダークベリーノート、シロップ状のカカオ、微かなスパイスが調和します。カップは明るくバランスの取れた、重みのないフルボディを呈します。慣例的なフレーバープロファイルに挑戦する実験的コーヒーを求める人々に最適です。",
+          "roastLevel": {
+            "level": "medium",
+            "dots": 2,
+            "label": "シティ+（ミディアム）"
+          }
+        },
+        "colombiaDecaf": {
+          "name": "Colombia Decaf",
+          "shortDesc": "滑らかなキャラメルの甘さ / ミディアムボディ / カフェイン除去",
+          "description": "OMWカフェのコロンビアンデカフは、カフェイン除去がフレーバーを犠牲にしないことを証明する、成長するスペシャルティデカフの世界を代表しています。この100%オーガニック、倫理的に調達された豆は、脱カフェイン後もコロンビアの古典的キャラクターを保持しつつ、注目すべき複雑性を達成しています。カップは滑らかなキャラメルの甘さと、微かなチョコレートとナッティーなアンダートーンを明かします。ミディアムボディは、時に脱カフェイン珈琲に関連する重さなしに満足のいく構造を提供します。夜間のお楽しみとしてもカフェイン感受性のある方にも、デカフはスペシャルティコーヒーの美徳がカフェイン含有量を超えて広がることを証明します。味覚と幸福の両方を尊重する優雅な選択です。",
+          "roastLevel": {
+            "level": "dark",
+            "dots": 3,
+            "label": "フルシティ（ダーク）"
+          }
+        },
+        "ethiopiaYirgacheffe": {
+          "name": "Ethiopia Yirgacheffe",
+          "shortDesc": "明るいフローラル、ジャスミン / 紅茶のようなボディ / シトラスノート",
+          "description": "SEHコーヒーハウスのイルガチェフェはコーヒー発祥の地エチオピアの心を表現する、ナチュラルサンドライの１級豆です。このシングルオリジンは、エチオピアコーヒーが重宝される繊細なフローラル特性を展開し、最初の一口の前からカップを香気でいっぱいにするジャスミンの香りが顕著です。フレーバープロファイルはレモンとベルガモットのような明るいシトラスノートで展開し、重さではなく優雅さが特徴の紅茶のようなボディとバランスしています。ナチュラルプロセシングは微かなフルーティーなアンダートーンを付与し、複雑でありながら調和したカップを創出します。イルガチェフェはその産地の洗練された高地コーヒー文化を体現し、本物のエチオピア体験を求める者にとって完璧です。",
+          "roastLevel": {
+            "level": "light",
+            "dots": 1,
+            "label": "シティ（ライト）"
+          }
+        },
+        "panamaGeisha": {
+          "name": "Panama Geisha",
+          "shortDesc": "ウルトラプレミアム / フローラル & ピーチ / シルキーな優雅さ",
+          "description": "エスメラルダエステートのパナマゲイシャは、コーヒーの世界において、ワインに相当する品質の極み—蒐集家向けの豆であり、経験の価値があるオリジンストーリーです。このウルトラプレミアム品種はエチオピア発祥ですが、パナマの独特なテロワールで成長し、その稀少性と優秀さを反映した価格を命じります。カップは強烈なフローラルノート—ベルガモットとジャスミン—で溢れ、その後パッションフルーツ、パイナップル、微かなハチミツの甘さなどの繊細なトロピカルフルーツレイヤーが続きます。ボディは洗練されてシルキーで、その伝説的な状態を正当化する空想的な質感を備えています。ゲイシャはその準備において敬意を要求し、ポアオーバーまたは軽いエスプレッソ抽出がその完全な複雑性を明かします。真摯なコーヒー愛好家にとっての一生に一度のカップです。",
+          "roastLevel": {
+            "level": "light",
+            "dots": 1,
+            "label": "シティ（ライト）"
+          }
+        },
+        "yemenWhiteCamel": {
+          "name": "Yemen White Camel",
+          "shortDesc": "エキゾチックなスパイス / 深い土っぽさ / ドライフルーツのアンダートーン",
+          "description": "イエメンホワイトキャメルは、世界で最も伝説的で複雑なコーヒーオリジンの一つを表現しています。このナチュラルプロセスされた豆は、500年以上前にコーヒーが最初に栽培されたイエメンコーヒー文化の古い遺産を担っています。カップはエキゾチックなスパイスノート—カルダモン、シナモン—のソフィスティケーテッドなバランスを呈し、革やシダーを思わせる深い大地のアンダートーンで根づいています。ドライフルーツの特性が二次的なノートとして浮かび上がり、複雑さにニュアンスを加えます。ボディはワイン的で重みがあり、スパイスの温かさを引き継ぐフィニッシュは長く続きます。イエメンホワイトキャメルはゆっくりとした鑑賞を要求し、これはコーヒーの歴史的・文化的ルーツの探求を求める瞑想的なコーヒーです。",
+          "roastLevel": {
+            "level": "dark",
+            "dots": 3,
+            "label": "フルシティ（ダーク）"
+          }
+        },
+        "papuaNewGuinea": {
+          "name": "Papua New Guinea",
+          "shortDesc": "ワイルド & シロップ状 / セイボリーなエッジ / トロピカルフルーツ",
+          "description": "SUCAFINAのパプアニューギニアはウォッシュト・ロー・アラビカであり、その山岳地帯オリジンの縛られざるキャラクターを捉えています。火山性土壌の高地で栽培されたこれらの豆は、独特のワイルドなプロファイルを発展させます—シロップ状でフルボディのありながら、PNGを通常のオリジンと区別する興味深いサボリーなエッジを持ちます。パッションフルーツとマンゴーのトロピカルフルーツノートが表面下で浮かび上がり、慣例的でないフレーバージャーニーを創出します。酸度は顕著でありながら調和的で、豊かさを鮮烈さで切り裂きます。これはアドベンチャーな味覚を持つコーヒー愛好家向けのコーヒーです。PNGはテロワール駆動の複雑性を提供し、探求と実験に報いるものです。",
+          "roastLevel": {
+            "level": "medium",
+            "dots": 2,
+            "label": "シティ+～フルシティ"
+          }
+        },
+        "jamaicaBlueMountain": {
+          "name": "Jamaica Blue Mountain No. 1",
+          "shortDesc": "完璧なバランス / マイルド & スムーズ / ビターネスゼロ",
+          "description": "ジャマイカブルーマウンテンは、ジャマイカのブルーマウンテン地域にのみ栽培される、世界で最も求められ且つ高価なコーヒーの一つとして立っています。このグレード1の豆は、理想的な条件での高地栽培で育ち、顕著な滑らかさとバランスのカップを生成します。フレーバープロファイルは洗練されてマイルドで、微かなチョコレートとナッティーな特性を持ちながら、純粋でクリーンなカップを決して圧倒しません。酸度はジェントルで測定されており、ビターネスは完全に欠如しています。ボディはミディアムでありながらフルフレーバーで、ブルーマウンテンが如何に優れたテロワールが最小限の介入を必要とするかの範例的な例となります。これは「夢を見るコーヒー」です—滑らか、包み込む、そして単純で純粋な享受のための瞑想的な朝のリチュアルに最適です。",
+          "roastLevel": {
+            "level": "medium",
+            "dots": 2,
+            "label": "シティ+（ミディアム）"
+          }
+        },
+        "elSalvadorFincaLaFany": {
+          "name": "El Salvador Finca La Fany",
+          "shortDesc": "甘い & クリーミー / プラム & ハチミツ / ダークチョコレート",
+          "description": "エルサルバドルフィンカラファニーは、持続可能で高品質な生産に専念する家族経営農園で栽培される、中米スペシャルティコーヒーの成長する優秀性を表現しています。このウォッシュト・アラビカは、明らかに甘いプロファイルを発展させ、クリーミーなマウスフィール属性を持ち、非常にアクセス可能にします。熟したプラムのフレーバーノート、ハニードチョコレート、微かなキャラメルの特徴が、追加の甘味化の必要性が稀な自然に甘いカップを創出します。ミディアムボディは重さなしに構造を提供し、複数の抽出方法に対して用途が広いです。エルサルバドルはアクセス可能性と複雑性のバランスを求める者にとって、キャラクターと品質の優秀性を生産するための認識を続けて獲得しています。フィンカラファニーはこの上向きの軌道を範例化します。",
+          "roastLevel": {
+            "level": "medium",
+            "dots": 2,
+            "label": "シティ+（ミディアム）"
+          }
+        }
+      }
+    },
+    "merch": {
+      "label": "アパレル・グッズ",
+      "apparel": {
+        "tshirts": [
+          {
+            "id": "tshirt-drive-date",
+            "name": "Drive Date",
+            "nameJa": "Drive Date",
+            "basePrice": 4500,
+            "description": "An owner's tribute to their beloved VW Thing—the vehicle that carries memories of coastal drives with Doug & Julie through Hayama's winding roads. This white tee captures the spirit of those unhurried journeys, where every turn reveals new light on familiar paths. Inspired by conversations under Hayama sky, with gratitude to Hanna Kirishima for the story these moments tell. Medium weight, 100% cotton—a piece for those who understand that the best drives aren't about the destination.",
+            "descriptionJa": "オーナーが愛してやまないVW Thing—葉山の曲がりくねった道を、Doug & Julieとドライブした思い出を乗せた一台。この白いTシャツは、馴染みの道を走るたびに新しい光が見える、その悠々とした時間を映し出している。葉山の空の下での会話に着想を得、桐島ハンナへの感謝を込めて。この瞬間が語る物語に捧ぐ一枚。100%コットン素材—目的地よりも、ドライブそのものの価値を知る人のための逸品。",
+            "color": "White",
+            "sizes": [
+              "M",
+              "L",
+              "XL"
+            ],
+            "images": [
+              "/apparel/drive-date.jpg"
+            ],
+            "variants": [
+              {
+                "id": "tshirt-drive-date-m",
+                "productId": "tshirt-drive-date",
+                "name": "Drive Date on Thing",
+                "basePrice": 4500,
+                "color": "White",
+                "size": "M"
+              },
+              {
+                "id": "tshirt-drive-date-l",
+                "productId": "tshirt-drive-date",
+                "name": "Drive Date on Thing",
+                "basePrice": 4500,
+                "color": "White",
+                "size": "L"
+              },
+              {
+                "id": "tshirt-drive-date-xl",
+                "productId": "tshirt-drive-date",
+                "name": "Drive Date on Thing",
+                "basePrice": 4500,
+                "color": "White",
+                "size": "XL"
+              }
+            ]
+          },
+          {
+            "id": "tshirt-peace-biker",
+            "name": "Peace Biker",
+            "nameJa": "Peace Biker",
+            "basePrice": 4500,
+            "description": "Illustrated by Kirishima Hanna, this peaceful chopper design captures the essence of the open road. 100% cotton, comfortable fit.",
+            "descriptionJa": "桐島ハンナのイラストによる穏やかなチョッパーライダー。シンプルで素朴な一枚。100%コットン。",
+            "color": "White",
+            "sizes": [
+              "M",
+              "L",
+              "XL",
+              "XXL"
+            ],
+            "images": [
+              "/apparel/peace-biker.jpg"
+            ],
+            "variants": [
+              {
+                "id": "tshirt-peace-biker-m",
+                "productId": "tshirt-peace-biker",
+                "name": "Peace Biker",
+                "basePrice": 4500,
+                "color": "White",
+                "size": "M"
+              },
+              {
+                "id": "tshirt-peace-biker-l",
+                "productId": "tshirt-peace-biker",
+                "name": "Peace Biker",
+                "basePrice": 4500,
+                "color": "White",
+                "size": "L"
+              },
+              {
+                "id": "tshirt-peace-biker-xl",
+                "productId": "tshirt-peace-biker",
+                "name": "Peace Biker",
+                "basePrice": 4500,
+                "color": "White",
+                "size": "XL"
+              },
+              {
+                "id": "tshirt-peace-biker-xxl",
+                "productId": "tshirt-peace-biker",
+                "name": "Peace Biker",
+                "basePrice": 4500,
+                "color": "White",
+                "size": "XXL"
+              }
+            ]
+          },
+          {
+            "id": "tshirt-la-motarde",
+            "name": "La Motarde",
+            "nameJa": "La Motarde",
+            "basePrice": 4500,
+            "description": "Inspired by Marianne Faithfull, illustrated by world-renowned fashion illustrator Hiroshi Tanabe. Features a Triumph racer in bold, timeless design.",
+            "descriptionJa": "マリアンヌ・フェイスフルに着想を得て、ファッション・イラストレーター・田辺ヒロシが描いたトリアンフ・レーサー。クラシカルで大胆なデザイン。100%コットン。",
+            "color": "Grey",
+            "sizes": [
+              "M",
+              "L",
+              "XL",
+              "XXL"
+            ],
+            "images": [
+              "/apparel/tshirt-la-motarde.jpg"
+            ],
+            "variants": [
+              {
+                "id": "tshirt-la-motarde-m",
+                "productId": "tshirt-la-motarde",
+                "name": "La Motarde",
+                "basePrice": 4500,
+                "color": "Grey",
+                "size": "M"
+              },
+              {
+                "id": "tshirt-la-motarde-l",
+                "productId": "tshirt-la-motarde",
+                "name": "La Motarde",
+                "basePrice": 4500,
+                "color": "Grey",
+                "size": "L"
+              },
+              {
+                "id": "tshirt-la-motarde-xl",
+                "productId": "tshirt-la-motarde",
+                "name": "La Motarde",
+                "basePrice": 4500,
+                "color": "Grey",
+                "size": "XL"
+              },
+              {
+                "id": "tshirt-la-motarde-xxl",
+                "productId": "tshirt-la-motarde",
+                "name": "La Motarde",
+                "basePrice": 4500,
+                "color": "Grey",
+                "size": "XXL"
+              }
+            ]
+          }
+        ],
+        "caps": [
+          {
+            "id": "cap-grey",
+            "name": "Staff Cap",
+            "nameJa": "スタッフキャップ",
+            "basePrice": 3000,
+            "description": "The Felicity staff cap is a functional piece born from necessity: protection from sun and salt spray while working the espresso bar, mixing coffee, or serving guests outdoors. Unstructured, breathable, and minimal—it carries the aesthetic of working culture. Available in grey, black, and beige.",
+            "descriptionJa": "Felicityのスタッフキャップは、必要性から生まれた実用的なピース。エスプレッソバーでの作業、コーヒーのブレンド、屋外でのサービス—日差しと塩水の影響から身を守る。アンストラクチャード、通気性、最小限のデザイン。ワーキングカルチャーの美学を体現しています。グレー、ブラック、ベージュ3色展開。",
+            "color": "Grey",
+            "images": [
+              "/apparel/cap-grey.jpg"
+            ],
+            "variants": [
+              {
+                "id": "cap-grey-regular",
+                "productId": "cap-grey",
+                "name": "Staff Cap Grey",
+                "basePrice": 3000,
+                "color": "Grey",
+                "size": "Regular"
+              }
+            ]
+          },
+          {
+            "id": "cap-black",
+            "name": "Staff Cap",
+            "nameJa": "スタッフキャップ",
+            "basePrice": 3000,
+            "description": "The Felicity staff cap is a functional piece born from necessity: protection from sun and salt spray while working the espresso bar, mixing coffee, or serving guests outdoors. Unstructured, breathable, and minimal—it carries the aesthetic of working culture. Available in grey and black.",
+            "descriptionJa": "Felicityのスタッフキャップは、必要性から生まれた実用的なピース。エスプレッソバーでの作業、コーヒーのブレンド、屋外でのサービス—日差しと塩水の影響から身を守る。アンストラクチャード、通気性、最小限のデザイン。ワーキングカルチャーの美学を体現しています。グレー、ブラック両色展開。",
+            "color": "Black",
+            "images": [
+              "/apparel/cap-black.jpg"
+            ],
+            "variants": [
+              {
+                "id": "cap-black-regular",
+                "productId": "cap-black",
+                "name": "Staff Cap Black",
+                "basePrice": 3000,
+                "color": "Black",
+                "size": "Regular"
+              }
+            ]
+          },
+          {
+            "id": "cap-beige",
+            "name": "Staff Cap",
+            "nameJa": "スタッフキャップ",
+            "basePrice": 3000,
+            "description": "The Felicity staff cap is a functional piece born from necessity: protection from sun and salt spray while working the espresso bar, mixing coffee, or serving guests outdoors. Unstructured, breathable, and minimal—it carries the aesthetic of working culture. Available in grey, black, and beige.",
+            "descriptionJa": "Felicityのスタッフキャップは、必要性から生まれた実用的なピース。エスプレッソバーでの作業、コーヒーのブレンド、屋外でのサービス—日差しと塩水の影響から身を守る。アンストラクチャード、通気性、最小限のデザイン。ワーキングカルチャーの美学を体現しています。グレー、ブラック、ベージュ3色展開。",
+            "color": "Beige",
+            "images": ["/apparel/cap-beige.jpg"],
+            "variants": [
+              {
+                "id": "cap-beige-regular",
+                "productId": "cap-beige",
+                "name": "Staff Cap Beige",
+                "basePrice": 3000,
+                "color": "Beige",
+                "size": "Regular"
+              }
+            ]
+          }
+        ],
+        "hoodie": {
+          "id": "hoodie",
+          "name": "Pullover Hoodie",
+          "nameJa": "プルオーバーパーカー",
+          "basePrice": 11000,
+          "description": "A substantial piece for coastal living. The pullover hoodie is engineered for layering in Hayama's temperamental weather—wind, rain, salt air. Premium heavyweight cotton-blend construction, thoughtfully sized for comfortable wearing over long-sleeves or tees. The muted color palette and understated branding position it as a versatile essential.",
+          "descriptionJa": "沿岸生活のための実質的なピース。プルオーバーパーカーは、葉山の気まぐれな気候—風、雨、塩を含む空気—でのレイヤリングを想定した設計。プレミアムなヘビーウェイト綿混素材、長袖やTシャツの上に快適に着用できるサイジング。控えめな色合いと目立たないブランディングが、万能な必需品として機能します。",
+          "sizes": [
+            "M",
+            "L",
+            "XL",
+            "XXL"
+          ],
+          "images": [
+            "/apparel/hoodie-pullover.jpg"
+          ],
+          "variants": [
+            {
+              "id": "hoodie-m",
+              "productId": "hoodie",
+              "name": "Pullover Hoodie",
+              "basePrice": 11000,
+              "size": "M"
+            },
+            {
+              "id": "hoodie-l",
+              "productId": "hoodie",
+              "name": "Pullover Hoodie",
+              "basePrice": 11000,
+              "size": "L"
+            },
+            {
+              "id": "hoodie-xl",
+              "productId": "hoodie",
+              "name": "Pullover Hoodie",
+              "basePrice": 11000,
+              "size": "XL"
+            },
+            {
+              "id": "hoodie-xxl",
+              "productId": "hoodie",
+              "name": "Pullover Hoodie",
+              "basePrice": 11000,
+              "size": "XXL"
+            }
+          ]
+        },
+        "sweatshirt": {
+          "id": "sweatshirt",
+          "name": "College Sweatshirt",
+          "nameJa": "カレッジスウェットシャツ",
+          "basePrice": 8000,
+          "description": "Inspired by the heritage of American college culture and the nostalgia of shared identity, this sweatshirt is a statement of belonging. Built from durable, brushed-back cotton-blend fabric designed to feel softer with each wash. Roomier cut, perfect for layering or wearing solo.",
+          "descriptionJa": "アメリカのカレッジ文化と共有のノスタルジアにインスパイアされたスウェット。ブラッシュバック綿混素材で、洗うたびに柔らかくなるように設計。ゆったりとしたカット、レイヤリングでも単品でも。",
+          "sizes": [
+            "M",
+            "L",
+            "XL",
+            "XXL"
+          ],
+          "images": [
+            "/apparel/sweatshirt-college.jpg"
+          ],
+          "variants": [
+            {
+              "id": "sweatshirt-m",
+              "productId": "sweatshirt",
+              "name": "College Sweatshirt",
+              "basePrice": 8000,
+              "size": "M"
+            },
+            {
+              "id": "sweatshirt-l",
+              "productId": "sweatshirt",
+              "name": "College Sweatshirt",
+              "basePrice": 8000,
+              "size": "L"
+            },
+            {
+              "id": "sweatshirt-xl",
+              "productId": "sweatshirt",
+              "name": "College Sweatshirt",
+              "basePrice": 8000,
+              "size": "XL"
+            },
+            {
+              "id": "sweatshirt-xxl",
+              "productId": "sweatshirt",
+              "name": "College Sweatshirt",
+              "basePrice": 8000,
+              "size": "XXL"
+            }
+          ]
+        },
+        "beanie": {
+          "id": "beanie-staff",
+          "name": "Staff Beanie — Grey Only",
+          "nameJa": "スタッフビーニー",
+          "basePrice": 5000,
+          "description": "The essentials of winter at the coast: a warm, functional beanie born from staff experience. Timeless grey, knit from soft merino-wool blend for temperature regulation and comfort. Minimal branding, maximum utility.",
+          "descriptionJa": "冬の海岸生活に必須なビーニー。スタッフの日常から生まれた、暖かく実用的な一枚。タイムレスなグレー。ソフトなメリノウール混で、温度調整と快適性を実現。最小限のブランディング、最大限の実用性。",
+          "colors": [
+            "Grey"
+          ],
+          "images": [
+            "/apparel/beanie-staff.jpg"
+          ],
+          "variants": [
+            {
+              "id": "beanie-staff-grey",
+              "productId": "beanie-staff",
+              "name": "Staff Beanie — Grey Only",
+              "basePrice": 5000,
+              "color": "Grey"
+            }
+          ]
+        },
+        "tumbler": {
+          "id": "tumbler",
+          "name": "Rivers Tumbler",
+          "nameJa": "Rivers タンブラー",
+          "basePrice": 3300,
+          "description": "A stainless steel tumbler for coffee culture—whether it's your Felicity latte heading to a mountain ride, or your morning brew during a quiet coastal moment. Designed with thermal efficiency in mind, it keeps hot beverages hot and cold drinks cold. Named after the rivers that feed Hayama's landscape, this is the perfect companion for motion or stillness.",
+          "descriptionJa": "Riversのステンレスタンブラー。保温性も保冷性能もピカイチ。飲みやすく、こぼれにくく、洗いやすい。",
+          "images": [
+            "/apparel/tumbler.jpg"
+          ],
+          "variants": [
+            {
+              "id": "tumbler-regular",
+              "productId": "tumbler",
+              "name": "Rivers Tumbler",
+              "basePrice": 3300
+            }
+          ]
+        }
+      }
+    },
+    "visit": {
+      "label": "訪問",
+      "address": "神奈川県三浦郡葉山町上山口2432-3",
+      "hours": [
+        {
+          "day": "月・火・金",
+          "hours": "11:00 – 17:00"
+        },
+        {
+          "day": "土・日",
+          "hours": "9:00 – 17:00"
+        },
+        {
+          "day": "定休日",
+          "hours": "水・木"
+        }
+      ]
+    },
+    "nav": {
+      "coffee": "Coffee",
+      "merch": "Goods",
+      "workshop": "Workshop",
+      "visit": "Visit",
+      "contact": "Contact"
+    },
+    "footer": {
+      "copyright": "Felicity © 2026 葉山、日本",
+      "about": "About",
+      "contact": "Contact",
+      "instagram": "Instagram",
+      "line": "LINE",
+      "disclosure": "特定商取引法に基づく表記"
+    }
+  },
+  "checkout": {
+    "shippingAddress": "配送先住所",
+    "fullName": "お名前",
+    "phone": "電話番号",
+    "postalCode": "郵便番号",
+    "postalCodeFormat": "郵便番号 (XXX-XXXX)",
+    "prefecture": "都道府県",
+    "city": "市区町村",
+    "streetAddress": "住所",
+    "building": "建物名・号室（任意）",
+    "postalCodeInvalid": "郵便番号の形式が正しくありません。XXX-XXXX の形式でご入力ください。",
+    "allFieldsRequired": "すべての必須項目を入力してください。"
+  },
+  "about": {
+    "title": "Why Coffee, Why Hayama",
+    "subtitle": "Our Philosophy",
+    "content": "なぜコーヒーなのか。\nその原点は、1987年のニューヨークにあります。\n\nニューヨーク大学で過ごしていた頃、グリニッジ・ビレッジのカフェ・ダンテで、初めて本当においしいカフェラテを飲みました。\nただ眠気を覚ますための飲み物ではなく、味わうための一杯。\n香りや温度、口にするまでの空気まで含めて、コーヒーがひとつの体験になりうることを、その時初めて知りました。\n\n今では当たり前になったエスプレッソやラテも、当時の日本ではまだそれほど身近なものではありませんでした。\nだからこそ、その一杯は自分にとってとても新鮮で、強く印象に残るものになりました。\nコーヒーが、ただ飲むものではなく、時間や空気まで含めて味わうものになった瞬間でした。\n\nもちろん、その時すぐにコーヒーの店をやろうと思ったわけではありません。\nその後の私は、写真の仕事を続けながら、さまざまな土地を訪れ、動き続けるように生きてきました。\nモーターサイクルも、その大切な一部でした。\n三十歳までにバイクで四十七都道府県を巡り、ダカールラリーにも挑戦しました。\n自分にとってバイクは、ただの乗り物ではなく、世界との距離を縮め、感覚を開いてくれる存在だったのだと思います。\n\nでも、動くことのよろこびを知っているからこそ、立ち止まる時間の大切さもわかるようになりました。\n速さの中では見えないものがあり、止まることで初めて戻ってくる感覚がある。\nコーヒーには、そんな時間をつくる力があると思っています。\n\n葉山に移り住んでから、その感覚はさらに自然なものになりました。\n葉山には、都会とは少し違う時間が流れています。\n海と山が近く、風が抜け、光の変化が近くにある。\n何かを詰め込んで進むというよりも、その日の天気や波や空気に合わせて、人の時間が少しだけやわらかく動いていく。\n遊ぶことと暮らすことが無理なくつながっていて、急ぎすぎなくても一日がちゃんと満ちていく。\nそんな土地柄そのものが、この店の大切な一部になっています。\n\nここは、ただ暮らす場所というだけでなく、遊びのフィールドでもあります。\n海へ向かう朝、山へ入る前、バイクや自転車で走り出す途中、そして遊び終えて少し力を抜く時間。\nFELICITYは、そんな葉山の時間の流れの中にある、ひとつの入口のような場所でありたいと思っています。\n\nFELICITYという名前は、この場所にあった、ヴィンテージバイク好きのあいだでよく知られた「幸福商會」の\"幸福\"を英語にしたものです。\nこの土地に残っていた名前の余韻に敬意を払いながら、ここから新しい時間を始めたい。\nそんな思いを込めて、この名前を選びました。\n\n私たちが目指しているのは、日常の中に小さな余白をつくるコーヒーです。\nニューヨークで出会ったエスプレッソの豊かさと、日本の喫茶店文化が育んできた静かで丁寧な時間。\nそのどちらにも敬意を払いながら、深みとバランスのある一杯を届けたいと思っています。\n\nコーヒーは、人生を大きく変えるものではないかもしれません。\nでも、一日の流れを少し変えることはできる。\n気持ちを整えたり、呼吸を深くしたり、誰かと時間を分かち合ったり。\nほんの少し立ち止まることで、見えてくるものがあります。\n\nFELICITYが、葉山の空気の中で、そんな時間のきっかけになる場所であれたら。\nそしてその一杯が、名前の通り、いっぱいのシアワセにつながっていけたらと思っています。\n\n— 桐島ローランド"
+  }
+}

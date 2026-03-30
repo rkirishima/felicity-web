@@ -1,0 +1,18 @@
+# Cloudflare Pages configuration
+name = "felicity-web"
+type = "javascript"
+account_id = "e4b7a94e3b8d7c9f1a2b3c4d5e6f7a8b"
+workers_dev = false
+
+[env.production]
+routes = [
+  { pattern = "felicity.cafe/*", zone_name = "felicity.cafe" }
+]
+
+[build]
+command = "npm run build"
+cwd = "./"
+watch_paths = ["app/**/*.tsx", "messages/**/*.json"]
+
+[build.upload]
+format = "modules"
