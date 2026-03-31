@@ -1,5 +1,6 @@
 import { Header } from '@/app/components/Header';
 import { Footer } from '@/app/components/Footer';
+import Image from 'next/image';
 
 export const metadata = {
   title: 'News | Felicity',
@@ -20,7 +21,15 @@ export default function NewsPageEN() {
           {/* News Article */}
           <article className="bg-white rounded-sm shadow-sm overflow-hidden mb-16">
             <div className="flex flex-col">
-              <div className="relative w-full h-64 bg-[#DDD5C5]" />
+              <div className="relative w-full h-64 bg-[#DDD5C5]">
+                <Image
+                  src="/images/news/food-truck.jpg"
+                  alt="Felicity Coffee Roasters Food Truck Launch"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
               <div className="p-8">
                 <p className="text-[12px] text-[#8C7B6B] mb-2 uppercase tracking-widest">
                   March 30, 2026
