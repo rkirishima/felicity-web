@@ -36,9 +36,9 @@ export default function NewsPage() {
           <div className="space-y-12">
             {newsItems.map((item) => (
               <article key={item.id} className="bg-white rounded-sm shadow-sm overflow-hidden">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-                  <div className="relative h-64 md:h-auto bg-[#DDD5C5]" />
-                  <div className="p-8 flex flex-col justify-center">
+                <div className="flex flex-col">
+                  <div className="relative w-full h-64 bg-[#DDD5C5]" />
+                  <div className="p-8">
                     <p className="text-[12px] text-[#8C7B6B] mb-2 uppercase tracking-widest">
                       {item.date}
                     </p>
