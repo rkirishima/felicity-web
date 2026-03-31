@@ -152,6 +152,34 @@ export default function HomePageEN() {
         </div>
       </section>
 
+      {/* ── News ─────────────────────────────────────────────────────── */}
+      <section id="news" className="bg-[#EDE5D8] pt-20 pb-24">
+        <div className="max-w-6xl mx-auto px-8">
+          <p className="font-mono text-[9px] tracking-[0.3em] text-[#8C7B6B] uppercase mb-12">News</p>
+          <article className="bg-white rounded-sm shadow-sm overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-2">
+              <div className="flex flex-col">
+                <div className="relative w-full bg-[#DDD5C5]" style={{ height: '300px' }}>
+                  <Image src="/images/news/food-truck.jpg" alt="Felicity Food Truck" fill className="object-contain" />
+                </div>
+                <div className="relative w-full bg-[#DDD5C5]" style={{ height: '300px' }}>
+                  <Image src="/images/news/roasting.jpg" alt="Felicity Roasting" fill className="object-contain" />
+                </div>
+              </div>
+              <div className="p-8 flex flex-col justify-center">
+                <p className="text-[12px] text-[#8C7B6B] mb-2 uppercase tracking-widest">March 30, 2026</p>
+                <h2 className="text-2xl font-light text-[#2C2416] mb-4">Felicity Coffee Roasters & Food Truck Launch</h2>
+                <div className="text-[14px] text-[#5C5451] leading-relaxed space-y-4">
+                  <p>We are excited to announce the launch of Felicity Coffee Roasters (FCR) and our new food truck, bringing our specialty coffee experience beyond the walls of our Hayama shop.</p>
+                  <p>The happiness we have cultivated in Hayama will now travel with us — through freshly roasted beans and a mobile coffee stand reaching new places and people.</p>
+                </div>
+                <Link href="/en/news" className="mt-6 font-mono text-[10px] tracking-[0.14em] text-[#7AAFC4] hover:text-[#2C2416] transition-colors uppercase">Read more →</Link>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
       {/* ── Visit ───────────────────────────────────────────────────────── */}
       <section id="visit" className="bg-[#F4EFE4] pt-20 pb-24">
         <div className="max-w-6xl mx-auto px-8">
