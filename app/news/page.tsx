@@ -1,6 +1,6 @@
-import { Header } from '@/app/components/Header';
 import { Footer } from '@/app/components/Footer';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export const metadata = {
   title: 'ニュース | Felicity',
@@ -10,10 +10,19 @@ export const metadata = {
 export default function NewsPage() {
   return (
     <>
-      <Header locale="ja" pathname="/news" contactLabel="お問い合わせ" />
+      {/* Simple Header with Back Link */}
+      <header className="fixed top-0 left-0 right-0 z-[100] bg-[#F4EFE4] border-b border-[#DDD5C5] py-4 px-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <Link href="/" className="text-[#2C2416] hover:text-[#8C7B6B] text-sm">
+            ← Back
+          </Link>
+          <span className="text-[#2C2416] font-light">ニュース</span>
+          <div className="w-12" />
+        </div>
+      </header>
       
       {/* Main Content */}
-      <div className="bg-[#F4EFE4] pb-16 px-4" style={{ marginTop: '80px' }}>
+      <main className="bg-[#F4EFE4] pt-24 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-light text-[#2C2416] mb-2">ニュース</h1>
           <p className="text-[#8C7B6B] mb-16">Felicityの最新情報をお届けします</p>
@@ -21,7 +30,7 @@ export default function NewsPage() {
           {/* News Article */}
           <article className="bg-white rounded-sm shadow-sm overflow-hidden mb-16">
             <div className="flex flex-col">
-              <div className="relative w-full h-64 bg-[#DDD5C5]">
+              <div className="relative w-full h-80 bg-[#DDD5C5]">
                 <Image
                   src="/images/news/food-truck.jpg"
                   alt="Felicity Coffee Roasters Food Truck"
@@ -58,7 +67,7 @@ export default function NewsPage() {
             </div>
           </article>
         </div>
-      </div>
+      </main>
 
       {/* VISIT Section */}
       <section className="bg-[#EDE5D8] py-16 px-4">
