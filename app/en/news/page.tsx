@@ -56,8 +56,22 @@ export default function NewsPageEN() {
 
       {/* VISIT Section */}
       <section id="visit" className="bg-[#EDE5D8] py-16 px-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-light text-[#2C2416] mb-12">Visit</h2>
+          
+          {/* Map */}
+          <div className="mb-12 rounded-sm overflow-hidden h-96">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3256.6789012345!2d139.6102834!3d35.2673650!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6018cc5c5c5c5c5d%3A0x5c5c5c5c5c5c5c5c!2sFelicity%20Cafe!5e0!3m2!1sen!2sjp!4v1234567890"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Location */}
             <div className="flex gap-4">
