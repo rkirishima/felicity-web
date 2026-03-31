@@ -209,7 +209,7 @@ export function CoffeeGrid({ locale = 'ja' }: CoffeeGridProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-[#DDD5C5]">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-px bg-[#DDD5C5]">
         {COFFEE_BEANS.map((bean) => {
           const itemId = `coffee-${bean.name.toLowerCase().replace(/\s+/g, '-')}`;
           const isAdded = addedId === itemId;
@@ -218,7 +218,7 @@ export function CoffeeGrid({ locale = 'ja' }: CoffeeGridProps) {
           return (
             <div
               key={bean.name}
-              className="group block h-auto overflow-hidden bg-[#EDE5D8] flex flex-col p-6 transition-all duration-300 ease-out hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
+              className="group block h-auto overflow-hidden bg-[#EDE5D8] flex flex-col p-3 md:p-6 transition-all duration-300 ease-out hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
             >
               {/* Image placeholder */}
               <div className="w-full h-48 bg-[#DDD5C5] flex items-center justify-center mb-4 relative overflow-hidden rounded-sm">

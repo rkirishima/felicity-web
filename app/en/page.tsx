@@ -1,3 +1,4 @@
+import { CollapsibleAbout } from "@/app/components/CollapsibleAbout";
 import { BulletinBoard } from "@/app/components/BulletinBoard";
 import { latestArticle } from "@/app/lib/news";
 import Link from "next/link";

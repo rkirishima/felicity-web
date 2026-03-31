@@ -1,3 +1,4 @@
+import { CollapsibleAbout } from "@/app/components/CollapsibleAbout";
 import { BulletinBoard } from "@/app/components/BulletinBoard";
 import { latestArticle } from "@/app/lib/news";
 import Link from "next/link";
@@ -79,9 +80,7 @@ export default function Home() {
           </h2>
 
           <div className="space-y-6 text-[16px] font-light text-[#2C2416] leading-relaxed">
-            {messages.about.content.split('\n\n').map((paragraph, idx) => (
-              <p key={idx} className="max-w-2xl">{paragraph}</p>
-            ))}
+            <CollapsibleAbout content={messages.about.content} />
           </div>
 
           <div className="mt-16 pt-8 border-t border-[#DDD5C5]">

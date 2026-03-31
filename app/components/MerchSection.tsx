@@ -61,7 +61,7 @@ export function MerchSection({ language = 'en', apparel }: MerchSectionProps) {
           {language === 'en' ? 'Apparel & Goods' : 'アパレル・グッズ'}
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {allItems.map((item) => (
             <ApparelCard
               key={item.id}
