@@ -53,6 +53,35 @@ export default function NewsPage() {
           </div>
         </div>
       </main>
+
+      {/* VISIT Section */}
+      <section id="visit" className="bg-[#EDE5D8] py-16 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-light text-[#2C2416] mb-12">訪問</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div>
+              <h3 className="text-[18px] font-light text-[#2C2416] mb-4">アクセス</h3>
+              <p className="text-[14px] text-[#8C7B6B] leading-relaxed mb-4">
+                〒240-0112<br />
+                神奈川県三浦郡葉山町上山口2432-3
+              </p>
+              <p className="text-[14px] text-[#8C7B6B]">
+                📧 info@felicity.cafe<br />
+                📱 Instagram: @felicity_hayama
+              </p>
+            </div>
+            <div>
+              <h3 className="text-[18px] font-light text-[#2C2416] mb-4">営業時間</h3>
+              <p className="text-[14px] text-[#8C7B6B] leading-relaxed">
+                平日: 11:00 - 17:00<br />
+                土日: 9:00 - 17:00<br />
+                定休日: 水曜・木曜
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <Footer locale="ja" />
     </>
   );
