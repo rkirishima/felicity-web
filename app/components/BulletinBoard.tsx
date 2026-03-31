@@ -30,7 +30,7 @@ export function BulletinBoard({ photos, alts }: BulletinBoardProps) {
           </div>
           {/* photo frame */}
           <div className="bg-white p-3 pb-8 shadow-lg">
-            <div className="relative w-full overflow-hidden bg-[#DDD5C5]" style={{ paddingBottom: '75%' }}>
+            <div className="relative w-full overflow-hidden bg-[#DDD5C5]" style={{ paddingBottom: '100%' }}>
               <Image
                 src={src}
                 alt={alts[i] || ''}
