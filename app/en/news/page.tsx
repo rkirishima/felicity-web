@@ -11,7 +11,7 @@ export default function NewsPageEN() {
   return (
     <>
       {/* Simple Header with Back Link */}
-      <header className="fixed top-0 left-0 right-0 z-[100] bg-[#F4EFE4] border-b border-[#DDD5C5] py-4 px-4">
+      <header className="sticky top-0 left-0 right-0 z-[50] bg-[#F4EFE4] border-b border-[#DDD5C5] py-4 px-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <Link href="/en" className="text-[#2C2416] hover:text-[#8C7B6B] text-sm">
             ← Back
@@ -22,7 +22,7 @@ export default function NewsPageEN() {
       </header>
       
       {/* Main Content */}
-      <main className="bg-[#F4EFE4] pt-24 pb-16 px-4">
+      <main className="bg-[#F4EFE4] pt-16 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-light text-[#2C2416] mb-2">News</h1>
           <p className="text-[#8C7B6B] mb-16">Latest updates from Felicity</p>
@@ -30,7 +30,7 @@ export default function NewsPageEN() {
           {/* News Article */}
           <article className="bg-white rounded-sm shadow-sm overflow-hidden mb-16">
             <div className="flex flex-col">
-              <div className="relative w-full h-80 bg-[#DDD5C5]">
+              <div className="relative w-full aspect-video bg-[#DDD5C5]">
                 <Image
                   src="/images/news/food-truck.jpg"
                   alt="Felicity Coffee Roasters Food Truck Launch"
