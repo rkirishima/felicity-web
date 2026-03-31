@@ -154,32 +154,23 @@ export default function Home() {
         </div>
       </section>      {/* ── News ─────────────────────────────────────────────────────── */}
       <section id="news" className="bg-[#EDE5D8] pt-20 pb-24">
-        <div className="max-w-6xl mx-auto px-8">
+        <div className="max-w-5xl mx-auto px-8">
           <p className="font-mono text-[9px] tracking-[0.3em] text-[#8C7B6B] uppercase mb-12">News</p>
-          <article className="bg-white rounded-sm shadow-sm overflow-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-2">
-              <div className="flex flex-col">
-                <div className="relative w-full bg-[#DDD5C5]" style={{ height: '300px' }}>
-                  <Image src="/images/news/food-truck.jpg" alt="Felicity Food Truck" fill className="object-contain" />
-                </div>
-                <div className="relative w-full bg-[#DDD5C5]" style={{ height: '300px' }}>
-                  <Image src="/images/news/roasting.jpg" alt="Felicity Roasting" fill className="object-contain" />
-                </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+            <BulletinBoard photos={latestArticle.photos} alts={latestArticle.alts} />
+            <div>
+              <p className="text-[11px] text-[#8C7B6B] mb-3 uppercase tracking-widest font-mono">{latestArticle.date}</p>
+              <h2 className="text-[22px] font-light text-[#2C2416] mb-6 leading-snug">{latestArticle.title}</h2>
+              <div className="text-[14px] text-[#5C5451] leading-relaxed space-y-4 mb-8">
+                {latestArticle.body.map((p, i) => <p key={i}>{p}</p>)}
               </div>
-              <div className="p-8 flex flex-col justify-center">
-                <p className="text-[12px] text-[#8C7B6B] mb-2 uppercase tracking-widest">2026年3月30日</p>
-                <h2 className="text-2xl font-light text-[#2C2416] mb-4">Felicity Coffee Roasters / キッチンカーがスタート</h2>
-                <div className="text-[14px] text-[#5C5451] leading-relaxed space-y-4">
-                  <p>Felicityではこのたび、自家焙煎事業「Felicity Coffee Roasters（FCR）」とキッチンカーでのコーヒー提供をスタートしました。</p>
-                  <p>葉山の店舗で大切にしてきた「いっぱいのシアワセ」を、これからは焙煎した豆と移動するコーヒースタンドを通して、もっとさまざまな場所へ届けていきます。</p>
-                </div>
-                <Link href="/news" className="mt-6 font-mono text-[10px] tracking-[0.14em] text-[#7AAFC4] hover:text-[#2C2416] transition-colors uppercase">続きを読む →</Link>
-              </div>
+              <Link href="/news" className="font-mono text-[10px] tracking-[0.14em] text-[#7AAFC4] hover:text-[#2C2416] transition-colors uppercase">
+                すべてのニュース →
+              </Link>
             </div>
-          </article>
+          </div>
         </div>
       </section>
-
 
       {/* ── Visit ───────────────────────────────────────────────────────── */}
       <section id="visit" className="bg-[#F4EFE4] pt-20 pb-24">
