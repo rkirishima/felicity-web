@@ -14,11 +14,14 @@ export function ResponsiveNav({ locale, pathname }: ResponsiveNavProps) {
   // Determine the ABOUT link based on locale
   const aboutLink = locale === 'en' ? '/en/about' : locale === 'ja' ? '/ja/about' : '/about';
 
+  const newsLink = locale === 'en' ? '/en/news' : '/news';
+  
   const navItems = [
     { label: 'ABOUT US', href: '#philosophy' },
     { label: 'COFFEE', href: '#coffee' },
     { label: 'GOODS', href: '#merch' },
     { label: 'EXPERIENCES', href: '#experiences' },
+    { label: 'NEWS', href: newsLink },
     { label: 'VISIT', href: '#visit' },
   ];
 
