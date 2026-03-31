@@ -1,3 +1,5 @@
+import { BulletinBoard } from "@/app/components/BulletinBoard";
+import { latestArticle } from "@/app/lib/news";
 import Link from "next/link";
 import Image from "next/image";
 import { Header } from "@/app/components/Header";
