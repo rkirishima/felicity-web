@@ -32,6 +32,14 @@ export function Footer({ locale }: FooterProps) {
             >
               Instagram
             </a>
+            {locale === 'ja' && (
+              <a
+                href="/ja/disclosure"
+                className="text-[#8C7B6B] hover:text-[#2C2416] transition-colors"
+              >
+                特定商取引法
+              </a>
+            )}
           </div>
 
           {/* Right: Legal */}
