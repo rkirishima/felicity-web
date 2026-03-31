@@ -1,3 +1,4 @@
+import { ExperiencesSection } from "@/app/components/ExperiencesSection";
 import { CollapsibleAbout } from "@/app/components/CollapsibleAbout";
 import { BulletinBoard } from "@/app/components/BulletinBoard";
 import { latestArticle } from "@/app/lib/news";
@@ -108,53 +109,8 @@ export default function HomePageEN() {
 
       {/* ── Merch ───────────────────────────────────────────────────────── */}
       <MerchSection language="en" apparel={homepage.merch.apparel} />
-
-      {/* ── Experiences ────────────────────────────────────────────────────── */}
-      <section id="experiences" className="bg-[#F4EFE4] pt-20 pb-24">
-        <div className="max-w-6xl mx-auto px-8">
-          <p className="font-mono text-[11px] tracking-[0.3em] text-[#7AAFC4] uppercase mb-12">
-            {experiences.title}
-          </p>
-
-          <h2 className="text-[clamp(40px,6vw,58px)] font-light text-[#2C2416] leading-tight mb-8">
-            {experiences.heading}
-          </h2>
-
-          <p className="text-[17px] font-light text-[#8C7B6B] leading-relaxed max-w-3xl mb-16">
-            {experiences.explanation}
-          </p>
-
-          {/* 3-column grid of experiences */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
-            {experiences.workshops.map((exp) => (
-              <div key={exp.name} className="bg-[#EDE5D8] rounded-lg p-8 flex flex-col">
-                <h3 className="text-[20px] font-light text-[#2C2416] mb-3">
-                  {exp.name}
-                </h3>
-                <p className="text-[16px] font-light text-[#8C7B6B] leading-relaxed flex-grow">
-                  {exp.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* CTA */}
-          <div className="text-center border-t border-[#DDD5C5] pt-12">
-            <p className="text-[16px] font-light text-[#2C2416] mb-4">
-              {experiences.cta}
-            </p>
-            <a
-              href="https://www.instagram.com/felicity_hayama"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block border border-[#7AAFC4] text-[#7AAFC4] font-mono text-[10px] tracking-[0.16em] uppercase px-6 py-3 hover:bg-[#7AAFC4] hover:text-[#2C2416] transition-colors"
-            >
-              @felicity_hayama
-            </a>
-          </div>
-        </div>
-      </section>
-
+      {/* ── Experiences ─────────────────────────────────────────────────── */}
+      <ExperiencesSection locale="en" />
       {/* ── News ─────────────────────────────────────────────────────── */}
       <section id="news" className="bg-[#EDE5D8] pt-20 pb-24">
         <div className="max-w-5xl mx-auto px-8">
