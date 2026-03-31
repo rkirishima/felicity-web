@@ -51,7 +51,7 @@ export function Footer({ locale }: FooterProps) {
 
         <div className="border-t border-[#C8B89A] pt-8">
           <p className="text-[11px] text-[#8C7B6B] text-center">
-            © {currentYear} Felicity Café. {locale === 'ja' ? '無断転載・複製を禁止します。' : 'All rights reserved.'}
+            © {currentYear} Felicity. {locale === 'ja' ? '無断転載・複製を禁止します。' : 'All rights reserved.'}
           </p>
         </div>
       </div>
