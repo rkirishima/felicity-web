@@ -188,7 +188,7 @@ export function ExperiencesSection({ locale }: Props) {
               ? 'Follow us on Instagram for upcoming workshops and events.'
               : 'ワークショップ、イベントの最新情報はInstagramをフォローしてください。'}
           </p>
-          
+          <a
             href="https://www.instagram.com/felicity_hayama"
             target="_blank"
             rel="noopener noreferrer"
