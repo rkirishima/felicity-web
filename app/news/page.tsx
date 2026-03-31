@@ -28,7 +28,7 @@ export default function NewsPage() {
   return (
     <>
       <Header locale="ja" pathname="/news" contactLabel="お問い合わせ" />
-      <main className="min-h-screen bg-[#F4EFE4] py-16 px-4 pt-32">
+      <main className="min-h-screen bg-[#F4EFE4] py-16 px-4" style={{ paddingTop: '120px' }}>
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-light text-[#2C2416] mb-2">ニュース</h1>
           <p className="text-[#8C7B6B] mb-12">Felicityの最新情報をお届けします</p>

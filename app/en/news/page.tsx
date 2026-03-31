@@ -28,7 +28,7 @@ export default function NewsPageEN() {
   return (
     <>
       <Header locale="en" pathname="/en/news" contactLabel="Contact" />
-      <main className="min-h-screen bg-[#F4EFE4] py-16 px-4 pt-32">
+      <main className="min-h-screen bg-[#F4EFE4] py-16 px-4" style={{ paddingTop: '120px' }}>
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-light text-[#2C2416] mb-2">News</h1>
           <p className="text-[#8C7B6B] mb-12">Latest updates from Felicity</p>
