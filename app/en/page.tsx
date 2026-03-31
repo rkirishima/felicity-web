@@ -70,7 +70,7 @@ export default function HomePageEN() {
       {/* ── Philosophy ───────────────────────────────────────────────────── */}
       <section id="philosophy" className="bg-[#F4EFE4] pt-20 pb-24">
         <div className="max-w-3xl mx-auto px-8">
-          <p className="font-mono text-[11px] tracking-[0.3em] text-[#8C7B6B] uppercase mb-8">
+          <p className="font-mono text-[11px] tracking-[0.3em] text-[#7AAFC4] uppercase mb-8">
             Our Story
           </p>
           
@@ -79,13 +79,11 @@ export default function HomePageEN() {
           </h2>
 
           <div className="space-y-6 text-[18px] font-light text-[#2C2416] leading-relaxed">
-            {messages.about.content.split('\n\n').map((paragraph, idx) => (
-              <p key={idx} className="max-w-2xl">{paragraph}</p>
-            ))}
+            <CollapsibleAbout content={messages.about.content} readMoreLabel="Read more" readLessLabel="Close" />
           </div>
 
           <div className="mt-16 pt-8 border-t border-[#DDD5C5]">
-            <p className="font-mono text-[10px] tracking-[0.2em] text-[#8C7B6B] uppercase">
+            <p className="font-mono text-[10px] tracking-[0.2em] text-[#7AAFC4] uppercase">
               Hayama, Kanagawa — Est. 2024
             </p>
           </div>
@@ -95,7 +93,7 @@ export default function HomePageEN() {
       {/* ── Coffee ──────────────────────────────────────────────────────── */}
       <section id="coffee" className="bg-[#EDE5D8] pt-20 pb-24">
         <div className="max-w-6xl mx-auto px-8">
-          <p className="font-mono text-[12px] tracking-[0.3em] text-[#8C7B6B] uppercase mb-12">
+          <p className="font-mono text-[12px] tracking-[0.3em] text-[#7AAFC4] uppercase mb-12">
             {homepage.coffee.label}
           </p>
 
@@ -114,7 +112,7 @@ export default function HomePageEN() {
       {/* ── News ─────────────────────────────────────────────────────── */}
       <section id="news" className="bg-[#EDE5D8] pt-20 pb-24">
         <div className="max-w-5xl mx-auto px-8">
-          <p className="font-mono text-[9px] tracking-[0.3em] text-[#8C7B6B] uppercase mb-12">News</p>
+          <p className="font-mono text-[9px] tracking-[0.3em] text-[#7AAFC4] uppercase mb-12">News</p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             <BulletinBoard photos={latestArticle.photos} alts={latestArticle.alts} />
             <div>
@@ -134,7 +132,7 @@ export default function HomePageEN() {
       {/* ── Visit ───────────────────────────────────────────────────────── */}
       <section id="visit" className="bg-[#F4EFE4] pt-20 pb-24">
         <div className="max-w-6xl mx-auto px-8">
-          <p className="font-mono text-[11px] tracking-[0.3em] text-[#8C7B6B] uppercase mb-12">
+          <p className="font-mono text-[11px] tracking-[0.3em] text-[#7AAFC4] uppercase mb-12">
             {homepage.visit.label}
           </p>
 

@@ -72,7 +72,7 @@ export default function Home() {
       {/* ── Philosophy ───────────────────────────────────────────────────── */}
       <section id="philosophy" className="bg-[#F4EFE4] pt-20 pb-24">
         <div className="max-w-3xl mx-auto px-8">
-          <p className="font-mono text-[9px] tracking-[0.3em] text-[#8C7B6B] uppercase mb-8">
+          <p className="font-mono text-[9px] tracking-[0.3em] text-[#7AAFC4] uppercase mb-8">
             Our Story
           </p>
           
@@ -114,7 +114,7 @@ export default function Home() {
       {/* ── News ─────────────────────────────────────────────────────── */}
       <section id="news" className="bg-[#EDE5D8] pt-20 pb-24">
         <div className="max-w-5xl mx-auto px-8">
-          <p className="font-mono text-[9px] tracking-[0.3em] text-[#8C7B6B] uppercase mb-12">News</p>
+          <p className="font-mono text-[9px] tracking-[0.3em] text-[#7AAFC4] uppercase mb-12">News</p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             <BulletinBoard photos={latestArticle.photos} alts={latestArticle.alts} />
             <div>
@@ -134,7 +134,7 @@ export default function Home() {
       {/* ── Visit ───────────────────────────────────────────────────────── */}
       <section id="visit" className="bg-[#F4EFE4] pt-20 pb-24">
         <div className="max-w-6xl mx-auto px-8">
-          <p className="font-mono text-[9px] tracking-[0.3em] text-[#8C7B6B] uppercase mb-12">
+          <p className="font-mono text-[9px] tracking-[0.3em] text-[#7AAFC4] uppercase mb-12">
             {homepage.visit.label}
           </p>
 
