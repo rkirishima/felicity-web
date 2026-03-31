@@ -1,26 +1,8 @@
 import { Header } from '@/app/components/Header';
 import { Footer } from '@/app/components/Footer';
 
-const newsItems = [
-  {
-    id: '1',
-    date: '2026年3月30日',
-    title: 'Felicity Coffee Roasters / キッチンカーがスタート',
-    content: `Felicityではこのたび、自家焙煎事業「Felicity Coffee Roasters（FCR）」とキッチンカーでのコーヒー提供をスタートしました。
-
-葉山の店舗で大切にしてきた「いっぱいのシアワセ」を、これからは焙煎した豆と移動するコーヒースタンドを通して、もっとさまざまな場所へ届けていきます。
-
-焙煎所では、産地ごとの個性を丁寧に引き出しながら、日常に寄り添うクリーンで心地よい味わいを追求しています。
-
-キッチンカーでは、Felicityらしい一杯をそのまま外へ持ち出し、街やイベント、さまざまなシーンでお楽しみいただけます。
-
-キッチンカーの出店情報や営業日は、Instagramにて随時ご案内いたします。`,
-    image: '/images/news/food-truck.jpg',
-  },
-];
-
 export const metadata = {
-  title: 'ニュース | Felicity Café',
+  title: 'ニュース | Felicity',
   description: 'Felicityの最新ニュースと情報',
 };
 
@@ -28,36 +10,50 @@ export default function NewsPage() {
   return (
     <>
       <Header locale="ja" pathname="/news" contactLabel="お問い合わせ" />
-      <main className="min-h-screen bg-[#F4EFE4] py-16 px-4" style={{ paddingTop: '80px' }}>
+      
+      {/* Main Content */}
+      <div className="bg-[#F4EFE4] pt-24 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-light text-[#2C2416] mb-2">ニュース</h1>
-          <p className="text-[#8C7B6B] mb-12">Felicityの最新情報をお届けします</p>
+          <p className="text-[#8C7B6B] mb-16">Felicityの最新情報をお届けします</p>
 
-          <div className="space-y-12">
-            {newsItems.map((item) => (
-              <article key={item.id} className="bg-white rounded-sm shadow-sm overflow-hidden">
-                <div className="flex flex-col">
-                  <div className="relative w-full h-64 bg-[#DDD5C5]" />
-                  <div className="p-8">
-                    <p className="text-[12px] text-[#8C7B6B] mb-2 uppercase tracking-widest">
-                      {item.date}
-                    </p>
-                    <h2 className="text-2xl font-light text-[#2C2416] mb-4">{item.title}</h2>
-                    <div className="text-[14px] text-[#5C5451] leading-relaxed whitespace-pre-line">
-                      {item.content}
-                    </div>
-                  </div>
+          {/* News Article */}
+          <article className="bg-white rounded-sm shadow-sm overflow-hidden mb-16">
+            <div className="flex flex-col">
+              <div className="relative w-full h-64 bg-[#DDD5C5]" />
+              <div className="p-8">
+                <p className="text-[12px] text-[#8C7B6B] mb-2 uppercase tracking-widest">
+                  2026年3月30日
+                </p>
+                <h2 className="text-2xl font-light text-[#2C2416] mb-4">
+                  Felicity Coffee Roasters / キッチンカーがスタート
+                </h2>
+                <div className="text-[14px] text-[#5C5451] leading-relaxed space-y-4">
+                  <p>
+                    Felicityではこのたび、自家焙煎事業「Felicity Coffee Roasters（FCR）」とキッチンカーでのコーヒー提供をスタートしました。
+                  </p>
+                  <p>
+                    葉山の店舗で大切にしてきた「いっぱいのシアワセ」を、これからは焙煎した豆と移動するコーヒースタンドを通して、もっとさまざまな場所へ届けていきます。
+                  </p>
+                  <p>
+                    焙煎所では、産地ごとの個性を丁寧に引き出しながら、日常に寄り添うクリーンで心地よい味わいを追求しています。
+                  </p>
+                  <p>
+                    キッチンカーでは、Felicityらしい一杯をそのまま外へ持ち出し、街やイベント、さまざまなシーンでお楽しみいただけます。
+                  </p>
+                  <p>
+                    キッチンカーの出店情報や営業日は、Instagramにて随時ご案内いたします。
+                  </p>
                 </div>
-              </article>
-            ))}
-          </div>
+              </div>
+            </div>
+          </article>
         </div>
-      </main>
+      </div>
 
       {/* VISIT Section */}
-      <section id="visit" className="bg-[#EDE5D8] py-16 px-4">
-        <div className="max-w-6xl mx-auto pt-8">
-          
+      <section className="bg-[#EDE5D8] py-16 px-4">
+        <div className="max-w-6xl mx-auto">
           {/* Map */}
           <div className="mb-12 rounded-sm overflow-hidden h-96">
             <iframe
@@ -71,6 +67,7 @@ export default function NewsPage() {
             />
           </div>
 
+          {/* Info Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Address */}
             <div className="flex gap-4">

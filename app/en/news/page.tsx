@@ -1,26 +1,8 @@
 import { Header } from '@/app/components/Header';
 import { Footer } from '@/app/components/Footer';
 
-const newsItems = [
-  {
-    id: '1',
-    date: 'March 30, 2026',
-    title: 'Felicity Coffee Roasters / Food Truck Launch',
-    content: `Felicity is now launching two new ventures: "Felicity Coffee Roasters (FCR)" – our in-house roasting operation, and our food truck – specialty coffee on the move.
-
-The spirit of "いっぱいのシアワセ" (one cup, full of happiness) that we've cultivated at our Hayama café will now reach more places through freshly roasted beans and our mobile coffee stand.
-
-At our roastery, we carefully highlight the character of each origin, pursuing clean and comforting flavors for everyday moments.
-
-Through our food truck, we bring Felicity's signature coffee beyond the café – to the streets, events, and everywhere our community gathers.
-
-Food truck schedules and appearances will be announced on Instagram.`,
-    image: '/images/news/food-truck.jpg',
-  },
-];
-
 export const metadata = {
-  title: 'News | Felicity Café',
+  title: 'News | Felicity',
   description: 'Latest news and updates from Felicity',
 };
 
@@ -28,36 +10,50 @@ export default function NewsPageEN() {
   return (
     <>
       <Header locale="en" pathname="/en/news" contactLabel="Contact" />
-      <main className="min-h-screen bg-[#F4EFE4] py-16 px-4" style={{ paddingTop: '80px' }}>
+      
+      {/* Main Content */}
+      <div className="bg-[#F4EFE4] pt-24 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-light text-[#2C2416] mb-2">News</h1>
-          <p className="text-[#8C7B6B] mb-12">Latest updates from Felicity</p>
+          <p className="text-[#8C7B6B] mb-16">Latest updates from Felicity</p>
 
-          <div className="space-y-12">
-            {newsItems.map((item) => (
-              <article key={item.id} className="bg-white rounded-sm shadow-sm overflow-hidden">
-                <div className="flex flex-col">
-                  <div className="relative w-full h-64 bg-[#DDD5C5]" />
-                  <div className="p-8">
-                    <p className="text-[12px] text-[#8C7B6B] mb-2 uppercase tracking-widest">
-                      {item.date}
-                    </p>
-                    <h2 className="text-2xl font-light text-[#2C2416] mb-4">{item.title}</h2>
-                    <div className="text-[14px] text-[#5C5451] leading-relaxed whitespace-pre-line">
-                      {item.content}
-                    </div>
-                  </div>
+          {/* News Article */}
+          <article className="bg-white rounded-sm shadow-sm overflow-hidden mb-16">
+            <div className="flex flex-col">
+              <div className="relative w-full h-64 bg-[#DDD5C5]" />
+              <div className="p-8">
+                <p className="text-[12px] text-[#8C7B6B] mb-2 uppercase tracking-widest">
+                  March 30, 2026
+                </p>
+                <h2 className="text-2xl font-light text-[#2C2416] mb-4">
+                  Felicity Coffee Roasters / Food Truck Launch
+                </h2>
+                <div className="text-[14px] text-[#5C5451] leading-relaxed space-y-4">
+                  <p>
+                    Felicity is now launching two new ventures: "Felicity Coffee Roasters (FCR)" – our in-house roasting operation, and our food truck – specialty coffee on the move.
+                  </p>
+                  <p>
+                    The spirit of "いっぱいのシアワセ" (one cup, full of happiness) that we've cultivated at our Hayama café will now reach more places through freshly roasted beans and our mobile coffee stand.
+                  </p>
+                  <p>
+                    At our roastery, we carefully highlight the character of each origin, pursuing clean and comforting flavors for everyday moments.
+                  </p>
+                  <p>
+                    Through our food truck, we bring Felicity's signature coffee beyond the café – to the streets, events, and everywhere our community gathers.
+                  </p>
+                  <p>
+                    Food truck schedules and appearances will be announced on Instagram.
+                  </p>
                 </div>
-              </article>
-            ))}
-          </div>
+              </div>
+            </div>
+          </article>
         </div>
-      </main>
+      </div>
 
       {/* VISIT Section */}
-      <section id="visit" className="bg-[#EDE5D8] py-16 px-4">
-        <div className="max-w-6xl mx-auto pt-8">
-          
+      <section className="bg-[#EDE5D8] py-16 px-4">
+        <div className="max-w-6xl mx-auto">
           {/* Map */}
           <div className="mb-12 rounded-sm overflow-hidden h-96">
             <iframe
@@ -71,6 +67,7 @@ export default function NewsPageEN() {
             />
           </div>
 
+          {/* Info Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Location */}
             <div className="flex gap-4">
