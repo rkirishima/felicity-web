@@ -19,10 +19,10 @@ const EXPERIENCES: Experience[] = [
     id: 'pilates',
     name: 'ピラティス',
     nameEn: 'Pilates',
-    desc: '海を感じながら、意図を持ってコアを鍛える。',
-    descEn: 'Core training with intention, by the sea.',
-    schedule: '毎週火曜日',
-    scheduleEn: 'Every Tuesday',
+    desc: '海を感じながら、意図を持ってコアを鍛える。ドリンク1杯で参加可。',
+    descEn: 'Core training with intention, by the sea. Join with one drink.',
+    schedule: '毎週火曜 10:00〜11:00',
+    scheduleEn: 'Every Tuesday 10–11am',
     photo: '/experiences/pilates.jpg',
     large: true,
   },
@@ -82,7 +82,7 @@ export function ExperiencesSection({ locale }: Props) {
 
   const scheduleEvents: (string | null)[] = [
     null,
-    isEn ? 'Pilates\nEvery Tue' : 'ピラティス\n毎週',
+    isEn ? 'Pilates\n10–11am' : 'ピラティス\n10:00-11:00',
     null,
     null,
     isEn ? 'Workshop\nOccasional' : 'ワークショップ\n不定期',
