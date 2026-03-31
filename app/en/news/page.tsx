@@ -58,26 +58,60 @@ export default function NewsPageEN() {
       <section id="visit" className="bg-[#EDE5D8] py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-light text-[#2C2416] mb-12">Visit</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div>
-              <h3 className="text-[18px] font-light text-[#2C2416] mb-4">Location</h3>
-              <p className="text-[14px] text-[#8C7B6B] leading-relaxed mb-4">
-                2432-3 Kamiyamaguchi<br />
-                Hayama, Kanagawa 240-0112<br />
-                Japan
-              </p>
-              <p className="text-[14px] text-[#8C7B6B]">
-                📧 info@felicity.cafe<br />
-                📱 Instagram: @felicity_hayama
-              </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Location */}
+            <div className="flex gap-4">
+              <div className="w-6 h-6 flex-shrink-0">
+                <svg className="w-full h-full stroke-[#8C7B6B]" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-[14px] font-light text-[#2C2416] mb-2">Location</h3>
+                <p className="text-[13px] text-[#8C7B6B] leading-relaxed">
+                  2432-3 Kamiyamaguchi<br />
+                  Hayama, Kanagawa<br />
+                  240-0112 Japan
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-[18px] font-light text-[#2C2416] mb-4">Hours</h3>
-              <p className="text-[14px] text-[#8C7B6B] leading-relaxed">
-                Weekdays: 11:00 - 17:00<br />
-                Weekends: 9:00 - 17:00<br />
-                Closed: Wednesdays & Thursdays
-              </p>
+
+            {/* Hours */}
+            <div className="flex gap-4">
+              <div className="w-6 h-6 flex-shrink-0">
+                <svg className="w-full h-full stroke-[#8C7B6B]" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 2m6-11a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-[14px] font-light text-[#2C2416] mb-2">Hours</h3>
+                <p className="text-[13px] text-[#8C7B6B] leading-relaxed">
+                  Weekdays: 11:00 - 17:00<br />
+                  Weekends: 9:00 - 17:00<br />
+                  Closed: Wed & Thu
+                </p>
+              </div>
+            </div>
+
+            {/* Contact */}
+            <div className="flex gap-4">
+              <div className="w-6 h-6 flex-shrink-0">
+                <svg className="w-full h-full stroke-[#8C7B6B]" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-[14px] font-light text-[#2C2416] mb-2">Contact</h3>
+                <p className="text-[13px] text-[#8C7B6B] leading-relaxed">
+                  <a href="mailto:info@felicity.cafe" className="hover:text-[#2C2416] transition-colors">
+                    info@felicity.cafe
+                  </a><br />
+                  <a href="https://www.instagram.com/felicity_hayama" target="_blank" rel="noopener noreferrer" className="hover:text-[#2C2416] transition-colors">
+                    @felicity_hayama
+                  </a>
+                </p>
+              </div>
             </div>
           </div>
         </div>
