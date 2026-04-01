@@ -82,8 +82,14 @@ export function CartDrawer() {
         {/* Items */}
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
           {items.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-[#8C7B6B]">
+            <div className="flex flex-col items-center justify-center h-full gap-6 text-[#8C7B6B]">
               <p className="text-center">{t.emptyCart}</p>
+              <button
+                onClick={closeCart}
+                className="font-mono text-[10px] tracking-[0.14em] text-[#7AAFC4] uppercase border border-[#7AAFC4] px-6 py-3 hover:bg-[#7AAFC4] hover:text-[#2C2416] transition-colors"
+              >
+                {t.continueShopping}
+              </button>
             </div>
           ) : (
             items.map((item) => (
