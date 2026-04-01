@@ -97,7 +97,7 @@ export const useCart = create<CartState>()(
       },
     }),
     {
-      name: 'felicity-cart',
+      name: 'felicity-cart', partialize: (state) => ({ items: state.items }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
