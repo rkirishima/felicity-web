@@ -16,8 +16,8 @@ interface HeaderProps {
 export function Header({ locale, pathname, contactLabel }: HeaderProps) {
   const getTotalItems = useCart((state) => state.getTotalItems);
   const openCart = useCart((state) => state.openCart);
-  const itemCount = getTotalItems();
   const [mounted, setMounted] = useState(false);
+  const itemCount = mounted ? getTotalItems() : 0;
   useEffect(() => setMounted(true), []);
 
   return (
