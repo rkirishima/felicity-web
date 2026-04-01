@@ -149,10 +149,10 @@ function CheckoutPageContent({ language = 'ja' }: { language: 'ja' | 'en' }) {
               </div>
 
               {/* Back to Cart */}
-              <div className="text-center">
+              <div className="text-center pt-8 border-t border-[#DDD5C5]">
                 <Link
                   href={language === 'en' ? '/en/#merch' : '/#merch'}
-                  className="text-[#8C7B6B] hover:text-[#2C2416] text-[14px] font-mono tracking-[0.08em] uppercase transition-colors"
+                  className="inline-block px-6 py-3 bg-[#F4EFE4] border border-[#DDD5C5] text-[#8C7B6B] hover:text-[#2C2416] hover:bg-[#EDE5D8] text-[14px] font-mono tracking-[0.08em] uppercase transition-colors rounded-sm"
                 >
                   {t.continueShopping}
                 </Link>
@@ -170,6 +170,16 @@ export default function CheckoutPage() {
     <main className="min-h-screen bg-[#F4EFE4]">
       {/* Header */}
       <Header locale="ja" pathname="/checkout" contactLabel="お問い合わせ" />
+
+      {/* Quick Escape: Back to Home (visible above content) */}
+      <div className="fixed top-20 left-8 z-50">
+        <Link
+          href="/"
+          className="text-[13px] text-[#8C7B6B] hover:text-[#2C2416] font-mono tracking-[0.08em] uppercase transition-colors underline"
+        >
+          ← ホームに戻る
+        </Link>
+      </div>
 
       {/* Content with Suspense boundary */}
       <Suspense fallback={

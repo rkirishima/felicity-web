@@ -23,7 +23,7 @@ export function Header({ locale, pathname, contactLabel }: HeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] h-auto py-2 bg-[#F4EFE4] md:bg-[#F4EFE4]/95 backdrop-blur-sm border-b border-[#DDD5C5]">
       <div className="max-w-6xl mx-auto px-8 flex items-center justify-between gap-8">
-        <Link href="/" className="flex items-center flex-shrink-0 -ml-2">
+        <Link href={locale === 'en' ? '/en/' : '/'} className="flex items-center flex-shrink-0 -ml-2">
           <Image
             src="/felicity-logo.png"
             alt="Felicity"
