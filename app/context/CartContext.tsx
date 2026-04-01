@@ -72,7 +72,7 @@ export const useCart = create<CartState>()(
       },
 
       clearCart: () => {
-        set({ items: [] });
+        set({ items: [], isOpen: false });
       },
 
       openCart: () => {
