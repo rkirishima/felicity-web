@@ -5,8 +5,68 @@ import { Providers } from "@/app/providers";
 import { CartDrawer } from "@/app/components/CartDrawer";
 
 export const metadata: Metadata = {
-  title: "Felicity | Specialty Coffee in Hayama",
-  description: "Specialty coffee café in Hayama, Japan.",
+  metadataBase: new URL("https://felicity.cafe"),
+  title: {
+    default: "FELICITY COFFEE ROASTERS | 葉山の自家焙煎スペシャルティコーヒー",
+    template: "%s | FELICITY COFFEE ROASTERS",
+  },
+  description:
+    "神奈川県葉山町の自家焙煎コーヒー専門店。エチオピア・パナマゲイシャ・グアテマラなど世界各地のスペシャルティコーヒー豆を焙煎・販売。オンライン通販あり。",
+  keywords: [
+    "葉山コーヒー",
+    "自家焙煎",
+    "スペシャルティコーヒー",
+    "コーヒー豆 通販",
+    "葉山カフェ",
+    "コーヒーロースター 神奈川",
+    "シングルオリジン",
+    "Felicity Coffee Roasters",
+    "葉山 焙煎",
+    "コーヒー豆 葉山",
+  ],
+  alternates: {
+    canonical: "https://felicity.cafe",
+    languages: {
+      ja: "https://felicity.cafe",
+      en: "https://felicity.cafe/en",
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "ja_JP",
+    alternateLocale: "en_US",
+    url: "https://felicity.cafe",
+    siteName: "FELICITY COFFEE ROASTERS",
+    title: "FELICITY COFFEE ROASTERS | 葉山の自家焙煎スペシャルティコーヒー",
+    description:
+      "神奈川県葉山町の自家焙煎コーヒー専門店。エチオピア・パナマゲイシャ・グアテマラなど世界各地のスペシャルティコーヒー豆を焙煎・販売。",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "FELICITY COFFEE ROASTERS 葉山の自家焙煎コーヒー",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "FELICITY COFFEE ROASTERS | 葉山の自家焙煎スペシャルティコーヒー",
+    description:
+      "神奈川県葉山町の自家焙煎コーヒー専門店。スペシャルティコーヒー豆を焙煎・販売。",
+    images: ["/og-image.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   icons: {
     icon: "/favicon.png",
     apple: "/apple-touch-icon.png",
