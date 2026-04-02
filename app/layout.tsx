@@ -78,10 +78,26 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
+
   return (
     <html lang="ja" suppressHydrationWarning className="m-0 p-0">
       <head>
         <Script src="https://js.stripe.com/v3/" strategy="beforeInteractive" />
+        {gaId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${gaId}');`}
+            </Script>
+          </>
+        )}
       </head>
       <body className="m-0 p-0">
         <Providers>
