@@ -3,6 +3,7 @@ import Script from "next/script";
 import "./globals.css";
 import { Providers } from "@/app/providers";
 import { CartDrawer } from "@/app/components/CartDrawer";
+import { StructuredData } from "@/app/components/StructuredData";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://felicity.cafe"),
@@ -100,6 +101,7 @@ export default function RootLayout({
         )}
       </head>
       <body className="m-0 p-0">
+        <StructuredData />
         <Providers>
           {children}
           <CartDrawer />
