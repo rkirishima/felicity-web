@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
     const body = await request.json();
-    const { amount, currency = 'jpy', email, fullName, items } = body;
+    const { amount, currency = 'jpy', email, fullName, items, phone, postalCode, prefecture, city, streetAddress, building } = body;
 
     if (!amount || !email) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
@@ -17,7 +17,10 @@ export async function POST(request: NextRequest) {
       receipt_email: email,
       metadata: {
         customer_name: fullName || '',
+        customer_email: email || '',
+        customer_phone: phone || '',
         items: JSON.stringify(items?.map((i: any) => ({ name: i.name, qty: i.quantity ?? 1 })) || []),
+        shipping_address: `${postalCode} ${prefecture}${city}${streetAddress}${building ? ' ' + building : ''}`,
       },
     });
 

@@ -37,6 +37,7 @@ function CheckoutPageContent({ language = 'ja' }: { language: 'ja' | 'en' }) {
   const searchParams = useSearchParams();
   const items = useCart((state) => state.items);
   const clearCart = useCart((state) => state.clearCart);
+  const _hasHydrated = useCart((state) => state._hasHydrated);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const t = translations[language];
@@ -52,8 +53,12 @@ function CheckoutPageContent({ language = 'ja' }: { language: 'ja' | 'en' }) {
     }
   }, [searchParams, clearCart]);
 
-  // Don't redirect - allow checkout page to load even with empty cart
-  // Cart will be populated from localStorage on mount
+  // Redirect to home when cart is empty after hydration (e.g. back button after confirmation)
+  useEffect(() => {
+    if (_hasHydrated && items.length === 0 && !orderConfirmed) {
+      router.push('/');
+    }
+  }, [_hasHydrated, items.length, orderConfirmed, router]);
 
   const checkoutUrl = language === 'en' ? '/en/checkout' : '/checkout';
   const homeUrl = language === 'en' ? '/en/' : '/';

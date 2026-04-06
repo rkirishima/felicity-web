@@ -188,16 +188,18 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
 
   const t = translations[language];
 
-  // Create PaymentIntent when address is complete and stripe is selected
+  // Create PaymentIntent when address is complete and stripe is selected.
+  // Re-create if total changes (e.g. items were updated before payment).
   useEffect(() => {
-    if (!addressComplete || paymentMethod !== 'stripe' || clientSecret) return;
+    if (!addressComplete || paymentMethod !== 'stripe') return;
     if (total <= 0) return;
 
+    setClientSecret(null);
     setLoadingIntent(true);
     fetch('/api/process-payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: total, currency: 'jpy', email, fullName, items }),
+      body: JSON.stringify({ amount: total, currency: 'jpy', email, fullName, items, phone, postalCode, prefecture, city, streetAddress, building }),
     })
       .then((r) => r.json())
       .then((data) => {
@@ -209,7 +211,8 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
       })
       .catch(() => setFormError('Failed to initialize payment'))
       .finally(() => setLoadingIntent(false));
-  }, [addressComplete, paymentMethod]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addressComplete, paymentMethod, total]);
 
   const handleAddressSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

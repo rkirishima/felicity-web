@@ -37,6 +37,7 @@ function CheckoutPageContent({ language = 'ja' }: { language: 'ja' | 'en' }) {
   const searchParams = useSearchParams();
   const items = useCart((state) => state.items);
   const clearCart = useCart((state) => state.clearCart);
+  const _hasHydrated = useCart((state) => state._hasHydrated);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const t = translations[language];
@@ -52,12 +53,12 @@ function CheckoutPageContent({ language = 'ja' }: { language: 'ja' | 'en' }) {
     }
   }, [searchParams, clearCart]);
 
-  // Redirect to home if cart is empty and not in confirmation state
-  if (items.length === 0 && !orderConfirmed) {
-    const homeUrl = language === 'en' ? '/en/' : '/';
-    router.push(homeUrl);
-    return null;
-  }
+  // Redirect to home when cart is empty after hydration (e.g. back button after confirmation)
+  useEffect(() => {
+    if (_hasHydrated && items.length === 0 && !orderConfirmed) {
+      router.push(language === 'en' ? '/en/' : '/');
+    }
+  }, [_hasHydrated, items.length, orderConfirmed, language, router]);
 
   const checkoutUrl = language === 'en' ? '/en/checkout' : '/checkout';
   const homeUrl = language === 'en' ? '/en/' : '/';
