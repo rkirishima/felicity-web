@@ -15,15 +15,7 @@ export async function POST(request: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err: any) {
-    return NextResponse.json({
-      error: 'Webhook signature failed',
-      debug: {
-        secretPrefix: webhookSecret?.substring(0, 16) ?? 'MISSING',
-        bodyLength: body.length,
-        hasSignature: !!signature,
-        errMsg: err.message,
-      },
-    }, { status: 400 });
+    return NextResponse.json({ error: 'Webhook signature failed' }, { status: 400 });
   }
 
   if (event.type === 'payment_intent.succeeded') {
