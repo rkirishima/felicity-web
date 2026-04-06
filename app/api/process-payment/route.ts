@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { amount, currency = 'jpy', email, fullName, items, phone, postalCode, prefecture, city, streetAddress, building } = body;
 
-    if (!amount || !email) {
+    if (!amount || amount <= 0 || !email) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 

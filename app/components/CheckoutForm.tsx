@@ -37,6 +37,8 @@ const translations = {
     proceedToPayment: 'お支払いへ進む',
     processing: 'お支払い処理中...',
     allFieldsRequired: 'すべての必須フィールドを入力してください。',
+    postalCodeInvalid: '郵便番号は XXX-XXXX 形式で入力してください。',
+    paymentNotCompleted: 'お支払いが完了しませんでした。もう一度お試しください。',
     bankDetails: '銀行振込先',
     bankName: '銀行名',
     branchName: '支店名',
@@ -78,6 +80,8 @@ const translations = {
     transferDeadline: 'Please transfer within 7 days of order',
     confirmOrder: 'Confirm Order',
     loadingPayment: 'Loading payment form...',
+    postalCodeInvalid: 'Postal code must be in XXX-XXXX format.',
+    paymentNotCompleted: 'Payment was not completed. Please try again.',
   },
 };
 
@@ -133,6 +137,9 @@ function StripePaymentForm({
     if (paymentIntent?.status === 'succeeded') {
       const orderId = `FLC-${Date.now()}`;
       if (onSuccess) onSuccess(orderId);
+    } else {
+      setError(t.paymentNotCompleted);
+      if (onError) onError('Payment not completed');
     }
 
     setIsLoading(false);
@@ -214,10 +221,24 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addressComplete, paymentMethod, total]);
 
+  const handlePostalCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value.replace(/[^\d]/g, '');
+    if (val.length > 3) val = val.slice(0, 3) + '-' + val.slice(3, 7);
+    setPostalCode(val);
+    setAddressComplete(false);
+    setClientSecret(null);
+  };
+
+  const postalCodeRegex = /^\d{3}-\d{4}$/;
+
   const handleAddressSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!email.trim() || !fullName.trim() || !phone.trim() || !prefecture || !city.trim() || !streetAddress.trim()) {
+    if (!email.trim() || !fullName.trim() || !phone.trim() || !prefecture || !city.trim() || !streetAddress.trim() || !postalCode.trim()) {
       setFormError(t.allFieldsRequired);
+      return;
+    }
+    if (!postalCodeRegex.test(postalCode)) {
+      setFormError(t.postalCodeInvalid);
       return;
     }
     setFormError(null);
@@ -225,8 +246,12 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
   };
 
   const handleBankTransfer = () => {
-    if (!email.trim() || !fullName.trim() || !phone.trim() || !prefecture || !city.trim() || !streetAddress.trim()) {
+    if (!email.trim() || !fullName.trim() || !phone.trim() || !prefecture || !city.trim() || !streetAddress.trim() || !postalCode.trim()) {
       setFormError(t.allFieldsRequired);
+      return;
+    }
+    if (!postalCodeRegex.test(postalCode)) {
+      setFormError(t.postalCodeInvalid);
       return;
     }
     const orderId = 'ORDER-' + Date.now();
@@ -308,7 +333,7 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
           <input type="email" placeholder={t.emailPlaceholder} value={email} onChange={(e) => { setEmail(e.target.value); setAddressComplete(false); setClientSecret(null); }} required className="w-full px-4 py-2 border border-[#DDD5C5] rounded-sm text-[14px]" />
           <input type="text" placeholder={t.fullName} value={fullName} onChange={(e) => { setFullName(e.target.value); setAddressComplete(false); setClientSecret(null); }} required className="w-full px-4 py-2 border border-[#DDD5C5] rounded-sm text-[14px]" />
           <input type="tel" placeholder={t.phone} value={phone} onChange={(e) => setPhone(e.target.value)} required className="w-full px-4 py-2 border border-[#DDD5C5] rounded-sm text-[14px]" />
-          <input type="text" placeholder={t.postalCodeFormat} value={postalCode} onChange={(e) => setPostalCode(e.target.value)} maxLength={8} className="w-full px-4 py-2 border border-[#DDD5C5] rounded-sm text-[14px]" />
+          <input type="text" placeholder={t.postalCodeFormat} value={postalCode} onChange={handlePostalCodeChange} maxLength={8} required className="w-full px-4 py-2 border border-[#DDD5C5] rounded-sm text-[14px]" />
           <select value={prefecture} onChange={(e) => setPrefecture(e.target.value)} required className="w-full px-4 py-2 border border-[#DDD5C5] rounded-sm text-[14px]">
             <option value="">{t.prefecture}</option>
             {PREFECTURES.map((pref) => <option key={pref} value={pref}>{pref}</option>)}
