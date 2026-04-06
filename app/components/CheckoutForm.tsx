@@ -201,12 +201,15 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
     if (!addressComplete || paymentMethod !== 'stripe') return;
     if (total <= 0) return;
 
+    const controller = new AbortController();
+
     setClientSecret(null);
     setLoadingIntent(true);
     fetch('/api/process-payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount: total, currency: 'jpy', email, fullName, items, phone, postalCode, prefecture, city, streetAddress, building }),
+      signal: controller.signal,
     })
       .then((r) => r.json())
       .then((data) => {
@@ -216,8 +219,10 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
           setFormError(data.message || 'Failed to initialize payment');
         }
       })
-      .catch(() => setFormError('Failed to initialize payment'))
+      .catch((err) => { if (err.name !== 'AbortError') setFormError('Failed to initialize payment'); })
       .finally(() => setLoadingIntent(false));
+
+    return () => controller.abort();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addressComplete, paymentMethod, total]);
 
