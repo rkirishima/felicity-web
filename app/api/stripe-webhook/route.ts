@@ -48,10 +48,6 @@ export async function POST(request: NextRequest) {
         reference_id: pi.id,
         customer_note: `ECサイト注文\n名前: ${customerName}\nメール: ${customerEmail}\n電話: ${customerPhone}\n住所: ${shippingAddress}`,
         line_items: lineItems,
-        metadata: {
-          stripe_payment_intent: pi.id,
-          customer_email: pi.receipt_email || '',
-        },
       },
     };
 
