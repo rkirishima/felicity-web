@@ -61,11 +61,12 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(orderPayload),
     });
 
-    const result = await res.json();
     if (!res.ok) {
+      const result = await res.json().catch(() => ({}));
       console.error('Square order error:', result);
       return NextResponse.json({ error: 'Square order failed' }, { status: 500 });
     }
+    const result = await res.json();
 
     console.log('Square order created:', result.order?.id);
 

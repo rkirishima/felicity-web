@@ -211,7 +211,10 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
       body: JSON.stringify({ amount: total, currency: 'jpy', email, fullName, items, phone, postalCode, prefecture, city, streetAddress, building }),
       signal: controller.signal,
     })
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`Payment API error: ${r.status}`);
+        return r.json();
+      })
       .then((data) => {
         if (data.clientSecret) {
           setClientSecret(data.clientSecret);
@@ -223,8 +226,7 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
       .finally(() => setLoadingIntent(false));
 
     return () => controller.abort();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addressComplete, paymentMethod, total]);
+  }, [addressComplete, paymentMethod, total, items]);
 
   const handlePostalCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let val = e.target.value.replace(/[^\d]/g, '');
