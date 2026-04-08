@@ -1,10 +1,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import type { Metadata } from 'next';
 import { Header } from '@/app/components/Header';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'COFFEE × FLOWER サブスク | FELICITY × PAUSE',
   description: '葉山発。自家焙煎コーヒーと季節の花を毎月お届けするサブスクリプション。FELICITY COFFEE ROASTERS × PAUSE のコラボレーション。',
+  alternates: {
+    canonical: 'https://felicity.cafe/subscribe',
+  },
 };
 
 const plans = [

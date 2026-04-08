@@ -5,7 +5,13 @@ import { getMessages } from "@/app/lib/translations";
 export const metadata = {
   title: "FELICITY COFFEE ROASTERS | スペシャルティコーヒー",
   description: "葉山のスペシャルティコーヒー専門店。",
-  canonical: "https://felicity.cafe/ja/",
+  alternates: {
+    canonical: "https://felicity.cafe/ja",
+    languages: {
+      ja: "https://felicity.cafe/ja",
+      en: "https://felicity.cafe/en",
+    },
+  },
 };
 
 export default function HomePageJA() {

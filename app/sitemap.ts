@@ -33,23 +33,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
       },
     },
-    // Japanese version explicit
-    {
-      url: `${BASE_URL}/ja/products/${product.slug}`,
-      lastModified: new Date(),
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-      alternates: {
-        languages: {
-          ja: `${BASE_URL}/ja/products/${product.slug}`,
-          en: `${BASE_URL}/en/products/${product.slug}`,
-        },
-      },
-    },
   ]);
 
   return [
-    // Home pages
+    // Primary home page
     {
       url: BASE_URL,
       lastModified: new Date(),
@@ -62,26 +49,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
       },
     },
+    // English home page
     {
       url: `${BASE_URL}/en`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 1,
-      alternates: {
-        languages: {
-          ja: BASE_URL,
-          en: `${BASE_URL}/en`,
-        },
-      },
-    },
-    {
-      url: `${BASE_URL}/ja`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.9,
       alternates: {
         languages: {
-          ja: `${BASE_URL}/ja`,
+          ja: BASE_URL,
           en: `${BASE_URL}/en`,
         },
       },
@@ -111,56 +87,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
       },
     },
+    // Subscribe page
     {
-      url: `${BASE_URL}/ja/about`,
+      url: `${BASE_URL}/subscribe`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.7,
-      alternates: {
-        languages: {
-          ja: `${BASE_URL}/ja/about`,
-          en: `${BASE_URL}/en/about`,
-        },
-      },
+    },
+    // News page
+    {
+      url: `${BASE_URL}/news`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
     },
     // Product listings
-    {
-      url: `${BASE_URL}/#coffee`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/en/#coffee`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/ja/#coffee`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    },
-    // Workshop pages
-    {
-      url: `${BASE_URL}/#workshop`,
-      lastModified: new Date(),
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/en/#workshop`,
-      lastModified: new Date(),
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/ja/#workshop`,
-      lastModified: new Date(),
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    },
     ...productEntries,
   ];
 }

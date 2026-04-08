@@ -13,7 +13,13 @@ import { getMessages } from "@/app/lib/translations";
 export const metadata = {
   title: "FELICITY COFFEE ROASTERS | Specialty Coffee",
   description: "Specialty coffee roasters in Hayama, Japan.",
-  canonical: "https://felicity.cafe/en/",
+  alternates: {
+    canonical: "https://felicity.cafe/en",
+    languages: {
+      ja: "https://felicity.cafe",
+      en: "https://felicity.cafe/en",
+    },
+  },
 };
 
 export default function HomePageEN() {

@@ -2,10 +2,14 @@ import { Footer } from '@/app/components/Footer';
 import { BulletinBoard } from '@/app/components/BulletinBoard';
 import { newsArticles } from '@/app/lib/news';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: 'ニュース | Felicity',
-  description: 'Felicityの最新ニュースと情報',
+export const metadata: Metadata = {
+  title: 'ニュース | FELICITY COFFEE ROASTERS',
+  description: 'Felicity Coffee Roastersの最新ニュースと情報',
+  alternates: {
+    canonical: 'https://felicity.cafe/news',
+  },
 };
 
 export default function NewsPage() {
