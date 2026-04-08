@@ -1,11 +1,20 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { Header } from '@/app/components/Header';
 
 export const metadata = {
   title: 'ご登録完了 | FELICITY × PAUSE サブスク',
 };
 
-export default function SubscribeSuccessPage() {
+export default function SubscribeSuccessPage({
+  searchParams,
+}: {
+  searchParams: { session_id?: string };
+}) {
+  if (!searchParams.session_id) {
+    redirect('/subscribe');
+  }
+
   return (
     <main className="min-h-screen bg-[#F4EFE4]">
       <Header locale="ja" pathname="/subscribe" contactLabel="お問い合わせ" />

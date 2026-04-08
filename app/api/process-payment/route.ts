@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { amount, currency = 'jpy', email, fullName, items, phone, postalCode, prefecture, city, streetAddress, building } = body;
 
-    if (!amount || amount <= 0 || !email) {
+    if (!amount || typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0 || !email) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
@@ -30,9 +30,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: any) {
     console.error('Stripe API error:', error);
+    const isStripeError = error?.type && typeof error.type === 'string' && error.type.startsWith('Stripe');
     return NextResponse.json(
       { message: error.message || 'Payment processing failed' },
-      { status: 400 }
+      { status: isStripeError ? 400 : 500 }
     );
   }
 }

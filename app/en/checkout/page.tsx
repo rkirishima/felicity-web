@@ -176,6 +176,16 @@ export default function CheckoutPageEN() {
       {/* Header */}
       <Header locale="en" pathname="/en/checkout" contactLabel="CONTACT" />
 
+      {/* Quick Escape: Back to Home (visible above content) */}
+      <div className="fixed top-20 left-8 z-50">
+        <Link
+          href="/en/"
+          className="text-[13px] text-[#8C7B6B] hover:text-[#2C2416] font-mono tracking-[0.08em] uppercase transition-colors underline"
+        >
+          ← Return to Home
+        </Link>
+      </div>
+
       {/* Content with Suspense boundary */}
       <Suspense fallback={
         <div className="pt-24 pb-20 text-center">

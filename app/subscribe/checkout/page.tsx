@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
@@ -13,6 +13,7 @@ const PLAN_LABELS: Record<string, string> = {
 function CheckoutRedirect() {
   const searchParams = useSearchParams();
   const plan = searchParams?.get('plan') ?? '';
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!plan) return;
@@ -21,11 +22,38 @@ function CheckoutRedirect() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ plan }),
     })
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) {
+          setError('お支払いページへの移動に失敗しました。もう一度お試しください。');
+          return null;
+        }
+        return r.json();
+      })
       .then((data) => {
-        if (data.url) window.location.href = data.url;
+        if (data === null) return;
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          setError('お支払いページへの移動に失敗しました。もう一度お試しください。');
+        }
+      })
+      .catch(() => {
+        setError('ネットワークエラーが発生しました。もう一度お試しください。');
       });
   }, [plan]);
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#F4EFE4] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="font-mono text-[11px] tracking-[0.2em] text-[#8C7B6B] uppercase">
+            エラーが発生しました
+          </p>
+          <p className="text-[14px] text-[#2C2416]">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F4EFE4] flex items-center justify-center">
