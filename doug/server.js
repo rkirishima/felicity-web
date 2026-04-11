@@ -47,13 +47,24 @@ async function getThreadHistory(threadId) {
 
 // ── context summary ───────────────────────────────────────────────────────────
 
-async function getContextSummary(threadId) {
+async function getThreadMeta(threadId) {
   const { data } = await supabase
     .from('doug_threads')
-    .select('context_summary')
+    .select('context_summary, project_id')
     .eq('id', threadId)
     .single();
-  return data?.context_summary || null;
+  return data || {};
+}
+
+async function getProjectNotes(projectId) {
+  if (!projectId) return null;
+  const { data } = await supabase
+    .from('doug_project_notes')
+    .select('notes')
+    .eq('project_id', projectId)
+    .single();
+  const notes = data?.notes?.trim();
+  return notes || null;
 }
 
 // Generates and stores a summary of the older portion of a long thread.
@@ -139,24 +150,33 @@ async function autoTitle(threadId, firstMessage, firstReply) {
 // ── core: streaming ask ───────────────────────────────────────────────────────
 
 async function* streamAskDoug(threadId, userMessage, model = 'claude-haiku-4-5-20251001', imageUrl = null) {
-  const [systemPrompt, history, contextSummary] = await Promise.all([
+  const [systemPrompt, history, threadMeta] = await Promise.all([
     loadMemory(),
     getThreadHistory(threadId),
-    getContextSummary(threadId),
+    getThreadMeta(threadId),
   ]);
+
+  const { context_summary: contextSummary, project_id: projectId } = threadMeta;
+  const projectNotes = await getProjectNotes(projectId);
 
   await saveMessage(threadId, 'user', userMessage, imageUrl);
 
   const isFirstMessage = history.length === 0 && !contextSummary;
 
-  // System: base prompt is cached (saves tokens on repeat calls).
-  // Summary appended uncached if present.
+  // System blocks (in order):
+  // 1. Base memory — cached, same every call
+  // 2. Project notes — uncached, specific to this project
+  // 3. Thread summary — uncached, specific to this thread
   const system = [
     {
       type: 'text',
       text: systemPrompt,
       cache_control: { type: 'ephemeral' },
     },
+    ...(projectNotes ? [{
+      type: 'text',
+      text: `Project context (${projectId}):\n${projectNotes}`,
+    }] : []),
     ...(contextSummary ? [{
       type: 'text',
       text: `Earlier conversation summary:\n${contextSummary}`,

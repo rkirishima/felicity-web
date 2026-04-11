@@ -212,6 +212,11 @@ export default function DougPage() {
   // mobile navigation: 'threads' | 'chat' | 'info'
   const [mobileView, setMobileView] = useState('threads');
 
+  // project notes
+  const [projectNotesMap, setProjectNotesMap] = useState({});
+  const [expandedNotes, setExpandedNotes] = useState(null);
+  const [savingNotes, setSavingNotes] = useState(false);
+
   // right panel
   const [rightTab, setRightTab] = useState('memory');
   const [memoryFile, setMemoryFile] = useState(null);
@@ -341,6 +346,34 @@ export default function DougPage() {
     if (!data.error) {
       setSelectedThread(data);
       setThreads(prev => prev.map(t => t.id === data.id ? data : t));
+    }
+  }
+
+  // ── project notes ─────────────────────────────────────────────────────────
+
+  async function loadProjectNotes(projectId) {
+    if (projectNotesMap[projectId] !== undefined) return;
+    const res = await fetch(`/api/doug/notes?projectId=${projectId}`);
+    const data = await res.json();
+    setProjectNotesMap(prev => ({ ...prev, [projectId]: data.notes ?? '' }));
+  }
+
+  async function saveProjectNotes(projectId, notes) {
+    setSavingNotes(true);
+    await fetch('/api/doug/notes', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projectId, notes }),
+    });
+    setSavingNotes(false);
+  }
+
+  function toggleNotes(projectId) {
+    if (expandedNotes === projectId) {
+      setExpandedNotes(null);
+    } else {
+      setExpandedNotes(projectId);
+      loadProjectNotes(projectId);
     }
   }
 
@@ -658,22 +691,55 @@ export default function DougPage() {
       {rightTab === 'projects' && (
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {PROJECTS.map(p => (
-            <div key={p.id} onClick={() => handleProjectClick(p)}
-              className="px-3 py-2.5 rounded-lg hover:bg-gray-800 transition-colors cursor-pointer">
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${PROJECT_DOT[p.status]}`} />
-                {p.url ? (
-                  <a href={p.url} target={p.url.startsWith('http') ? '_blank' : '_self'} rel="noreferrer"
-                    onClick={e => e.stopPropagation()}
-                    className="text-sm text-gray-200 hover:text-white font-medium truncate">
-                    {p.name}
-                  </a>
-                ) : (
-                  <span className="text-sm text-gray-200 font-medium truncate">{p.name}</span>
-                )}
+            <div key={p.id} className="rounded-lg overflow-hidden">
+              {/* project card */}
+              <div className="px-3 py-2.5 hover:bg-gray-800 transition-colors cursor-pointer flex items-start gap-2"
+                onClick={() => handleProjectClick(p)}>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${PROJECT_DOT[p.status]}`} />
+                    {p.url ? (
+                      <a href={p.url} target={p.url.startsWith('http') ? '_blank' : '_self'} rel="noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        className="text-sm text-gray-200 hover:text-white font-medium truncate">
+                        {p.name}
+                      </a>
+                    ) : (
+                      <span className="text-sm text-gray-200 font-medium truncate">{p.name}</span>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500 leading-snug mb-0.5">{p.desc}</p>
+                  <p className="text-xs text-gray-700 font-mono truncate">{p.tech}</p>
+                </div>
+                {/* notes toggle */}
+                <button
+                  onClick={e => { e.stopPropagation(); toggleNotes(p.id); }}
+                  className={`flex-shrink-0 mt-0.5 px-2 py-0.5 rounded text-xs transition-colors ${
+                    expandedNotes === p.id ? 'bg-gray-600 text-gray-200' : 'text-gray-600 hover:text-gray-400 hover:bg-gray-800'
+                  }`}
+                  title="Project notes">
+                  ✎
+                </button>
               </div>
-              <p className="text-xs text-gray-500 leading-snug mb-1">{p.desc}</p>
-              <p className="text-xs text-gray-700 font-mono truncate">{p.tech}</p>
+              {/* notes editor */}
+              {expandedNotes === p.id && (
+                <div className="px-3 pb-3 bg-gray-800/50">
+                  <p className="text-xs text-gray-500 pt-2 pb-1.5">
+                    Notes — Doug reads these automatically in {p.name} threads
+                  </p>
+                  <textarea
+                    value={projectNotesMap[p.id] ?? ''}
+                    onChange={e => setProjectNotesMap(prev => ({ ...prev, [p.id]: e.target.value }))}
+                    onBlur={e => saveProjectNotes(p.id, e.target.value)}
+                    placeholder={`Stack, contacts, current focus, decisions…\n\ne.g. Stack: Next.js + Supabase\nDomain: ${p.url || 'tbd'}\nStatus: ${p.status}`}
+                    rows={5}
+                    className="w-full bg-gray-900 text-gray-300 text-xs rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-gray-600 placeholder-gray-700 leading-relaxed"
+                  />
+                  <p className="text-xs text-gray-700 mt-1">
+                    {savingNotes ? 'Saving…' : 'Auto-saves on blur'}
+                  </p>
+                </div>
+              )}
             </div>
           ))}
         </div>
