@@ -16,6 +16,11 @@ const supabase = createClient(
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+const CONTEXT_WINDOW = 20;      // most recent messages to include verbatim
+const SUMMARY_THRESHOLD = 40;   // generate summary when thread exceeds this many messages
+
+// ── memory ────────────────────────────────────────────────────────────────────
+
 async function loadMemory() {
   const files = ['SOUL.md', 'IDENTITY.md', 'MEMORY.md'];
   const parts = await Promise.all(
@@ -24,24 +29,82 @@ async function loadMemory() {
   return parts.join('\n\n---\n\n');
 }
 
-async function getThreadHistory(threadId, limit = 20) {
+// ── thread history ────────────────────────────────────────────────────────────
+
+// Returns the most recent CONTEXT_WINDOW messages, in chronological order.
+// Bug fix: was previously returning the FIRST N messages on long threads.
+async function getThreadHistory(threadId) {
   const { data, error } = await supabase
     .from('doug_messages')
     .select('role, content')
     .eq('thread_id', threadId)
-    .order('created_at', { ascending: true })
-    .limit(limit);
+    .order('created_at', { ascending: false })
+    .limit(CONTEXT_WINDOW);
 
   if (error) throw error;
-  return data || [];
+  return (data || []).reverse();
 }
 
+// ── context summary ───────────────────────────────────────────────────────────
+
+async function getContextSummary(threadId) {
+  const { data } = await supabase
+    .from('doug_threads')
+    .select('context_summary')
+    .eq('id', threadId)
+    .single();
+  return data?.context_summary || null;
+}
+
+// Generates and stores a summary of the older portion of a long thread.
+// Fire-and-forget — runs after the reply is sent.
+async function maybeGenerateSummary(threadId) {
+  try {
+    const { count } = await supabase
+      .from('doug_messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('thread_id', threadId);
+
+    if (!count || count <= SUMMARY_THRESHOLD) return;
+
+    // Skip if we already have one
+    const existing = await getContextSummary(threadId);
+    if (existing) return;
+
+    // Fetch all but the most recent CONTEXT_WINDOW messages
+    const { data: oldMsgs } = await supabase
+      .from('doug_messages')
+      .select('role, content')
+      .eq('thread_id', threadId)
+      .order('created_at', { ascending: true })
+      .limit(count - CONTEXT_WINDOW);
+
+    if (!oldMsgs?.length) return;
+
+    const response = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 400,
+      messages: [{
+        role: 'user',
+        content: `Summarize this conversation into a compact context block. Preserve key facts, decisions, topics covered, and important details. Be specific and concise.\n\n${oldMsgs.map(m => `${m.role.toUpperCase()}: ${m.content.slice(0, 500)}`).join('\n\n')}`,
+      }],
+    });
+
+    const summary = response.content[0].text.trim();
+    await supabase.from('doug_threads').update({ context_summary: summary }).eq('id', threadId);
+  } catch {
+    // non-critical
+  }
+}
+
+// ── persist messages ──────────────────────────────────────────────────────────
+
 async function saveMessage(threadId, role, content) {
-  const { error: msgError } = await supabase
+  const { error } = await supabase
     .from('doug_messages')
     .insert({ thread_id: threadId, role, content });
 
-  if (msgError) throw msgError;
+  if (error) throw error;
 
   const now = new Date().toISOString();
   await supabase
@@ -53,6 +116,8 @@ async function saveMessage(threadId, role, content) {
     })
     .eq('id', threadId);
 }
+
+// ── auto title ────────────────────────────────────────────────────────────────
 
 async function autoTitle(threadId, firstMessage, firstReply) {
   try {
@@ -71,39 +136,64 @@ async function autoTitle(threadId, firstMessage, firstReply) {
   }
 }
 
-async function askDoug(threadId, userMessage, model = 'claude-haiku-4-5-20251001') {
-  const [systemPrompt, history] = await Promise.all([
+// ── core: streaming ask ───────────────────────────────────────────────────────
+
+async function* streamAskDoug(threadId, userMessage, model = 'claude-haiku-4-5-20251001') {
+  const [systemPrompt, history, contextSummary] = await Promise.all([
     loadMemory(),
     getThreadHistory(threadId),
+    getContextSummary(threadId),
   ]);
 
   await saveMessage(threadId, 'user', userMessage);
+
+  const isFirstMessage = history.length === 0 && !contextSummary;
+
+  // System: base prompt is cached (saves tokens on repeat calls).
+  // Summary appended uncached if present.
+  const system = [
+    {
+      type: 'text',
+      text: systemPrompt,
+      cache_control: { type: 'ephemeral' },
+    },
+    ...(contextSummary ? [{
+      type: 'text',
+      text: `Earlier conversation summary:\n${contextSummary}`,
+    }] : []),
+  ];
 
   const messages = [
     ...history.map(m => ({ role: m.role, content: m.content })),
     { role: 'user', content: userMessage },
   ];
 
-  const response = await anthropic.messages.create({
-    model,
-    max_tokens: 1024,
-    system: systemPrompt,
-    messages,
-  });
+  const stream = anthropic.messages.stream({ model, max_tokens: 1024, system, messages });
 
-  const reply = response.content
-    .filter(b => b.type === 'text')
-    .map(b => b.text)
-    .join('');
-
-  await saveMessage(threadId, 'assistant', reply);
-
-  // Auto-title on first exchange (fire and forget)
-  if (history.length === 0) {
-    autoTitle(threadId, userMessage, reply);
+  let fullReply = '';
+  for await (const event of stream) {
+    if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+      fullReply += event.delta.text;
+      yield event.delta.text;
+    }
   }
 
-  return reply;
+  // Save assistant reply — must complete before [DONE] reaches the client
+  await saveMessage(threadId, 'assistant', fullReply);
+
+  // Non-critical post-send work
+  if (isFirstMessage) autoTitle(threadId, userMessage, fullReply).catch(() => {});
+  maybeGenerateSummary(threadId).catch(() => {});
 }
 
-export { askDoug, supabase };
+// ── non-streaming wrapper (used by Telegram bot) ──────────────────────────────
+
+async function askDoug(threadId, userMessage, model = 'claude-haiku-4-5-20251001') {
+  let fullReply = '';
+  for await (const chunk of streamAskDoug(threadId, userMessage, model)) {
+    fullReply += chunk;
+  }
+  return fullReply;
+}
+
+export { askDoug, streamAskDoug, supabase };

@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // ── constants ────────────────────────────────────────────────────────────────
 
@@ -30,6 +32,40 @@ function relativeTime(ts) {
   if (h < 24) return `${h}h`;
   return `${d}d`;
 }
+
+// ── markdown renderer ─────────────────────────────────────────────────────────
+
+const mdComponents = {
+  code({ node, inline, className, children, ...props }) {
+    if (inline) {
+      return <code className="bg-gray-700 px-1 py-0.5 rounded text-xs font-mono text-gray-200" {...props}>{children}</code>;
+    }
+    return (
+      <pre className="bg-gray-950 rounded-lg p-3 overflow-x-auto my-2 text-xs">
+        <code className="font-mono text-gray-300" {...props}>{children}</code>
+      </pre>
+    );
+  },
+  a({ children, href, ...props }) {
+    return <a href={href} target="_blank" rel="noreferrer" className="text-blue-400 underline underline-offset-2" {...props}>{children}</a>;
+  },
+  p({ children }) { return <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>; },
+  ul({ children }) { return <ul className="list-disc list-inside mb-2 space-y-0.5">{children}</ul>; },
+  ol({ children }) { return <ol className="list-decimal list-inside mb-2 space-y-0.5">{children}</ol>; },
+  li({ children }) { return <li className="text-gray-200">{children}</li>; },
+  h1({ children }) { return <h1 className="text-sm font-bold mb-2 mt-3 first:mt-0 text-white">{children}</h1>; },
+  h2({ children }) { return <h2 className="text-sm font-bold mb-1.5 mt-2.5 first:mt-0 text-white">{children}</h2>; },
+  h3({ children }) { return <h3 className="text-xs font-semibold mb-1 mt-2 first:mt-0 text-gray-100 uppercase tracking-wide">{children}</h3>; },
+  strong({ children }) { return <strong className="font-semibold text-gray-100">{children}</strong>; },
+  em({ children }) { return <em className="italic text-gray-300">{children}</em>; },
+  blockquote({ children }) {
+    return <blockquote className="border-l-2 border-gray-600 pl-3 text-gray-400 my-2 italic">{children}</blockquote>;
+  },
+  hr() { return <hr className="border-gray-700 my-3" />; },
+  table({ children }) { return <div className="overflow-x-auto my-2"><table className="text-xs border-collapse w-full">{children}</table></div>; },
+  th({ children }) { return <th className="border border-gray-700 px-2 py-1 text-left font-semibold text-gray-200 bg-gray-800">{children}</th>; },
+  td({ children }) { return <td className="border border-gray-700 px-2 py-1 text-gray-300">{children}</td>; },
+};
 
 // ── pin screen ───────────────────────────────────────────────────────────────
 
@@ -182,6 +218,8 @@ export default function DougPage() {
   const messagesEndRef = useRef(null);
   const searchTimer = useRef(null);
   const isInitialLoad = useRef(false);
+  const prevMsgCount = useRef(0);
+  const scrollRAF = useRef(null);
 
   // ── auth ──
   useEffect(() => {
@@ -196,14 +234,25 @@ export default function DougPage() {
     if (selectedThread) loadMessages(selectedThread.id);
   }, [selectedThread?.id]);
 
+  // ── scroll: instant on load, smooth on new message, instant on streaming ──
   useEffect(() => {
-    if (!messagesEndRef.current) return;
-    if (isInitialLoad.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
-      isInitialLoad.current = false;
-    } else {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (!messagesEndRef.current || messages.length === 0) return;
+
+    if (scrollRAF.current) cancelAnimationFrame(scrollRAF.current);
+    scrollRAF.current = requestAnimationFrame(() => {
+      if (!messagesEndRef.current) return;
+      if (isInitialLoad.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
+        isInitialLoad.current = false;
+      } else if (messages.length > prevMsgCount.current) {
+        // New message added (user or start of assistant reply)
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        // Content update during streaming — follow without jank
+        messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
+      }
+      prevMsgCount.current = messages.length;
+    });
   }, [messages]);
 
   // ── search debounce ──
@@ -261,6 +310,7 @@ export default function DougPage() {
   function selectThread(thread) {
     setSelectedThread(thread);
     setMessages([]);
+    prevMsgCount.current = 0;
     setSearchQuery('');
     setLeftOpen(false);
   }
@@ -286,32 +336,79 @@ export default function DougPage() {
     }
   }
 
-  // ── send message ──
+  // ── send message (streaming) ──────────────────────────────────────────────
   async function sendMessage() {
     if (!draft.trim() || !selectedThread || sending) return;
     const text = draft.trim();
     setDraft('');
     setSending(true);
-    setMessages(prev => [...prev, { id: `opt-${Date.now()}`, role: 'user', content: text, created_at: new Date().toISOString() }]);
+
+    const streamingId = `streaming-${Date.now()}`;
+
+    setMessages(prev => [
+      ...prev,
+      { id: `opt-${Date.now()}`, role: 'user', content: text, created_at: new Date().toISOString() },
+      { id: streamingId, role: 'assistant', content: '', created_at: new Date().toISOString(), streaming: true },
+    ]);
+
     try {
       const res = await fetch('/api/doug/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ threadId: selectedThread.id, message: text, model }),
       });
-      const data = await res.json();
-      if (data.error) {
-        setMessages(prev => [...prev, { id: `err-${Date.now()}`, role: 'error', content: data.error, created_at: new Date().toISOString() }]);
-      } else {
-        await loadMessages(selectedThread.id);
-        await loadThreads();
-        // refresh selected thread (title may have been auto-updated)
-        const updated = (await (await fetch('/api/doug/threads')).json());
-        const fresh = updated.find?.(t => t.id === selectedThread.id);
-        if (fresh) setSelectedThread(fresh);
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? '';
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const raw = line.slice(6).trim();
+          if (raw === '[DONE]') break;
+          try {
+            const parsed = JSON.parse(raw);
+            if (parsed.error) throw new Error(parsed.error);
+            if (parsed.text) {
+              setMessages(prev => prev.map(m =>
+                m.id === streamingId ? { ...m, content: m.content + parsed.text } : m
+              ));
+            }
+          } catch (e) {
+            if (e.message !== 'Unexpected end of JSON input') throw e;
+          }
+        }
       }
+
+      // Remove streaming flag, then reload from DB (message is now saved)
+      setMessages(prev => prev.map(m => m.id === streamingId ? { ...m, streaming: false } : m));
+      await loadMessages(selectedThread.id);
+
+      // Refresh thread list (title may have been auto-updated)
+      loadThreads().then(() => {
+        setThreads(prev => {
+          const fresh = prev.find(t => t.id === selectedThread.id);
+          if (fresh) setSelectedThread(fresh);
+          return prev;
+        });
+      });
+
     } catch (err) {
-      setMessages(prev => [...prev, { id: `err-${Date.now()}`, role: 'error', content: err.message, created_at: new Date().toISOString() }]);
+      setMessages(prev => prev.map(m =>
+        m.id === streamingId
+          ? { id: `err-${Date.now()}`, role: 'error', content: err.message, created_at: new Date().toISOString() }
+          : m
+      ));
     } finally {
       setSending(false);
     }
@@ -436,21 +533,18 @@ export default function DougPage() {
           {selectedThread ? (
             <>
               <span className="text-sm font-medium text-gray-200 flex-1 truncate">{selectedThread.title}</span>
-              {/* status */}
               <select value={selectedThread.status || 'open'} onChange={e => updateThread({ status: e.target.value })}
                 className="text-xs bg-gray-800 text-gray-400 border border-gray-700 rounded px-2 py-1 focus:outline-none">
                 <option value="open">Open</option>
                 <option value="done">Done</option>
                 <option value="waiting">Waiting</option>
               </select>
-              {/* pin */}
               <button onClick={() => updateThread({ pinned: !selectedThread.pinned })}
                 className={`text-sm px-1 ${selectedThread.pinned ? 'text-yellow-400' : 'text-gray-600 hover:text-gray-400'}`}
                 title={selectedThread.pinned ? 'Unpin' : 'Pin'}>★</button>
               <div className="w-px h-4 bg-gray-700 mx-1" />
             </>
           ) : <span className="flex-1" />}
-          {/* model */}
           <span className="text-gray-500 text-xs">Model</span>
           {['haiku', 'sonnet'].map(m => (
             <button key={m} onClick={() => setModel(m)}
@@ -473,11 +567,22 @@ export default function DougPage() {
           ) : (
             messages.map(msg => (
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[78%] px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap leading-relaxed ${
-                  msg.role === 'user'    ? 'bg-gray-700 text-gray-100 rounded-br-sm' :
-                  msg.role === 'error'   ? 'bg-red-900/50 text-red-300 rounded-bl-sm' :
-                                          'bg-gray-800 text-gray-200 rounded-bl-sm'
-                }`}>{msg.content}</div>
+                <div className={`max-w-[78%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                  msg.role === 'user'  ? 'bg-gray-700 text-gray-100 rounded-br-sm whitespace-pre-wrap' :
+                  msg.role === 'error' ? 'bg-red-900/50 text-red-300 rounded-bl-sm whitespace-pre-wrap' :
+                                        'bg-gray-800 text-gray-200 rounded-bl-sm'
+                }`}>
+                  {msg.role === 'assistant' ? (
+                    <>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                        {msg.content}
+                      </ReactMarkdown>
+                      {msg.streaming && (
+                        <span className="inline-block w-0.5 h-3.5 bg-gray-400 ml-0.5 align-middle animate-pulse" />
+                      )}
+                    </>
+                  ) : msg.content}
+                </div>
               </div>
             ))
           )}
@@ -541,7 +646,6 @@ export default function DougPage() {
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
           ))}
-          {/* close button (mobile) */}
           <button onClick={() => setRightOpen(false)} className="md:hidden px-3 text-gray-600 hover:text-gray-400">×</button>
         </div>
 
