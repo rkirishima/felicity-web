@@ -6,7 +6,7 @@ const MODEL_MAP = {
 };
 
 export async function POST(request) {
-  const { threadId, message, model } = await request.json();
+  const { threadId, message, model, imageUrl } = await request.json();
   const resolvedModel = MODEL_MAP[model] ?? MODEL_MAP.haiku;
 
   const encoder = new TextEncoder();
@@ -14,7 +14,7 @@ export async function POST(request) {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        for await (const chunk of streamAskDoug(threadId, message, resolvedModel)) {
+        for await (const chunk of streamAskDoug(threadId, message, resolvedModel, imageUrl ?? null)) {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: chunk })}\n\n`));
         }
         controller.enqueue(encoder.encode('data: [DONE]\n\n'));

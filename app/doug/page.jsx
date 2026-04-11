@@ -200,6 +200,8 @@ export default function DougPage() {
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
   const [model, setModel] = useState('haiku');
+  const [selectedImage, setSelectedImage] = useState(null); // { file, previewUrl }
+  const fileInputRef = useRef(null);
 
   // drawers (mobile)
   const [leftOpen, setLeftOpen] = useState(false);
@@ -336,18 +338,76 @@ export default function DougPage() {
     }
   }
 
+  // ── image helpers ────────────────────────────────────────────────────────
+
+  // Resize to max 1920px and re-encode as JPEG to stay under Vercel's 4.5MB limit
+  async function resizeImage(file) {
+    return new Promise(resolve => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const MAX = 1920;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width  = Math.round(img.width  * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        URL.revokeObjectURL(url);
+        canvas.toBlob(blob => resolve(new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' })), 'image/jpeg', 0.85);
+      };
+      img.src = url;
+    });
+  }
+
+  function handleFileChange(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+    const previewUrl = URL.createObjectURL(file);
+    setSelectedImage({ file, previewUrl });
+  }
+
+  function clearImage() {
+    if (selectedImage?.previewUrl) URL.revokeObjectURL(selectedImage.previewUrl);
+    setSelectedImage(null);
+  }
+
   // ── send message (streaming) ──────────────────────────────────────────────
   async function sendMessage() {
-    if (!draft.trim() || !selectedThread || sending) return;
+    if (!draft.trim() && !selectedImage) return;
+    if (!selectedThread || sending) return;
+
     const text = draft.trim();
     setDraft('');
     setSending(true);
+
+    // Upload image first if attached
+    let imageUrl = null;
+    let imagePreview = null;
+    if (selectedImage) {
+      imagePreview = selectedImage.previewUrl;
+      clearImage();
+      try {
+        const resized = await resizeImage(selectedImage.file);
+        const form = new FormData();
+        form.append('file', resized);
+        form.append('threadId', selectedThread.id);
+        const up = await fetch('/api/doug/upload', { method: 'POST', body: form });
+        const upData = await up.json();
+        if (upData.error) throw new Error(upData.error);
+        imageUrl = upData.url;
+      } catch (err) {
+        setMessages(prev => [...prev, { id: `err-${Date.now()}`, role: 'error', content: `Upload failed: ${err.message}`, created_at: new Date().toISOString() }]);
+        setSending(false);
+        return;
+      }
+    }
 
     const streamingId = `streaming-${Date.now()}`;
 
     setMessages(prev => [
       ...prev,
-      { id: `opt-${Date.now()}`, role: 'user', content: text, created_at: new Date().toISOString() },
+      { id: `opt-${Date.now()}`, role: 'user', content: text, image_url: imageUrl, created_at: new Date().toISOString() },
       { id: streamingId, role: 'assistant', content: '', created_at: new Date().toISOString(), streaming: true },
     ]);
 
@@ -355,7 +415,7 @@ export default function DougPage() {
       const res = await fetch('/api/doug/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ threadId: selectedThread.id, message: text, model }),
+        body: JSON.stringify({ threadId: selectedThread.id, message: text, model, imageUrl }),
       });
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -567,21 +627,34 @@ export default function DougPage() {
           ) : (
             messages.map(msg => (
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[78%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
-                  msg.role === 'user'  ? 'bg-gray-700 text-gray-100 rounded-br-sm whitespace-pre-wrap' :
-                  msg.role === 'error' ? 'bg-red-900/50 text-red-300 rounded-bl-sm whitespace-pre-wrap' :
+                <div className={`max-w-[78%] rounded-2xl text-sm leading-relaxed overflow-hidden ${
+                  msg.role === 'user'  ? 'bg-gray-700 text-gray-100 rounded-br-sm' :
+                  msg.role === 'error' ? 'bg-red-900/50 text-red-300 rounded-bl-sm px-4 py-2.5 whitespace-pre-wrap' :
                                         'bg-gray-800 text-gray-200 rounded-bl-sm'
                 }`}>
-                  {msg.role === 'assistant' ? (
-                    <>
-                      <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
-                        {msg.content}
-                      </ReactMarkdown>
-                      {msg.streaming && (
-                        <span className="inline-block w-0.5 h-3.5 bg-gray-400 ml-0.5 align-middle animate-pulse" />
+                  {/* image attachment */}
+                  {msg.image_url && (
+                    <a href={msg.image_url} target="_blank" rel="noreferrer">
+                      <img src={msg.image_url} alt="Attached" className="w-full max-h-72 object-cover block" />
+                    </a>
+                  )}
+                  {/* message content */}
+                  {(msg.content || msg.streaming) && (
+                    <div className="px-4 py-2.5">
+                      {msg.role === 'assistant' ? (
+                        <>
+                          <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                            {msg.content}
+                          </ReactMarkdown>
+                          {msg.streaming && (
+                            <span className="inline-block w-0.5 h-3.5 bg-gray-400 ml-0.5 align-middle animate-pulse" />
+                          )}
+                        </>
+                      ) : (
+                        <span className="whitespace-pre-wrap">{msg.content}</span>
                       )}
-                    </>
-                  ) : msg.content}
+                    </div>
+                  )}
                 </div>
               </div>
             ))
@@ -615,15 +688,36 @@ export default function DougPage() {
 
         {/* input */}
         <div className="px-4 py-3 border-t border-gray-800 bg-gray-900 flex-shrink-0">
+          {/* image preview */}
+          {selectedImage && (
+            <div className="mb-2 relative inline-block">
+              <img src={selectedImage.previewUrl} alt="Preview" className="h-20 w-20 object-cover rounded-xl" />
+              <button onClick={clearImage}
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-600 hover:bg-gray-500 text-white rounded-full text-xs leading-none flex items-center justify-center">
+                ×
+              </button>
+            </div>
+          )}
           <div className="flex gap-2 items-end">
+            {/* hidden file input */}
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+            {/* attach button */}
+            <button onClick={() => fileInputRef.current?.click()}
+              disabled={!selectedThread || sending}
+              className="flex-shrink-0 w-9 h-9 flex items-center justify-center bg-gray-800 hover:bg-gray-700 disabled:opacity-30 text-gray-400 hover:text-gray-200 rounded-xl transition-colors"
+              title="Attach image">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+              </svg>
+            </button>
             <textarea value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={handleKeyDown}
               disabled={!selectedThread || sending}
-              placeholder={selectedThread ? 'Message Doug… (Enter to send)' : 'Select a thread first'}
+              placeholder={selectedThread ? (selectedImage ? 'Add a message… (optional)' : 'Message Doug… (Enter to send)') : 'Select a thread first'}
               rows={1}
               className="flex-1 bg-gray-800 text-gray-200 placeholder-gray-600 rounded-xl px-4 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-gray-600 disabled:opacity-40"
               style={{ minHeight: '2.5rem', maxHeight: '8rem' }}
               onInput={e => { e.target.style.height = 'auto'; e.target.style.height = `${Math.min(e.target.scrollHeight, 128)}px`; }} />
-            <button onClick={sendMessage} disabled={!selectedThread || !draft.trim() || sending}
+            <button onClick={sendMessage} disabled={!selectedThread || (!draft.trim() && !selectedImage) || sending}
               className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-30 text-gray-200 rounded-xl text-sm transition-colors whitespace-nowrap">
               {sending ? '…' : 'Send'}
             </button>

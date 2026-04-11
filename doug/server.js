@@ -99,11 +99,11 @@ async function maybeGenerateSummary(threadId) {
 
 // ── persist messages ──────────────────────────────────────────────────────────
 
-async function saveMessage(threadId, role, content) {
-  const { error } = await supabase
-    .from('doug_messages')
-    .insert({ thread_id: threadId, role, content });
+async function saveMessage(threadId, role, content, imageUrl = null) {
+  const row = { thread_id: threadId, role, content };
+  if (imageUrl) row.image_url = imageUrl;
 
+  const { error } = await supabase.from('doug_messages').insert(row);
   if (error) throw error;
 
   const now = new Date().toISOString();
@@ -138,14 +138,14 @@ async function autoTitle(threadId, firstMessage, firstReply) {
 
 // ── core: streaming ask ───────────────────────────────────────────────────────
 
-async function* streamAskDoug(threadId, userMessage, model = 'claude-haiku-4-5-20251001') {
+async function* streamAskDoug(threadId, userMessage, model = 'claude-haiku-4-5-20251001', imageUrl = null) {
   const [systemPrompt, history, contextSummary] = await Promise.all([
     loadMemory(),
     getThreadHistory(threadId),
     getContextSummary(threadId),
   ]);
 
-  await saveMessage(threadId, 'user', userMessage);
+  await saveMessage(threadId, 'user', userMessage, imageUrl);
 
   const isFirstMessage = history.length === 0 && !contextSummary;
 
@@ -163,9 +163,15 @@ async function* streamAskDoug(threadId, userMessage, model = 'claude-haiku-4-5-2
     }] : []),
   ];
 
+  // Build user content — image block first if present, then text
+  const userContent = [
+    ...(imageUrl ? [{ type: 'image', source: { type: 'url', url: imageUrl } }] : []),
+    { type: 'text', text: userMessage || ' ' },
+  ];
+
   const messages = [
     ...history.map(m => ({ role: m.role, content: m.content })),
-    { role: 'user', content: userMessage },
+    { role: 'user', content: userContent },
   ];
 
   const stream = anthropic.messages.stream({ model, max_tokens: 1024, system, messages });

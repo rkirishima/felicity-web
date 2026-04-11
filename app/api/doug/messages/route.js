@@ -13,7 +13,7 @@ export async function GET(request) {
 
   const { data, error } = await supabase
     .from('doug_messages')
-    .select('*')
+    .select('id, role, content, image_url, created_at')
     .eq('thread_id', threadId)
     .order('created_at', { ascending: true });
 
