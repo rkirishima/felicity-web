@@ -209,9 +209,8 @@ export default function DougPage() {
   const [voiceLang, setVoiceLang] = useState('ja-JP');
   const recognitionRef = useRef(null);
 
-  // drawers (mobile)
-  const [leftOpen, setLeftOpen] = useState(false);
-  const [rightOpen, setRightOpen] = useState(false);
+  // mobile navigation: 'threads' | 'chat' | 'info'
+  const [mobileView, setMobileView] = useState('threads');
 
   // right panel
   const [rightTab, setRightTab] = useState('memory');
@@ -321,7 +320,7 @@ export default function DougPage() {
     setMessages([]);
     prevMsgCount.current = 0;
     setSearchQuery('');
-    setLeftOpen(false);
+    setMobileView('chat');
   }
 
   async function deleteThread(e, threadId) {
@@ -550,8 +549,7 @@ export default function DougPage() {
   // ── project click (from Projects tab) ──
   function handleProjectClick(project) {
     setProjectFilter(project.id);
-    setRightOpen(false);
-    setLeftOpen(true);
+    setMobileView('threads');
   }
 
   // ── filtered thread list ──
@@ -562,103 +560,329 @@ export default function DougPage() {
   // ── derived ──
   const threadCost = selectedThread?.cost_usd != null ? `$${Number(selectedThread.cost_usd).toFixed(4)}` : '—';
   const threadModel = selectedThread?.model_used ?? '—';
-  const anyDrawerOpen = leftOpen || rightOpen;
 
   if (!unlocked) return <PinScreen onUnlock={() => setUnlocked(true)} />;
+
+  // ── shared sub-sections ──────────────────────────────────────────────────
+
+  const threadListContent = (
+    <>
+      {/* search */}
+      <div className="p-2 border-b border-gray-800 flex-shrink-0">
+        <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+          placeholder="Search…"
+          className="w-full bg-gray-800 text-gray-200 placeholder-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-600" />
+      </div>
+      {/* project filter pills */}
+      <div className="flex gap-1.5 px-2 py-2 overflow-x-auto border-b border-gray-800 flex-shrink-0" style={{ scrollbarWidth: 'none' }}>
+        <button onClick={() => setProjectFilter(null)}
+          className={`flex-shrink-0 px-3 py-1 rounded-full text-xs transition-colors ${!projectFilter ? 'bg-gray-600 text-white' : 'bg-gray-800 text-gray-400'}`}>
+          All
+        </button>
+        {PROJECTS.map(p => (
+          <button key={p.id} onClick={() => setProjectFilter(projectFilter === p.id ? null : p.id)}
+            className={`flex-shrink-0 px-3 py-1 rounded-full text-xs transition-colors ${projectFilter === p.id ? 'bg-gray-600 text-white' : 'bg-gray-800 text-gray-400'}`}>
+            {p.name}
+          </button>
+        ))}
+      </div>
+      {/* new thread */}
+      <div className="p-2 border-b border-gray-800 flex-shrink-0">
+        <button onClick={() => createThread(projectFilter)}
+          className="w-full py-2 px-3 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg text-sm transition-colors text-left">
+          + New Thread{projectFilter ? ` in ${PROJECTS.find(p => p.id === projectFilter)?.name}` : ''}
+        </button>
+      </div>
+      {/* list */}
+      <div className="flex-1 overflow-y-auto">
+        {searchQuery ? (
+          searching
+            ? <p className="text-gray-600 text-sm px-4 py-4">Searching…</p>
+            : <SearchResults results={searchResults} query={searchQuery} onSelectThread={t => selectThread(t)} />
+        ) : threadsLoading ? (
+          <p className="text-gray-600 text-sm px-4 py-4">Loading…</p>
+        ) : displayThreads.length === 0 ? (
+          <p className="text-gray-600 text-sm px-4 py-4">No threads{projectFilter ? ' for this project' : ''}</p>
+        ) : (
+          displayThreads.map(thread => (
+            <ThreadItem key={thread.id} thread={thread}
+              isSelected={selectedThread?.id === thread.id}
+              onSelect={() => selectThread(thread)}
+              onDelete={deleteThread} />
+          ))
+        )}
+      </div>
+      {/* cost footer */}
+      <div className="p-3 border-t border-gray-800 flex justify-between items-center flex-shrink-0">
+        <p className="text-gray-600 text-xs">This month</p>
+        <p className="text-gray-300 text-xs font-mono">{monthlyCost != null ? `$${monthlyCost.toFixed(4)}` : '—'}</p>
+      </div>
+    </>
+  );
+
+  const infoPanelContent = (
+    <>
+      <div className="flex border-b border-gray-800 flex-shrink-0">
+        {['memory', 'projects'].map(tab => (
+          <button key={tab} onClick={() => setRightTab(tab)}
+            className={`flex-1 py-3 text-xs transition-colors ${rightTab === tab ? 'text-gray-200 border-b border-gray-400' : 'text-gray-600 hover:text-gray-400'}`}>
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
+      </div>
+      {rightTab === 'memory' && (
+        <>
+          <div className="p-2 space-y-1 flex-1 overflow-y-auto">
+            {MEMORY_FILES.map(f => (
+              <button key={f} onClick={() => setMemoryFile(f)}
+                className="w-full text-left px-3 py-2.5 text-sm text-gray-400 hover:text-gray-200 hover:bg-gray-800 rounded-lg transition-colors font-mono">
+                {f}
+              </button>
+            ))}
+          </div>
+          {selectedThread && (
+            <div className="p-3 border-t border-gray-800 flex-shrink-0">
+              <p className="text-gray-500 text-xs uppercase tracking-wider mb-2">Thread</p>
+              <div className="space-y-1.5">
+                {[['Messages', messages.length], ['Model', threadModel], ['Cost', threadCost]].map(([k, v]) => (
+                  <div key={k} className="flex justify-between text-xs">
+                    <span className="text-gray-600">{k}</span>
+                    <span className="text-gray-300 font-mono truncate max-w-[8rem]">{v}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+      {rightTab === 'projects' && (
+        <div className="flex-1 overflow-y-auto p-2 space-y-1">
+          {PROJECTS.map(p => (
+            <div key={p.id} onClick={() => handleProjectClick(p)}
+              className="px-3 py-2.5 rounded-lg hover:bg-gray-800 transition-colors cursor-pointer">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${PROJECT_DOT[p.status]}`} />
+                {p.url ? (
+                  <a href={p.url} target={p.url.startsWith('http') ? '_blank' : '_self'} rel="noreferrer"
+                    onClick={e => e.stopPropagation()}
+                    className="text-sm text-gray-200 hover:text-white font-medium truncate">
+                    {p.name}
+                  </a>
+                ) : (
+                  <span className="text-sm text-gray-200 font-medium truncate">{p.name}</span>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 leading-snug mb-1">{p.desc}</p>
+              <p className="text-xs text-gray-700 font-mono truncate">{p.tech}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  );
+
+  const chatContent = (
+    <>
+      {/* messages */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+        {!selectedThread ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-gray-600 text-sm">Select or create a thread</p>
+          </div>
+        ) : messagesLoading ? (
+          <p className="text-gray-600 text-sm text-center pt-8">Loading…</p>
+        ) : messages.length === 0 ? (
+          <p className="text-gray-600 text-sm text-center pt-8">Start the conversation</p>
+        ) : (
+          messages.map(msg => (
+            <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[78%] rounded-2xl text-sm leading-relaxed overflow-hidden ${
+                msg.role === 'user'  ? 'bg-gray-700 text-gray-100 rounded-br-sm' :
+                msg.role === 'error' ? 'bg-red-900/50 text-red-300 rounded-bl-sm px-4 py-2.5 whitespace-pre-wrap' :
+                                      'bg-gray-800 text-gray-200 rounded-bl-sm'
+              }`}>
+                {msg.image_url && (
+                  <a href={msg.image_url} target="_blank" rel="noreferrer">
+                    <img src={msg.image_url} alt="Attached" className="w-full max-h-72 object-cover block" />
+                  </a>
+                )}
+                {(msg.content || msg.streaming) && (
+                  <div className="px-4 py-2.5">
+                    {msg.role === 'assistant' ? (
+                      <>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                          {msg.content}
+                        </ReactMarkdown>
+                        {msg.streaming && <span className="inline-block w-0.5 h-3.5 bg-gray-400 ml-0.5 align-middle animate-pulse" />}
+                      </>
+                    ) : (
+                      <span className="whitespace-pre-wrap">{msg.content}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* model / status bar */}
+      <div className="flex items-center gap-2 px-4 py-1.5 border-t border-gray-800 bg-gray-900 flex-shrink-0">
+        <span className="text-gray-600 text-xs">Model</span>
+        {['haiku', 'sonnet'].map(m => (
+          <button key={m} onClick={() => setModel(m)}
+            className={`px-2.5 py-0.5 rounded-full text-xs transition-colors ${model === m ? 'bg-gray-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>
+            {m.charAt(0).toUpperCase() + m.slice(1)}
+          </button>
+        ))}
+        {selectedThread && (
+          <>
+            <div className="flex-1" />
+            <select value={selectedThread.status || 'open'} onChange={e => updateThread({ status: e.target.value })}
+              className="text-xs bg-gray-800 text-gray-400 border border-gray-700 rounded px-2 py-0.5 focus:outline-none">
+              <option value="open">Open</option>
+              <option value="done">Done</option>
+              <option value="waiting">Waiting</option>
+            </select>
+            <button onClick={() => updateThread({ pinned: !selectedThread.pinned })}
+              className={`text-sm px-1 ${selectedThread.pinned ? 'text-yellow-400' : 'text-gray-600 hover:text-gray-400'}`}>★</button>
+          </>
+        )}
+      </div>
+
+      {/* input */}
+      <div className="px-4 pt-2 pb-3 border-t border-gray-800 bg-gray-900 flex-shrink-0"
+        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+        {selectedImage && (
+          <div className="mb-2 relative inline-block">
+            <img src={selectedImage.previewUrl} alt="Preview" className="h-20 w-20 object-cover rounded-xl" />
+            <button onClick={clearImage}
+              className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-600 hover:bg-gray-500 text-white rounded-full text-xs leading-none flex items-center justify-center">×</button>
+          </div>
+        )}
+        {isRecording && (
+          <div className="mb-1.5 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
+            <span className="text-xs text-gray-400 italic truncate">{interimText || 'Listening…'}</span>
+          </div>
+        )}
+        <div className="flex gap-2 items-end">
+          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+          {/* attach */}
+          <button onClick={() => fileInputRef.current?.click()} disabled={!selectedThread || sending}
+            className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-gray-800 hover:bg-gray-700 disabled:opacity-30 text-gray-400 hover:text-gray-200 rounded-xl transition-colors" title="Attach image">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+            </svg>
+          </button>
+          {/* mic */}
+          <div className="flex-shrink-0 flex flex-col items-center gap-0.5">
+            <button onClick={toggleRecording} disabled={!selectedThread || sending}
+              className={`w-10 h-10 flex items-center justify-center rounded-xl transition-colors disabled:opacity-30 ${
+                isRecording ? 'bg-red-600 hover:bg-red-500 text-white' : 'bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-gray-200'
+              }`}>
+              {isRecording ? (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+              )}
+            </button>
+            <button onClick={toggleVoiceLang} className="text-[9px] text-gray-600 hover:text-gray-400 transition-colors leading-none tracking-wide">
+              {voiceLang === 'ja-JP' ? 'JA' : 'EN'}
+            </button>
+          </div>
+          <textarea value={draft} onChange={e => { if (!isRecording) setDraft(e.target.value); }} onKeyDown={handleKeyDown}
+            disabled={!selectedThread || sending}
+            placeholder={!selectedThread ? 'Select a thread first' : selectedImage ? 'Add a message… (optional)' : isRecording ? '' : 'Message Doug…'}
+            rows={1}
+            className="flex-1 bg-gray-800 text-gray-200 placeholder-gray-600 rounded-xl px-4 py-2.5 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-gray-600 disabled:opacity-40"
+            style={{ minHeight: '2.75rem', maxHeight: '8rem' }}
+            onInput={e => { e.target.style.height = 'auto'; e.target.style.height = `${Math.min(e.target.scrollHeight, 128)}px`; }} />
+          <button onClick={sendMessage} disabled={!selectedThread || (!draft.trim() && !selectedImage) || sending}
+            className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-gray-700 hover:bg-gray-600 disabled:opacity-30 text-gray-200 rounded-xl text-sm transition-colors">
+            {sending ? '…' : (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 -rotate-90">
+                <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+              </svg>
+            )}
+          </button>
+        </div>
+      </div>
+    </>
+  );
 
   // ── layout ───────────────────────────────────────────────────────────────
 
   return (
     <div className="flex h-screen bg-gray-950 text-gray-200 overflow-hidden">
 
-      {/* backdrop (mobile only) */}
-      {anyDrawerOpen && (
-        <div className="fixed inset-0 bg-black/60 z-40 md:hidden"
-          onClick={() => { setLeftOpen(false); setRightOpen(false); }} />
-      )}
-
-      {/* ── LEFT: thread list ────────────────────────────────────────────── */}
-      <aside className={`
-        fixed inset-y-0 left-0 z-50 w-72 flex flex-col bg-gray-900 border-r border-gray-800
-        transform transition-transform duration-200
-        ${leftOpen ? 'translate-x-0' : '-translate-x-full'}
-        md:relative md:translate-x-0 md:w-64 md:z-auto
-      `}>
-        {/* search */}
-        <div className="p-2 border-b border-gray-800">
-          <input
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search…"
-            className="w-full bg-gray-800 text-gray-200 placeholder-gray-600 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-gray-600"
-          />
-        </div>
-
-        {/* project filter pills */}
-        <div className="flex gap-1.5 px-2 py-2 overflow-x-auto border-b border-gray-800 scrollbar-none">
-          <button onClick={() => setProjectFilter(null)}
-            className={`flex-shrink-0 px-2.5 py-1 rounded-full text-xs transition-colors ${!projectFilter ? 'bg-gray-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>
-            All
-          </button>
-          {PROJECTS.map(p => (
-            <button key={p.id} onClick={() => setProjectFilter(projectFilter === p.id ? null : p.id)}
-              className={`flex-shrink-0 px-2.5 py-1 rounded-full text-xs transition-colors ${projectFilter === p.id ? 'bg-gray-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>
-              {p.name}
+      {/* ── MOBILE: thread list view ─────────────────────────────────────── */}
+      <div className={`flex flex-col w-full bg-gray-900 md:hidden ${mobileView === 'threads' ? 'flex' : 'hidden'}`}>
+        {/* header */}
+        <div className="flex items-center justify-between px-4 bg-gray-900 border-b border-gray-800 flex-shrink-0"
+          style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))', paddingBottom: '0.75rem' }}>
+          <span className="text-base font-semibold text-gray-100">Doug</span>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setMobileView('info')} className="text-gray-400 hover:text-gray-200 p-1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
             </button>
-          ))}
+            <button onClick={() => createThread(projectFilter)}
+              className="w-8 h-8 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg text-lg leading-none">+</button>
+          </div>
         </div>
+        {threadListContent}
+      </div>
 
-        {/* new thread button */}
-        <div className="p-2 border-b border-gray-800">
-          <button onClick={() => createThread(projectFilter)}
-            className="w-full py-1.5 px-3 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg text-xs transition-colors text-left">
-            + New Thread{projectFilter ? ` in ${PROJECTS.find(p => p.id === projectFilter)?.name}` : ''}
+      {/* ── MOBILE: chat view ────────────────────────────────────────────── */}
+      <div className={`flex-col w-full bg-gray-950 md:hidden ${mobileView === 'chat' ? 'flex' : 'hidden'}`}>
+        {/* header */}
+        <div className="flex items-center gap-3 px-4 bg-gray-900 border-b border-gray-800 flex-shrink-0"
+          style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))', paddingBottom: '0.75rem' }}>
+          <button onClick={() => setMobileView('threads')} className="text-gray-400 hover:text-gray-200 p-1 -ml-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </button>
+          <span className="text-sm font-medium text-gray-200 flex-1 truncate">{selectedThread?.title || 'Doug'}</span>
+          <button onClick={() => setMobileView('info')} className="text-gray-400 hover:text-gray-200 p-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+              <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+            </svg>
           </button>
         </div>
+        {chatContent}
+      </div>
 
-        {/* thread list */}
-        <div className="flex-1 overflow-y-auto">
-          {searchQuery ? (
-            searching
-              ? <p className="text-gray-600 text-xs px-4 py-3">Searching…</p>
-              : <SearchResults results={searchResults} query={searchQuery} onSelectThread={t => { selectThread(t); setSelectedThread(t); }} />
-          ) : threadsLoading ? (
-            <p className="text-gray-600 text-xs px-4 py-3">Loading…</p>
-          ) : displayThreads.length === 0 ? (
-            <p className="text-gray-600 text-xs px-4 py-3">No threads{projectFilter ? ' for this project' : ''}</p>
-          ) : (
-            displayThreads.map(thread => (
-              <ThreadItem key={thread.id} thread={thread}
-                isSelected={selectedThread?.id === thread.id}
-                onSelect={() => selectThread(thread)}
-                onDelete={deleteThread} />
-            ))
-          )}
+      {/* ── MOBILE: info view ────────────────────────────────────────────── */}
+      <div className={`flex-col w-full bg-gray-900 md:hidden ${mobileView === 'info' ? 'flex' : 'hidden'}`}>
+        {/* header */}
+        <div className="flex items-center gap-3 px-4 bg-gray-900 border-b border-gray-800 flex-shrink-0"
+          style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))', paddingBottom: '0.75rem' }}>
+          <button onClick={() => setMobileView(selectedThread ? 'chat' : 'threads')} className="text-gray-400 hover:text-gray-200 p-1 -ml-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </button>
+          <span className="text-sm font-medium text-gray-200">Memory &amp; Projects</span>
         </div>
+        {infoPanelContent}
+      </div>
 
-        {/* monthly cost */}
-        <div className="p-3 border-t border-gray-800 flex justify-between items-center">
-          <p className="text-gray-600 text-xs">This month</p>
-          <p className="text-gray-300 text-xs font-mono">{monthlyCost != null ? `$${monthlyCost.toFixed(4)}` : '—'}</p>
-        </div>
+      {/* ── DESKTOP: three-column layout ─────────────────────────────────── */}
+      {/* Left: thread list */}
+      <aside className="hidden md:flex md:flex-col md:w-64 md:flex-shrink-0 bg-gray-900 border-r border-gray-800">
+        {threadListContent}
       </aside>
 
-      {/* ── CENTER: messages ─────────────────────────────────────────────── */}
-      <main className="flex-1 flex flex-col min-w-0">
-
-        {/* mobile header */}
-        <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-gray-900 flex-shrink-0">
-          <button onClick={() => { setLeftOpen(true); setRightOpen(false); }}
-            className="text-gray-400 hover:text-gray-200 text-lg w-8">☰</button>
-          <span className="text-sm text-gray-300 truncate max-w-[60%]">
-            {selectedThread?.title || 'Doug'}
-          </span>
-          <button onClick={() => { setRightOpen(true); setLeftOpen(false); }}
-            className="text-gray-400 hover:text-gray-200 text-lg w-8 text-right">⚙</button>
-        </div>
-
-        {/* thread header (desktop) / model selector */}
-        <div className="hidden md:flex items-center gap-2 px-4 py-2 border-b border-gray-800 bg-gray-900 flex-shrink-0">
+      {/* Center: chat */}
+      <main className="hidden md:flex md:flex-col md:flex-1 md:min-w-0">
+        {/* desktop thread header */}
+        <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-800 bg-gray-900 flex-shrink-0">
           {selectedThread ? (
             <>
               <span className="text-sm font-medium text-gray-200 flex-1 truncate">{selectedThread.title}</span>
@@ -669,8 +893,7 @@ export default function DougPage() {
                 <option value="waiting">Waiting</option>
               </select>
               <button onClick={() => updateThread({ pinned: !selectedThread.pinned })}
-                className={`text-sm px-1 ${selectedThread.pinned ? 'text-yellow-400' : 'text-gray-600 hover:text-gray-400'}`}
-                title={selectedThread.pinned ? 'Unpin' : 'Pin'}>★</button>
+                className={`text-sm px-1 ${selectedThread.pinned ? 'text-yellow-400' : 'text-gray-600 hover:text-gray-400'}`}>★</button>
               <div className="w-px h-4 bg-gray-700 mx-1" />
             </>
           ) : <span className="flex-1" />}
@@ -682,218 +905,12 @@ export default function DougPage() {
             </button>
           ))}
         </div>
-
-        {/* messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-          {!selectedThread ? (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-gray-600 text-sm">Select or create a thread</p>
-            </div>
-          ) : messagesLoading ? (
-            <p className="text-gray-600 text-sm text-center pt-8">Loading…</p>
-          ) : messages.length === 0 ? (
-            <p className="text-gray-600 text-sm text-center pt-8">Start the conversation</p>
-          ) : (
-            messages.map(msg => (
-              <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[78%] rounded-2xl text-sm leading-relaxed overflow-hidden ${
-                  msg.role === 'user'  ? 'bg-gray-700 text-gray-100 rounded-br-sm' :
-                  msg.role === 'error' ? 'bg-red-900/50 text-red-300 rounded-bl-sm px-4 py-2.5 whitespace-pre-wrap' :
-                                        'bg-gray-800 text-gray-200 rounded-bl-sm'
-                }`}>
-                  {/* image attachment */}
-                  {msg.image_url && (
-                    <a href={msg.image_url} target="_blank" rel="noreferrer">
-                      <img src={msg.image_url} alt="Attached" className="w-full max-h-72 object-cover block" />
-                    </a>
-                  )}
-                  {/* message content */}
-                  {(msg.content || msg.streaming) && (
-                    <div className="px-4 py-2.5">
-                      {msg.role === 'assistant' ? (
-                        <>
-                          <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
-                            {msg.content}
-                          </ReactMarkdown>
-                          {msg.streaming && (
-                            <span className="inline-block w-0.5 h-3.5 bg-gray-400 ml-0.5 align-middle animate-pulse" />
-                          )}
-                        </>
-                      ) : (
-                        <span className="whitespace-pre-wrap">{msg.content}</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* mobile model selector */}
-        <div className="md:hidden flex items-center gap-1.5 px-4 py-1.5 border-t border-gray-800 bg-gray-900">
-          <span className="text-gray-600 text-xs mr-1">Model</span>
-          {['haiku', 'sonnet'].map(m => (
-            <button key={m} onClick={() => setModel(m)}
-              className={`px-2.5 py-0.5 rounded-full text-xs transition-colors ${model === m ? 'bg-gray-600 text-white' : 'bg-gray-800 text-gray-400'}`}>
-              {m.charAt(0).toUpperCase() + m.slice(1)}
-            </button>
-          ))}
-          {selectedThread && (
-            <>
-              <div className="flex-1" />
-              <select value={selectedThread.status || 'open'} onChange={e => updateThread({ status: e.target.value })}
-                className="text-xs bg-gray-800 text-gray-400 border border-gray-700 rounded px-1.5 py-0.5 focus:outline-none">
-                <option value="open">Open</option>
-                <option value="done">Done</option>
-                <option value="waiting">Waiting</option>
-              </select>
-              <button onClick={() => updateThread({ pinned: !selectedThread.pinned })}
-                className={`text-sm px-1 ${selectedThread.pinned ? 'text-yellow-400' : 'text-gray-600'}`}>★</button>
-            </>
-          )}
-        </div>
-
-        {/* input */}
-        <div className="px-4 py-3 border-t border-gray-800 bg-gray-900 flex-shrink-0">
-          {/* image preview */}
-          {selectedImage && (
-            <div className="mb-2 relative inline-block">
-              <img src={selectedImage.previewUrl} alt="Preview" className="h-20 w-20 object-cover rounded-xl" />
-              <button onClick={clearImage}
-                className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-600 hover:bg-gray-500 text-white rounded-full text-xs leading-none flex items-center justify-center">
-                ×
-              </button>
-            </div>
-          )}
-          {/* interim voice preview */}
-          {isRecording && (
-            <div className="mb-1.5 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
-              <span className="text-xs text-gray-400 italic truncate">
-                {interimText || 'Listening…'}
-              </span>
-            </div>
-          )}
-          <div className="flex gap-2 items-end">
-            {/* hidden file input */}
-            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
-            {/* attach button */}
-            <button onClick={() => fileInputRef.current?.click()}
-              disabled={!selectedThread || sending}
-              className="flex-shrink-0 w-9 h-9 flex items-center justify-center bg-gray-800 hover:bg-gray-700 disabled:opacity-30 text-gray-400 hover:text-gray-200 rounded-xl transition-colors"
-              title="Attach image">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-              </svg>
-            </button>
-            {/* mic + language */}
-            <div className="flex-shrink-0 flex flex-col items-center gap-0.5">
-              <button onClick={toggleRecording}
-                disabled={!selectedThread || sending}
-                title={isRecording ? 'Stop recording' : 'Start voice input'}
-                className={`w-9 h-9 flex items-center justify-center rounded-xl transition-colors disabled:opacity-30 ${
-                  isRecording ? 'bg-red-600 hover:bg-red-500 text-white' : 'bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-gray-200'
-                }`}>
-                {isRecording ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                    <rect x="6" y="6" width="12" height="12" rx="1"/>
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
-                  </svg>
-                )}
-              </button>
-              <button onClick={toggleVoiceLang}
-                className="text-[9px] text-gray-600 hover:text-gray-400 transition-colors leading-none tracking-wide">
-                {voiceLang === 'ja-JP' ? 'JA' : 'EN'}
-              </button>
-            </div>
-            <textarea value={draft} onChange={e => { if (!isRecording) setDraft(e.target.value); }} onKeyDown={handleKeyDown}
-              disabled={!selectedThread || sending}
-              placeholder={selectedThread ? (selectedImage ? 'Add a message… (optional)' : isRecording ? '' : 'Message Doug… (Enter to send)') : 'Select a thread first'}
-              rows={1}
-              className="flex-1 bg-gray-800 text-gray-200 placeholder-gray-600 rounded-xl px-4 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-gray-600 disabled:opacity-40"
-              style={{ minHeight: '2.5rem', maxHeight: '8rem' }}
-              onInput={e => { e.target.style.height = 'auto'; e.target.style.height = `${Math.min(e.target.scrollHeight, 128)}px`; }} />
-            <button onClick={sendMessage} disabled={!selectedThread || (!draft.trim() && !selectedImage) || sending}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-30 text-gray-200 rounded-xl text-sm transition-colors whitespace-nowrap">
-              {sending ? '…' : 'Send'}
-            </button>
-          </div>
-        </div>
+        {chatContent}
       </main>
 
-      {/* ── RIGHT: memory / projects ─────────────────────────────────────── */}
-      <aside className={`
-        fixed inset-y-0 right-0 z-50 w-64 flex flex-col bg-gray-900 border-l border-gray-800
-        transform transition-transform duration-200
-        ${rightOpen ? 'translate-x-0' : 'translate-x-full'}
-        md:relative md:translate-x-0 md:w-52 md:z-auto
-      `}>
-        {/* tab bar */}
-        <div className="flex border-b border-gray-800 flex-shrink-0">
-          {['memory', 'projects'].map(tab => (
-            <button key={tab} onClick={() => setRightTab(tab)}
-              className={`flex-1 py-2.5 text-xs transition-colors ${rightTab === tab ? 'text-gray-200 border-b border-gray-400' : 'text-gray-600 hover:text-gray-400'}`}>
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
-          <button onClick={() => setRightOpen(false)} className="md:hidden px-3 text-gray-600 hover:text-gray-400">×</button>
-        </div>
-
-        {rightTab === 'memory' && (
-          <>
-            <div className="p-2 space-y-1 flex-1 overflow-y-auto">
-              {MEMORY_FILES.map(f => (
-                <button key={f} onClick={() => setMemoryFile(f)}
-                  className="w-full text-left px-3 py-2 text-xs text-gray-400 hover:text-gray-200 hover:bg-gray-800 rounded-lg transition-colors font-mono">
-                  {f}
-                </button>
-              ))}
-            </div>
-            {selectedThread && (
-              <div className="p-3 border-t border-gray-800 flex-shrink-0">
-                <p className="text-gray-500 text-xs uppercase tracking-wider mb-2">Thread</p>
-                <div className="space-y-1">
-                  {[['Messages', messages.length], ['Model', threadModel], ['Cost', threadCost]].map(([k, v]) => (
-                    <div key={k} className="flex justify-between text-xs">
-                      <span className="text-gray-600">{k}</span>
-                      <span className="text-gray-300 font-mono truncate max-w-[7rem]">{v}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-
-        {rightTab === 'projects' && (
-          <div className="flex-1 overflow-y-auto p-2 space-y-1">
-            {PROJECTS.map(p => (
-              <div key={p.id}
-                className="px-3 py-2.5 rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
-                onClick={() => handleProjectClick(p)}>
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${PROJECT_DOT[p.status]}`} />
-                  {p.url ? (
-                    <a href={p.url} target={p.url.startsWith('http') ? '_blank' : '_self'} rel="noreferrer"
-                      onClick={e => e.stopPropagation()}
-                      className="text-xs text-gray-200 hover:text-white font-medium truncate">
-                      {p.name}
-                    </a>
-                  ) : (
-                    <span className="text-xs text-gray-200 font-medium truncate">{p.name}</span>
-                  )}
-                </div>
-                <p className="text-xs text-gray-500 leading-snug mb-1">{p.desc}</p>
-                <p className="text-xs text-gray-700 font-mono truncate">{p.tech}</p>
-              </div>
-            ))}
-          </div>
-        )}
+      {/* Right: info panel */}
+      <aside className="hidden md:flex md:flex-col md:w-56 md:flex-shrink-0 bg-gray-900 border-l border-gray-800">
+        {infoPanelContent}
       </aside>
 
       {memoryFile && <MemoryModal file={memoryFile} onClose={() => setMemoryFile(null)} />}
