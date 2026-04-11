@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+doug/node_modules
+doug/.claude
 /.pnp
 .pnp.*
 .yarn/*

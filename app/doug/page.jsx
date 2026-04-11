@@ -1,0 +1,595 @@
+'use client';
+
+import { useState, useEffect, useRef, useCallback } from 'react';
+
+// ── constants ────────────────────────────────────────────────────────────────
+
+const MEMORY_FILES = ['SOUL', 'IDENTITY', 'MEMORY', 'HEARTBEAT'];
+
+const PROJECTS = [
+  { id: 'felicity-web',   name: 'felicity.cafe',      desc: 'Main website — EN/JA, shop, merch, news',         status: 'live',  url: 'https://felicity.cafe',              tech: 'Next.js 16 · Stripe · Supabase' },
+  { id: 'felicity-staff', name: 'Felicity Staff',      desc: 'Staff PWA — clock-in, schedules, recipes, admin', status: 'live',  url: 'https://felicity-staff.vercel.app',  tech: 'Next.js · Supabase · TanStack' },
+  { id: 'doug',           name: 'Doug AI',             desc: 'Claude-powered assistant — Telegram + web',       status: 'live',  url: '/doug',                              tech: 'Claude · Supabase · PM2' },
+  { id: 'print-server',   name: 'Print Server',        desc: 'Food label printer on Raspberry Pi',              status: 'local', url: 'http://192.168.11.28',               tech: 'Python · Flask · Brother QL' },
+  { id: 'miura-rally',    name: 'Miura Rally',         desc: 'Stamp rally PWA — Miura Peninsula tour',          status: 'build', url: 'https://tour.felicity.cafe',         tech: 'Vanilla JS · Supabase · Cloudflare' },
+  { id: 'immunity-lab',   name: 'Immunity Lab',        desc: 'Clinic marketing site — 免疫ラボ',                status: 'build', url: null,                                 tech: 'Next.js · static' },
+  { id: 'ys-body',        name: "Y's Body Factory",    desc: '張力フレックストレーニング® studio — Hayama',     status: 'plan',  url: null,                                 tech: 'Proposal stage' },
+];
+
+const STATUS_DOT = { open: 'bg-blue-500', done: 'bg-green-500', waiting: 'bg-yellow-500' };
+const PROJECT_DOT = { live: 'bg-green-500', local: 'bg-yellow-500', build: 'bg-gray-600', plan: 'bg-gray-700' };
+
+function relativeTime(ts) {
+  if (!ts) return '';
+  const diff = Date.now() - new Date(ts).getTime();
+  const m = Math.floor(diff / 60000);
+  const h = Math.floor(diff / 3600000);
+  const d = Math.floor(diff / 86400000);
+  if (m < 1)  return 'now';
+  if (m < 60) return `${m}m`;
+  if (h < 24) return `${h}h`;
+  return `${d}d`;
+}
+
+// ── pin screen ───────────────────────────────────────────────────────────────
+
+function PinScreen({ onUnlock }) {
+  const [pin, setPin] = useState('');
+  const [error, setError] = useState(false);
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (pin === '4499') { localStorage.setItem('doug_pin', '4499'); onUnlock(); }
+    else { setError(true); setPin(''); }
+  }
+  return (
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
+        <div className="text-gray-400 text-sm tracking-widest uppercase mb-2">Doug</div>
+        <input type="password" inputMode="numeric" maxLength={4} value={pin}
+          onChange={e => { setPin(e.target.value); setError(false); }} placeholder="PIN" autoFocus
+          className="w-32 text-center text-2xl tracking-[0.5em] bg-gray-900 border border-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-gray-500" />
+        {error && <p className="text-red-400 text-xs">Incorrect PIN</p>}
+        <button type="submit" className="px-6 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg text-sm transition-colors">Enter</button>
+      </form>
+    </div>
+  );
+}
+
+// ── memory modal ─────────────────────────────────────────────────────────────
+
+function MemoryModal({ file, onClose }) {
+  const [content, setContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    fetch(`/api/doug/memory?file=${file}`)
+      .then(r => r.json())
+      .then(d => setContent(d.error ? `Error: ${d.error}` : d.content))
+      .catch(() => setContent('Failed to load'))
+      .finally(() => setLoading(false));
+  }, [file]);
+  return (
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-gray-900 border border-gray-700 rounded-xl w-full max-w-2xl max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-700">
+          <span className="text-gray-200 font-mono text-sm">{file}.md</span>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-300 text-lg leading-none">&times;</button>
+        </div>
+        <div className="overflow-auto p-5 flex-1">
+          {loading ? <p className="text-gray-500 text-sm">Loading…</p>
+            : <pre className="text-gray-300 text-xs font-mono whitespace-pre-wrap leading-relaxed">{content}</pre>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── thread item ──────────────────────────────────────────────────────────────
+
+function ThreadItem({ thread, isSelected, onSelect, onDelete }) {
+  const proj = PROJECTS.find(p => p.id === thread.project_id);
+  return (
+    <div onClick={onSelect}
+      className={`group px-3 py-2.5 cursor-pointer border-b border-gray-800/60 hover:bg-gray-800/60 transition-colors ${isSelected ? 'bg-gray-800' : ''}`}>
+      <div className="flex items-center gap-1.5">
+        {thread.pinned && <span className="text-yellow-400 text-xs flex-shrink-0">★</span>}
+        <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${STATUS_DOT[thread.status] || 'bg-gray-600'}`} />
+        <span className="text-xs text-gray-200 truncate flex-1 font-medium">{thread.title}</span>
+        <span className="text-xs text-gray-600 flex-shrink-0 ml-1">{relativeTime(thread.updated_at)}</span>
+        <button onClick={e => onDelete(e, thread.id)}
+          className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-400 text-sm leading-none flex-shrink-0 ml-0.5">×</button>
+      </div>
+      {thread.last_message_preview && (
+        <p className="text-xs text-gray-500 truncate mt-0.5 pl-3">{thread.last_message_preview}</p>
+      )}
+      {proj && (
+        <div className="mt-1 pl-3">
+          <span className="text-xs px-1.5 py-0.5 rounded-sm bg-gray-800 text-gray-600 border border-gray-700/50">{proj.name}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── search results ────────────────────────────────────────────────────────────
+
+function SearchResults({ results, onSelectThread, query }) {
+  if (!query) return null;
+  const { threads, messages } = results;
+  if (!threads.length && !messages.length) {
+    return <p className="text-gray-600 text-xs px-4 py-3">No results for "{query}"</p>;
+  }
+  return (
+    <div>
+      {threads.length > 0 && (
+        <>
+          <p className="text-gray-600 text-xs px-3 py-1.5 uppercase tracking-wider">Threads</p>
+          {threads.map(t => (
+            <div key={t.id} onClick={() => onSelectThread(t)}
+              className="px-3 py-2 cursor-pointer hover:bg-gray-800 border-b border-gray-800/60">
+              <p className="text-xs text-gray-200 truncate font-medium">{t.title}</p>
+            </div>
+          ))}
+        </>
+      )}
+      {messages.length > 0 && (
+        <>
+          <p className="text-gray-600 text-xs px-3 py-1.5 uppercase tracking-wider mt-1">Messages</p>
+          {messages.map(m => (
+            <div key={m.id} onClick={() => onSelectThread(m.thread)}
+              className="px-3 py-2 cursor-pointer hover:bg-gray-800 border-b border-gray-800/60">
+              <p className="text-xs text-gray-400 truncate mb-0.5">{m.thread?.title}</p>
+              <p className="text-xs text-gray-500 truncate">{m.content.slice(0, 100)}</p>
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── main ─────────────────────────────────────────────────────────────────────
+
+export default function DougPage() {
+  const [unlocked, setUnlocked] = useState(false);
+
+  // data
+  const [threads, setThreads] = useState([]);
+  const [selectedThread, setSelectedThread] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [threadsLoading, setThreadsLoading] = useState(true);
+  const [messagesLoading, setMessagesLoading] = useState(false);
+  const [monthlyCost, setMonthlyCost] = useState(null);
+
+  // input
+  const [draft, setDraft] = useState('');
+  const [sending, setSending] = useState(false);
+  const [model, setModel] = useState('haiku');
+
+  // drawers (mobile)
+  const [leftOpen, setLeftOpen] = useState(false);
+  const [rightOpen, setRightOpen] = useState(false);
+
+  // right panel
+  const [rightTab, setRightTab] = useState('memory');
+  const [memoryFile, setMemoryFile] = useState(null);
+
+  // filter / search
+  const [projectFilter, setProjectFilter] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState({ threads: [], messages: [] });
+  const [searching, setSearching] = useState(false);
+
+  const messagesEndRef = useRef(null);
+  const searchTimer = useRef(null);
+
+  // ── auth ──
+  useEffect(() => {
+    if (localStorage.getItem('doug_pin') === '4499') setUnlocked(true);
+  }, []);
+
+  useEffect(() => {
+    if (unlocked) loadThreads();
+  }, [unlocked]);
+
+  useEffect(() => {
+    if (selectedThread) loadMessages(selectedThread.id);
+  }, [selectedThread?.id]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // ── search debounce ──
+  useEffect(() => {
+    clearTimeout(searchTimer.current);
+    if (!searchQuery || searchQuery.length < 2) {
+      setSearchResults({ threads: [], messages: [] });
+      return;
+    }
+    setSearching(true);
+    searchTimer.current = setTimeout(async () => {
+      const res = await fetch(`/api/doug/search?q=${encodeURIComponent(searchQuery)}`);
+      const data = await res.json();
+      setSearchResults(data);
+      setSearching(false);
+    }, 400);
+  }, [searchQuery]);
+
+  // ── data loaders ──
+  async function loadThreads() {
+    setThreadsLoading(true);
+    const res = await fetch('/api/doug/threads');
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : [];
+    setThreads(list);
+    setThreadsLoading(false);
+    const month = new Date().toISOString().slice(0, 7);
+    setMonthlyCost(list.filter(t => t.updated_at?.startsWith(month)).reduce((s, t) => s + (t.cost_usd || 0), 0));
+  }
+
+  async function loadMessages(threadId) {
+    setMessagesLoading(true);
+    const res = await fetch(`/api/doug/messages?threadId=${threadId}`);
+    const data = await res.json();
+    setMessages(Array.isArray(data) ? data : []);
+    setMessagesLoading(false);
+  }
+
+  // ── thread actions ──
+  async function createThread(projectId = null) {
+    const title = `Thread ${new Date().toLocaleString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
+    const res = await fetch('/api/doug/threads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, model, project_id: projectId }),
+    });
+    const data = await res.json();
+    if (!data.error) {
+      setThreads(prev => [data, ...prev]);
+      selectThread(data);
+    }
+  }
+
+  function selectThread(thread) {
+    setSelectedThread(thread);
+    setMessages([]);
+    setSearchQuery('');
+    setLeftOpen(false);
+  }
+
+  async function deleteThread(e, threadId) {
+    e.stopPropagation();
+    if (!confirm('Delete this thread?')) return;
+    await fetch(`/api/doug/threads?id=${threadId}`, { method: 'DELETE' });
+    if (selectedThread?.id === threadId) { setSelectedThread(null); setMessages([]); }
+    setThreads(prev => prev.filter(t => t.id !== threadId));
+  }
+
+  async function updateThread(updates) {
+    const res = await fetch(`/api/doug/threads?id=${selectedThread.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+    const data = await res.json();
+    if (!data.error) {
+      setSelectedThread(data);
+      setThreads(prev => prev.map(t => t.id === data.id ? data : t));
+    }
+  }
+
+  // ── send message ──
+  async function sendMessage() {
+    if (!draft.trim() || !selectedThread || sending) return;
+    const text = draft.trim();
+    setDraft('');
+    setSending(true);
+    setMessages(prev => [...prev, { id: `opt-${Date.now()}`, role: 'user', content: text, created_at: new Date().toISOString() }]);
+    try {
+      const res = await fetch('/api/doug/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ threadId: selectedThread.id, message: text, model }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        setMessages(prev => [...prev, { id: `err-${Date.now()}`, role: 'error', content: data.error, created_at: new Date().toISOString() }]);
+      } else {
+        await loadMessages(selectedThread.id);
+        await loadThreads();
+        // refresh selected thread (title may have been auto-updated)
+        const updated = (await (await fetch('/api/doug/threads')).json());
+        const fresh = updated.find?.(t => t.id === selectedThread.id);
+        if (fresh) setSelectedThread(fresh);
+      }
+    } catch (err) {
+      setMessages(prev => [...prev, { id: `err-${Date.now()}`, role: 'error', content: err.message, created_at: new Date().toISOString() }]);
+    } finally {
+      setSending(false);
+    }
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  }
+
+  // ── project click (from Projects tab) ──
+  function handleProjectClick(project) {
+    setProjectFilter(project.id);
+    setRightOpen(false);
+    setLeftOpen(true);
+  }
+
+  // ── filtered thread list ──
+  const displayThreads = projectFilter
+    ? threads.filter(t => t.project_id === projectFilter)
+    : threads;
+
+  // ── derived ──
+  const threadCost = selectedThread?.cost_usd != null ? `$${Number(selectedThread.cost_usd).toFixed(4)}` : '—';
+  const threadModel = selectedThread?.model_used ?? '—';
+  const anyDrawerOpen = leftOpen || rightOpen;
+
+  if (!unlocked) return <PinScreen onUnlock={() => setUnlocked(true)} />;
+
+  // ── layout ───────────────────────────────────────────────────────────────
+
+  return (
+    <div className="flex h-screen bg-gray-950 text-gray-200 overflow-hidden">
+
+      {/* backdrop (mobile only) */}
+      {anyDrawerOpen && (
+        <div className="fixed inset-0 bg-black/60 z-40 md:hidden"
+          onClick={() => { setLeftOpen(false); setRightOpen(false); }} />
+      )}
+
+      {/* ── LEFT: thread list ────────────────────────────────────────────── */}
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 w-72 flex flex-col bg-gray-900 border-r border-gray-800
+        transform transition-transform duration-200
+        ${leftOpen ? 'translate-x-0' : '-translate-x-full'}
+        md:relative md:translate-x-0 md:w-64 md:z-auto
+      `}>
+        {/* search */}
+        <div className="p-2 border-b border-gray-800">
+          <input
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Search…"
+            className="w-full bg-gray-800 text-gray-200 placeholder-gray-600 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-gray-600"
+          />
+        </div>
+
+        {/* project filter pills */}
+        <div className="flex gap-1.5 px-2 py-2 overflow-x-auto border-b border-gray-800 scrollbar-none">
+          <button onClick={() => setProjectFilter(null)}
+            className={`flex-shrink-0 px-2.5 py-1 rounded-full text-xs transition-colors ${!projectFilter ? 'bg-gray-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>
+            All
+          </button>
+          {PROJECTS.map(p => (
+            <button key={p.id} onClick={() => setProjectFilter(projectFilter === p.id ? null : p.id)}
+              className={`flex-shrink-0 px-2.5 py-1 rounded-full text-xs transition-colors ${projectFilter === p.id ? 'bg-gray-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>
+              {p.name}
+            </button>
+          ))}
+        </div>
+
+        {/* new thread button */}
+        <div className="p-2 border-b border-gray-800">
+          <button onClick={() => createThread(projectFilter)}
+            className="w-full py-1.5 px-3 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg text-xs transition-colors text-left">
+            + New Thread{projectFilter ? ` in ${PROJECTS.find(p => p.id === projectFilter)?.name}` : ''}
+          </button>
+        </div>
+
+        {/* thread list */}
+        <div className="flex-1 overflow-y-auto">
+          {searchQuery ? (
+            searching
+              ? <p className="text-gray-600 text-xs px-4 py-3">Searching…</p>
+              : <SearchResults results={searchResults} query={searchQuery} onSelectThread={t => { selectThread(t); setSelectedThread(t); }} />
+          ) : threadsLoading ? (
+            <p className="text-gray-600 text-xs px-4 py-3">Loading…</p>
+          ) : displayThreads.length === 0 ? (
+            <p className="text-gray-600 text-xs px-4 py-3">No threads{projectFilter ? ' for this project' : ''}</p>
+          ) : (
+            displayThreads.map(thread => (
+              <ThreadItem key={thread.id} thread={thread}
+                isSelected={selectedThread?.id === thread.id}
+                onSelect={() => selectThread(thread)}
+                onDelete={deleteThread} />
+            ))
+          )}
+        </div>
+
+        {/* monthly cost */}
+        <div className="p-3 border-t border-gray-800 flex justify-between items-center">
+          <p className="text-gray-600 text-xs">This month</p>
+          <p className="text-gray-300 text-xs font-mono">{monthlyCost != null ? `$${monthlyCost.toFixed(4)}` : '—'}</p>
+        </div>
+      </aside>
+
+      {/* ── CENTER: messages ─────────────────────────────────────────────── */}
+      <main className="flex-1 flex flex-col min-w-0">
+
+        {/* mobile header */}
+        <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-gray-900 flex-shrink-0">
+          <button onClick={() => { setLeftOpen(true); setRightOpen(false); }}
+            className="text-gray-400 hover:text-gray-200 text-lg w-8">☰</button>
+          <span className="text-sm text-gray-300 truncate max-w-[60%]">
+            {selectedThread?.title || 'Doug'}
+          </span>
+          <button onClick={() => { setRightOpen(true); setLeftOpen(false); }}
+            className="text-gray-400 hover:text-gray-200 text-lg w-8 text-right">⚙</button>
+        </div>
+
+        {/* thread header (desktop) / model selector */}
+        <div className="hidden md:flex items-center gap-2 px-4 py-2 border-b border-gray-800 bg-gray-900 flex-shrink-0">
+          {selectedThread ? (
+            <>
+              <span className="text-sm font-medium text-gray-200 flex-1 truncate">{selectedThread.title}</span>
+              {/* status */}
+              <select value={selectedThread.status || 'open'} onChange={e => updateThread({ status: e.target.value })}
+                className="text-xs bg-gray-800 text-gray-400 border border-gray-700 rounded px-2 py-1 focus:outline-none">
+                <option value="open">Open</option>
+                <option value="done">Done</option>
+                <option value="waiting">Waiting</option>
+              </select>
+              {/* pin */}
+              <button onClick={() => updateThread({ pinned: !selectedThread.pinned })}
+                className={`text-sm px-1 ${selectedThread.pinned ? 'text-yellow-400' : 'text-gray-600 hover:text-gray-400'}`}
+                title={selectedThread.pinned ? 'Unpin' : 'Pin'}>★</button>
+              <div className="w-px h-4 bg-gray-700 mx-1" />
+            </>
+          ) : <span className="flex-1" />}
+          {/* model */}
+          <span className="text-gray-500 text-xs">Model</span>
+          {['haiku', 'sonnet'].map(m => (
+            <button key={m} onClick={() => setModel(m)}
+              className={`px-3 py-1 rounded-full text-xs transition-colors ${model === m ? 'bg-gray-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>
+              {m.charAt(0).toUpperCase() + m.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {/* messages */}
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+          {!selectedThread ? (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-gray-600 text-sm">Select or create a thread</p>
+            </div>
+          ) : messagesLoading ? (
+            <p className="text-gray-600 text-sm text-center pt-8">Loading…</p>
+          ) : messages.length === 0 ? (
+            <p className="text-gray-600 text-sm text-center pt-8">Start the conversation</p>
+          ) : (
+            messages.map(msg => (
+              <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[78%] px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap leading-relaxed ${
+                  msg.role === 'user'    ? 'bg-gray-700 text-gray-100 rounded-br-sm' :
+                  msg.role === 'error'   ? 'bg-red-900/50 text-red-300 rounded-bl-sm' :
+                                          'bg-gray-800 text-gray-200 rounded-bl-sm'
+                }`}>{msg.content}</div>
+              </div>
+            ))
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* mobile model selector */}
+        <div className="md:hidden flex items-center gap-1.5 px-4 py-1.5 border-t border-gray-800 bg-gray-900">
+          <span className="text-gray-600 text-xs mr-1">Model</span>
+          {['haiku', 'sonnet'].map(m => (
+            <button key={m} onClick={() => setModel(m)}
+              className={`px-2.5 py-0.5 rounded-full text-xs transition-colors ${model === m ? 'bg-gray-600 text-white' : 'bg-gray-800 text-gray-400'}`}>
+              {m.charAt(0).toUpperCase() + m.slice(1)}
+            </button>
+          ))}
+          {selectedThread && (
+            <>
+              <div className="flex-1" />
+              <select value={selectedThread.status || 'open'} onChange={e => updateThread({ status: e.target.value })}
+                className="text-xs bg-gray-800 text-gray-400 border border-gray-700 rounded px-1.5 py-0.5 focus:outline-none">
+                <option value="open">Open</option>
+                <option value="done">Done</option>
+                <option value="waiting">Waiting</option>
+              </select>
+              <button onClick={() => updateThread({ pinned: !selectedThread.pinned })}
+                className={`text-sm px-1 ${selectedThread.pinned ? 'text-yellow-400' : 'text-gray-600'}`}>★</button>
+            </>
+          )}
+        </div>
+
+        {/* input */}
+        <div className="px-4 py-3 border-t border-gray-800 bg-gray-900 flex-shrink-0">
+          <div className="flex gap-2 items-end">
+            <textarea value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={handleKeyDown}
+              disabled={!selectedThread || sending}
+              placeholder={selectedThread ? 'Message Doug… (Enter to send)' : 'Select a thread first'}
+              rows={1}
+              className="flex-1 bg-gray-800 text-gray-200 placeholder-gray-600 rounded-xl px-4 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-gray-600 disabled:opacity-40"
+              style={{ minHeight: '2.5rem', maxHeight: '8rem' }}
+              onInput={e => { e.target.style.height = 'auto'; e.target.style.height = `${Math.min(e.target.scrollHeight, 128)}px`; }} />
+            <button onClick={sendMessage} disabled={!selectedThread || !draft.trim() || sending}
+              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-30 text-gray-200 rounded-xl text-sm transition-colors whitespace-nowrap">
+              {sending ? '…' : 'Send'}
+            </button>
+          </div>
+        </div>
+      </main>
+
+      {/* ── RIGHT: memory / projects ─────────────────────────────────────── */}
+      <aside className={`
+        fixed inset-y-0 right-0 z-50 w-64 flex flex-col bg-gray-900 border-l border-gray-800
+        transform transition-transform duration-200
+        ${rightOpen ? 'translate-x-0' : 'translate-x-full'}
+        md:relative md:translate-x-0 md:w-52 md:z-auto
+      `}>
+        {/* tab bar */}
+        <div className="flex border-b border-gray-800 flex-shrink-0">
+          {['memory', 'projects'].map(tab => (
+            <button key={tab} onClick={() => setRightTab(tab)}
+              className={`flex-1 py-2.5 text-xs transition-colors ${rightTab === tab ? 'text-gray-200 border-b border-gray-400' : 'text-gray-600 hover:text-gray-400'}`}>
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
+          {/* close button (mobile) */}
+          <button onClick={() => setRightOpen(false)} className="md:hidden px-3 text-gray-600 hover:text-gray-400">×</button>
+        </div>
+
+        {rightTab === 'memory' && (
+          <>
+            <div className="p-2 space-y-1 flex-1 overflow-y-auto">
+              {MEMORY_FILES.map(f => (
+                <button key={f} onClick={() => setMemoryFile(f)}
+                  className="w-full text-left px-3 py-2 text-xs text-gray-400 hover:text-gray-200 hover:bg-gray-800 rounded-lg transition-colors font-mono">
+                  {f}
+                </button>
+              ))}
+            </div>
+            {selectedThread && (
+              <div className="p-3 border-t border-gray-800 flex-shrink-0">
+                <p className="text-gray-500 text-xs uppercase tracking-wider mb-2">Thread</p>
+                <div className="space-y-1">
+                  {[['Messages', messages.length], ['Model', threadModel], ['Cost', threadCost]].map(([k, v]) => (
+                    <div key={k} className="flex justify-between text-xs">
+                      <span className="text-gray-600">{k}</span>
+                      <span className="text-gray-300 font-mono truncate max-w-[7rem]">{v}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {rightTab === 'projects' && (
+          <div className="flex-1 overflow-y-auto p-2 space-y-1">
+            {PROJECTS.map(p => (
+              <div key={p.id}
+                className="px-3 py-2.5 rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
+                onClick={() => handleProjectClick(p)}>
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${PROJECT_DOT[p.status]}`} />
+                  {p.url ? (
+                    <a href={p.url} target={p.url.startsWith('http') ? '_blank' : '_self'} rel="noreferrer"
+                      onClick={e => e.stopPropagation()}
+                      className="text-xs text-gray-200 hover:text-white font-medium truncate">
+                      {p.name}
+                    </a>
+                  ) : (
+                    <span className="text-xs text-gray-200 font-medium truncate">{p.name}</span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 leading-snug mb-1">{p.desc}</p>
+                <p className="text-xs text-gray-700 font-mono truncate">{p.tech}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </aside>
+
+      {memoryFile && <MemoryModal file={memoryFile} onClose={() => setMemoryFile(null)} />}
+    </div>
+  );
+}

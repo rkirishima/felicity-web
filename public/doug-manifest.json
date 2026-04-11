@@ -1,0 +1,14 @@
+{
+  "name": "Doug",
+  "short_name": "Doug",
+  "description": "Personal AI — Rowly & Doug",
+  "start_url": "/doug",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#030712",
+  "theme_color": "#030712",
+  "icons": [
+    { "src": "/favicon.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/favicon.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "doug",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node telegram.js",
+    "dev": "node --watch telegram.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39",
+    "@supabase/supabase-js": "^2",
+    "dotenv": "^16",
+    "node-telegram-bot-api": "^0.66"
+  },
+  "devDependencies": {
+    "pg": "^8.20.0"
+  }
+}
