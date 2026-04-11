@@ -203,6 +203,12 @@ export default function DougPage() {
   const [selectedImage, setSelectedImage] = useState(null); // { file, previewUrl }
   const fileInputRef = useRef(null);
 
+  // voice
+  const [isRecording, setIsRecording] = useState(false);
+  const [interimText, setInterimText] = useState('');
+  const [voiceLang, setVoiceLang] = useState('ja-JP');
+  const recognitionRef = useRef(null);
+
   // drawers (mobile)
   const [leftOpen, setLeftOpen] = useState(false);
   const [rightOpen, setRightOpen] = useState(false);
@@ -310,6 +316,7 @@ export default function DougPage() {
   }
 
   function selectThread(thread) {
+    if (isRecording) stopRecording();
     setSelectedThread(thread);
     setMessages([]);
     prevMsgCount.current = 0;
@@ -372,10 +379,72 @@ export default function DougPage() {
     setSelectedImage(null);
   }
 
+  // ── voice input ──────────────────────────────────────────────────────────
+
+  function startRecording() {
+    const SR = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
+    if (!SR) {
+      alert('Voice input not supported in this browser. Use Safari on iPhone or Chrome on desktop.');
+      return;
+    }
+
+    const recognition = new SR();
+    recognition.lang = voiceLang;
+    recognition.interimResults = true;
+    recognition.continuous = true;
+
+    let committed = draft;
+
+    recognition.onstart = () => setIsRecording(true);
+
+    recognition.onresult = (event) => {
+      let finalPart = '';
+      let interimPart = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) finalPart += event.results[i][0].transcript;
+        else interimPart += event.results[i][0].transcript;
+      }
+      if (finalPart) {
+        // Japanese doesn't need a space separator; English does
+        const sep = committed && voiceLang === 'en-US' && !committed.endsWith(' ') ? ' ' : '';
+        committed += sep + finalPart;
+        setDraft(committed);
+      }
+      setInterimText(interimPart);
+    };
+
+    recognition.onend = () => { setIsRecording(false); setInterimText(''); };
+    recognition.onerror = (e) => {
+      if (e.error !== 'no-speech') console.error('Speech recognition error:', e.error);
+      setIsRecording(false);
+      setInterimText('');
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  }
+
+  function stopRecording() {
+    recognitionRef.current?.stop();
+    recognitionRef.current = null;
+  }
+
+  function toggleRecording() {
+    if (isRecording) stopRecording();
+    else startRecording();
+  }
+
+  function toggleVoiceLang() {
+    if (isRecording) stopRecording();
+    setVoiceLang(l => l === 'ja-JP' ? 'en-US' : 'ja-JP');
+  }
+
   // ── send message (streaming) ──────────────────────────────────────────────
   async function sendMessage() {
     if (!draft.trim() && !selectedImage) return;
     if (!selectedThread || sending) return;
+
+    if (isRecording) stopRecording();
 
     const text = draft.trim();
     setDraft('');
@@ -698,6 +767,15 @@ export default function DougPage() {
               </button>
             </div>
           )}
+          {/* interim voice preview */}
+          {isRecording && (
+            <div className="mb-1.5 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
+              <span className="text-xs text-gray-400 italic truncate">
+                {interimText || 'Listening…'}
+              </span>
+            </div>
+          )}
           <div className="flex gap-2 items-end">
             {/* hidden file input */}
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
@@ -710,9 +788,32 @@ export default function DougPage() {
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
               </svg>
             </button>
-            <textarea value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={handleKeyDown}
+            {/* mic + language */}
+            <div className="flex-shrink-0 flex flex-col items-center gap-0.5">
+              <button onClick={toggleRecording}
+                disabled={!selectedThread || sending}
+                title={isRecording ? 'Stop recording' : 'Start voice input'}
+                className={`w-9 h-9 flex items-center justify-center rounded-xl transition-colors disabled:opacity-30 ${
+                  isRecording ? 'bg-red-600 hover:bg-red-500 text-white' : 'bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-gray-200'
+                }`}>
+                {isRecording ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                    <rect x="6" y="6" width="12" height="12" rx="1"/>
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+                  </svg>
+                )}
+              </button>
+              <button onClick={toggleVoiceLang}
+                className="text-[9px] text-gray-600 hover:text-gray-400 transition-colors leading-none tracking-wide">
+                {voiceLang === 'ja-JP' ? 'JA' : 'EN'}
+              </button>
+            </div>
+            <textarea value={draft} onChange={e => { if (!isRecording) setDraft(e.target.value); }} onKeyDown={handleKeyDown}
               disabled={!selectedThread || sending}
-              placeholder={selectedThread ? (selectedImage ? 'Add a message… (optional)' : 'Message Doug… (Enter to send)') : 'Select a thread first'}
+              placeholder={selectedThread ? (selectedImage ? 'Add a message… (optional)' : isRecording ? '' : 'Message Doug… (Enter to send)') : 'Select a thread first'}
               rows={1}
               className="flex-1 bg-gray-800 text-gray-200 placeholder-gray-600 rounded-xl px-4 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-gray-600 disabled:opacity-40"
               style={{ minHeight: '2.5rem', maxHeight: '8rem' }}
