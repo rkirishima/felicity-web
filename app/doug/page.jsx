@@ -181,6 +181,7 @@ export default function DougPage() {
 
   const messagesEndRef = useRef(null);
   const searchTimer = useRef(null);
+  const isInitialLoad = useRef(false);
 
   // ── auth ──
   useEffect(() => {
@@ -196,7 +197,13 @@ export default function DougPage() {
   }, [selectedThread?.id]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (!messagesEndRef.current) return;
+    if (isInitialLoad.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
+      isInitialLoad.current = false;
+    } else {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages]);
 
   // ── search debounce ──
@@ -229,6 +236,7 @@ export default function DougPage() {
 
   async function loadMessages(threadId) {
     setMessagesLoading(true);
+    isInitialLoad.current = true;
     const res = await fetch(`/api/doug/messages?threadId=${threadId}`);
     const data = await res.json();
     setMessages(Array.isArray(data) ? data : []);
