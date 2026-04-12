@@ -3,10 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 
 export const maxDuration = 30;
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_DOUG_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY_DOUG
-);
+const _url = process.env.NEXT_PUBLIC_DOUG_SUPABASE_URL || '';
+const _key = process.env.SUPABASE_SERVICE_KEY_DOUG || '';
+const supabase = _url && _key ? createClient(_url, _key) : null;
 
 export async function POST(request) {
   const formData = await request.formData();

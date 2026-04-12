@@ -22,6 +22,8 @@ export default function HeroCarousel() {
             muted
             loop
             playsInline
+            preload={idx === 0 ? "auto" : "none"}
+            poster="/og-image.jpg"
             className="hidden md:block w-full h-full object-cover"
           >
             <source src={video.landscape} type="video/mp4" />
@@ -33,6 +35,8 @@ export default function HeroCarousel() {
             muted
             loop
             playsInline
+            preload={idx === 0 ? "auto" : "none"}
+            poster="/og-image.jpg"
             className="md:hidden w-full h-full object-cover"
           >
             <source src={video.portrait} type="video/mp4" />

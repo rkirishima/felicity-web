@@ -94,12 +94,62 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.7,
     },
-    // News page
+    // News pages
     {
       url: `${BASE_URL}/news`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.7,
+      alternates: {
+        languages: {
+          ja: `${BASE_URL}/news`,
+          en: `${BASE_URL}/en/news`,
+        },
+      },
+    },
+    {
+      url: `${BASE_URL}/en/news`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+      alternates: {
+        languages: {
+          ja: `${BASE_URL}/news`,
+          en: `${BASE_URL}/en/news`,
+        },
+      },
+    },
+    // Contact pages
+    {
+      url: `${BASE_URL}/contact`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+      alternates: {
+        languages: {
+          ja: `${BASE_URL}/contact`,
+          en: `${BASE_URL}/en/contact`,
+        },
+      },
+    },
+    {
+      url: `${BASE_URL}/en/contact`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+      alternates: {
+        languages: {
+          ja: `${BASE_URL}/contact`,
+          en: `${BASE_URL}/en/contact`,
+        },
+      },
+    },
+    // Disclosure
+    {
+      url: `${BASE_URL}/ja/disclosure`,
+      lastModified: new Date(),
+      changeFrequency: "yearly" as const,
+      priority: 0.3,
     },
     // Product listings
     ...productEntries,

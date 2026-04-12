@@ -10,9 +10,5 @@ export default function JaLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <html lang="ja">
-      <body>{children}</body>
-    </html>
-  );
+  return children;
 }
