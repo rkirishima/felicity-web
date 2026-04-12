@@ -16,8 +16,6 @@ export function ResponsiveNav({ locale, pathname }: ResponsiveNavProps) {
 
     const newsLink = '/#news';
   
-  const contactLink = locale === 'en' ? '/en/contact' : '/contact';
-
   const navItems = [
     { label: 'ABOUT US', href: '#philosophy' },
     { label: 'COFFEE', href: '#coffee' },
@@ -25,7 +23,6 @@ export function ResponsiveNav({ locale, pathname }: ResponsiveNavProps) {
     { label: 'EXPERIENCES', href: '#experiences' },
     { label: 'NEWS', href: newsLink },
     { label: 'VISIT', href: '#visit' },
-    { label: 'CONTACT', href: contactLink },
   ];
 
   const handleNavClick = () => {
