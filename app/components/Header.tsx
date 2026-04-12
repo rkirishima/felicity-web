@@ -42,9 +42,9 @@ export function Header({ locale, pathname, contactLabel }: HeaderProps) {
           {/* Language Toggle */}
           <LanguageToggle currentLocale={locale} currentPath={pathname} />
           {/* Contact */}
-          <a
-            href="mailto:info@felicity.cafe"
-            aria-label="Email contact"
+          <Link
+            href={locale === 'en' ? '/en/contact' : '/contact'}
+            aria-label="Contact"
             className="text-[#8C7B6B] hover:text-[#2C2416] transition-colors"
           >
             <svg
@@ -60,7 +60,7 @@ export function Header({ locale, pathname, contactLabel }: HeaderProps) {
               <rect x="2" y="4" width="20" height="16" rx="2" />
               <path d="m22 7-10 5L2 7" />
             </svg>
-          </a>
+          </Link>
           {/* Instagram */}
           <a
             href="https://www.instagram.com/felicity_hayama"

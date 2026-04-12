@@ -16,6 +16,11 @@ const supabase = createClient(
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+// Felicity main DB (reservations, orders — separate from Doug's Supabase)
+const felicityDb = process.env.FELICITY_SUPABASE_URL
+  ? createClient(process.env.FELICITY_SUPABASE_URL, process.env.FELICITY_SUPABASE_SERVICE_KEY)
+  : null;
+
 const CONTEXT_WINDOW = 20;      // most recent messages to include verbatim
 const SUMMARY_THRESHOLD = 40;   // generate summary when thread exceeds this many messages
 
@@ -136,6 +141,64 @@ async function autoTitle(threadId, firstMessage, firstReply) {
   }
 }
 
+// ── reservation tools ────────────────────────────────────────────────────────
+
+const RESERVATION_TOOLS = [
+  {
+    name: 'list_reservations',
+    description: 'List cafe reservations. Defaults to today if no date given.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        date: { type: 'string', description: 'Date in YYYY-MM-DD format. Defaults to today.' },
+        status: { type: 'string', description: 'Filter by status: pending, confirmed, cancelled, completed' },
+      },
+    },
+  },
+  {
+    name: 'update_reservation',
+    description: 'Update a reservation status (confirm, cancel, or complete).',
+    input_schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Reservation UUID' },
+        status: { type: 'string', enum: ['confirmed', 'cancelled', 'completed'], description: 'New status' },
+      },
+      required: ['id', 'status'],
+    },
+  },
+];
+
+async function executeReservationTool(name, input) {
+  if (!felicityDb) return 'Reservation database not configured.';
+
+  if (name === 'list_reservations') {
+    const date = input.date || new Date().toISOString().split('T')[0];
+    let query = felicityDb.from('reservations').select('*').eq('date', date).order('time');
+    if (input.status) query = query.eq('status', input.status);
+    const { data, error } = await query;
+    if (error) return `Error: ${error.message}`;
+    if (!data?.length) return `No reservations for ${date}.`;
+    return data.map(r =>
+      `[${r.status.toUpperCase()}] ${r.time} — ${r.name} (${r.party_size}名)${r.floor_preference ? ` ${r.floor_preference}` : ''} | ${r.contact}${r.notes ? ` | ${r.notes}` : ''} | ID: ${r.id.slice(0, 8)}`
+    ).join('\n');
+  }
+
+  if (name === 'update_reservation') {
+    const { data, error } = await felicityDb
+      .from('reservations')
+      .update({ status: input.status })
+      .eq('id', input.id)
+      .select()
+      .single();
+    if (error) return `Error: ${error.message}`;
+    if (!data) return `Reservation not found.`;
+    return `Updated: ${data.name} ${data.date} ${data.time} → ${data.status}`;
+  }
+
+  return 'Unknown tool.';
+}
+
 // ── core: streaming ask ───────────────────────────────────────────────────────
 
 async function* streamAskDoug(threadId, userMessage, model = 'claude-haiku-4-5-20251001', imageUrl = null) {
@@ -154,7 +217,7 @@ async function* streamAskDoug(threadId, userMessage, model = 'claude-haiku-4-5-2
   const system = [
     {
       type: 'text',
-      text: systemPrompt,
+      text: systemPrompt + '\n\n---\n\nYou have access to the cafe reservation system. When Rowly asks about reservations, use your tools to look them up. You can list, confirm, or cancel reservations. Show data clearly — use the short ID (first 8 chars) when referencing reservations.',
       cache_control: { type: 'ephemeral' },
     },
     ...(contextSummary ? [{
@@ -169,18 +232,58 @@ async function* streamAskDoug(threadId, userMessage, model = 'claude-haiku-4-5-2
     { type: 'text', text: userMessage || ' ' },
   ];
 
-  const messages = [
+  let currentMessages = [
     ...history.map(m => ({ role: m.role, content: m.content })),
     { role: 'user', content: userContent },
   ];
 
-  const stream = anthropic.messages.stream({ model, max_tokens: 1024, system, messages });
-
+  // Tool use loop — stream text, handle tool calls, continue
   let fullReply = '';
-  for await (const event of stream) {
-    if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-      fullReply += event.delta.text;
-      yield event.delta.text;
+  let done = false;
+
+  while (!done) {
+    const streamOpts = { model, max_tokens: 1024, system, messages: currentMessages };
+    if (felicityDb) streamOpts.tools = RESERVATION_TOOLS;
+
+    let currentText = '';
+    let toolUseBlock = null;
+    let stopReason = '';
+
+    const stream = anthropic.messages.stream(streamOpts);
+
+    for await (const event of stream) {
+      if (event.type === 'content_block_start' && event.content_block.type === 'tool_use') {
+        toolUseBlock = { id: event.content_block.id, name: event.content_block.name, input: '' };
+      } else if (event.type === 'content_block_delta') {
+        if (event.delta.type === 'text_delta') {
+          currentText += event.delta.text;
+          fullReply += event.delta.text;
+          yield event.delta.text;
+        } else if (event.delta.type === 'input_json_delta' && toolUseBlock) {
+          toolUseBlock.input += event.delta.partial_json;
+        }
+      } else if (event.type === 'message_delta') {
+        stopReason = event.delta.stop_reason || '';
+      }
+    }
+
+    if (stopReason === 'tool_use' && toolUseBlock) {
+      const input = JSON.parse(toolUseBlock.input);
+      const result = await executeReservationTool(toolUseBlock.name, input);
+
+      // Build assistant content for tool call turn
+      const assistantContent = [];
+      if (currentText) assistantContent.push({ type: 'text', text: currentText });
+      assistantContent.push({ type: 'tool_use', id: toolUseBlock.id, name: toolUseBlock.name, input });
+
+      currentMessages = [
+        ...currentMessages,
+        { role: 'assistant', content: assistantContent },
+        { role: 'user', content: [{ type: 'tool_result', tool_use_id: toolUseBlock.id, content: result }] },
+      ];
+      // Loop continues — Claude will respond with natural language
+    } else {
+      done = true;
     }
   }
 
