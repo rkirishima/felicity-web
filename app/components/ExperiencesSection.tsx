@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Image from 'next/image';
+import { UpcomingWorkshops } from './UpcomingWorkshops';
 
 interface Experience {
   id: string;
@@ -181,6 +182,9 @@ export function ExperiencesSection({ locale }: Props) {
         <p className="font-mono text-[9px] tracking-[0.1em] text-[#8C7B6B] uppercase mt-4 text-center">
           {isEn ? 'tap for details' : 'タップで詳細'}
         </p>
+
+        {/* Upcoming workshops with date voting */}
+        <UpcomingWorkshops locale={locale} />
 
         <div className="text-center mt-16 border-t border-[#DDD5C5] pt-12">
           <p className="text-[15px] font-light text-[#2C2416] mb-4">
