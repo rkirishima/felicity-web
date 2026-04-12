@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /doug
+Disallow: /api/doug
+Disallow: /api/enter
