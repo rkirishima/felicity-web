@@ -186,11 +186,6 @@ export function getProductSchema(
       price: priceValue,
       priceCurrency: "JPY",
     },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.8",
-      ratingCount: "24",
-    },
   };
 }
 

@@ -252,7 +252,9 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
     setAddressComplete(true);
   };
 
-  const handleBankTransfer = () => {
+  const [bankTransferLoading, setBankTransferLoading] = useState(false);
+
+  const handleBankTransfer = async () => {
     if (!email.trim() || !fullName.trim() || !phone.trim() || !prefecture || !city.trim() || !streetAddress.trim() || !postalCode.trim()) {
       setFormError(t.allFieldsRequired);
       return;
@@ -261,8 +263,27 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
       setFormError(t.postalCodeInvalid);
       return;
     }
-    const orderId = 'ORDER-' + Date.now();
-    if (onSuccess) onSuccess(orderId);
+    setFormError(null);
+    setBankTransferLoading(true);
+
+    try {
+      const res = await fetch('/api/bank-transfer-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email, fullName, phone, postalCode, prefecture, city, streetAddress, building,
+          items: items.map((item) => ({ name: item.name, quantity: item.quantity ?? 1, price: item.price })),
+          amount: total,
+        }),
+      });
+      if (!res.ok) throw new Error('Order failed');
+      const data = await res.json();
+      if (onSuccess) onSuccess(data.orderId);
+    } catch {
+      setFormError(language === 'ja' ? '注文の処理中にエラーが発生しました。もう一度お試しください。' : 'An error occurred while processing your order. Please try again.');
+    } finally {
+      setBankTransferLoading(false);
+    }
   };
 
   return (
@@ -355,9 +376,9 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
 
           {/* Show payment based on method */}
           {paymentMethod === 'bank-transfer' ? (
-            <button type="button" onClick={handleBankTransfer}
-              className="w-full bg-[#2C2416] text-white py-4 rounded-sm font-light text-[16px] hover:bg-[#1a1410]">
-              {t.confirmOrder}
+            <button type="button" onClick={handleBankTransfer} disabled={bankTransferLoading}
+              className="w-full bg-[#2C2416] text-white py-4 rounded-sm font-light text-[16px] hover:bg-[#1a1410] disabled:opacity-50 disabled:cursor-not-allowed">
+              {bankTransferLoading ? t.processing : t.confirmOrder}
             </button>
           ) : !addressComplete ? (
             <button type="submit"

@@ -84,7 +84,6 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning className="m-0 p-0">
       <head>
-        <Script src="https://js.stripe.com/v3/" strategy="beforeInteractive" />
         {gaId && (
           <>
             <Script

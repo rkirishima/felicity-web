@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { products } from "../../lib/products";
 import { getProductSchema, getBreadcrumbSchema } from "../../lib/schema";
 import { LanguageToggle } from "@/app/components/LanguageToggle";
+import { ProductActions } from "./ProductActions";
 
 export async function generateMetadata({
   params,
@@ -82,6 +82,9 @@ export default async function ProductPage({
     { label: "GTIN", value: product.gtin },
   ];
 
+  // Parse price to number
+  const priceYen = parseInt(product.price.replace(/[^\d]/g, ""), 10);
+
   // Generate schemas
   const productSchema = getProductSchema(
     product.name,
@@ -127,12 +130,12 @@ export default async function ProductPage({
       <div className="max-w-6xl mx-auto px-8">
         {/* ── Back link ──────────────────────────────────────────────────── */}
         <div className="pt-10 pb-12">
-          <Link
-            href="/"
+          <a
+            href="/#coffee"
             className="font-mono text-[9px] tracking-[0.25em] text-[#8C7B6B] uppercase hover:text-[#2C2416] transition-colors duration-200"
           >
             ← Back to Collection
-          </Link>
+          </a>
         </div>
 
         {/* ── Product name ───────────────────────────────────────────────── */}
@@ -146,13 +149,25 @@ export default async function ProductPage({
           </p>
         </div>
 
-        {/* ── Product image ───────────────────────────────────────────────── */}
+        {/* ── Product image + Add to Cart ─────────────────────────────── */}
         <div className="mt-12 mb-16">
           <div className="w-full h-[300px] overflow-hidden">
             <img
               src={product.image}
               alt={product.name}
               className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* Add to Cart */}
+          <div className="mt-8 flex items-center gap-6">
+            <p className="font-mono text-[18px] tracking-[0.04em] text-[#7AAFC4] font-semibold">
+              {product.weight}&nbsp;&mdash;&nbsp;{product.price}
+            </p>
+            <ProductActions
+              productName={product.name}
+              productWeight={product.weight}
+              priceYen={priceYen}
             />
           </div>
         </div>
