@@ -1,9 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const _url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const _key = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabase = _url && _key ? createClient(_url, _key) : null;
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);

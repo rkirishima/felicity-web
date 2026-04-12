@@ -10,10 +10,9 @@ import Anthropic from '@anthropic-ai/sdk';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Works both locally (SUPABASE_URL) and on Vercel (NEXT_PUBLIC_DOUG_SUPABASE_URL)
-const supabase = createClient(
-  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_DOUG_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_KEY_DOUG
-);
+const _dougUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_DOUG_SUPABASE_URL;
+const _dougKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_KEY_DOUG;
+const supabase = _dougUrl && _dougKey ? createClient(_dougUrl, _dougKey) : null;
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
