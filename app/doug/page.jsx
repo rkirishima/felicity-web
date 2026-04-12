@@ -221,6 +221,11 @@ export default function DougPage() {
   const [rightTab, setRightTab] = useState('memory');
   const [memoryFile, setMemoryFile] = useState(null);
 
+  // reservations panel
+  const [reservations, setReservations] = useState([]);
+  const [reservationDate, setReservationDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [reservationsLoading, setReservationsLoading] = useState(false);
+
   // filter / search
   const [projectFilter, setProjectFilter] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -245,6 +250,36 @@ export default function DougPage() {
   useEffect(() => {
     if (selectedThread) loadMessages(selectedThread.id);
   }, [selectedThread?.id]);
+
+  // ── reservations ──
+  const loadReservations = useCallback(async (date) => {
+    setReservationsLoading(true);
+    try {
+      const res = await fetch(`/api/doug/reservations?date=${date}`);
+      const data = await res.json();
+      setReservations(data.reservations || []);
+    } catch { setReservations([]); }
+    finally { setReservationsLoading(false); }
+  }, []);
+
+  useEffect(() => {
+    if (rightTab === 'reservations') loadReservations(reservationDate);
+  }, [rightTab, reservationDate]);
+
+  const updateReservationStatus = async (id, status) => {
+    await fetch('/api/doug/reservations', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status }),
+    });
+    loadReservations(reservationDate);
+  };
+
+  const shiftDate = (days) => {
+    const d = new Date(reservationDate);
+    d.setDate(d.getDate() + days);
+    setReservationDate(d.toISOString().split('T')[0]);
+  };
 
   // ── scroll: instant on load, smooth on new message, instant on streaming ──
   useEffect(() => {
@@ -656,10 +691,10 @@ export default function DougPage() {
   const infoPanelContent = (
     <>
       <div className="flex border-b border-gray-800 flex-shrink-0">
-        {['memory', 'projects'].map(tab => (
+        {['memory', 'projects', 'reservations'].map(tab => (
           <button key={tab} onClick={() => setRightTab(tab)}
             className={`flex-1 py-3 text-xs transition-colors ${rightTab === tab ? 'text-gray-200 border-b border-gray-400' : 'text-gray-600 hover:text-gray-400'}`}>
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {tab === 'reservations' ? '予約' : tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
         ))}
       </div>
@@ -742,6 +777,65 @@ export default function DougPage() {
               )}
             </div>
           ))}
+        </div>
+      )}
+      {rightTab === 'reservations' && (
+        <div className="flex-1 overflow-y-auto">
+          {/* Date nav */}
+          <div className="flex items-center justify-between px-3 py-2 border-b border-gray-800">
+            <button onClick={() => shiftDate(-1)} className="text-gray-500 hover:text-gray-300 text-sm px-2">←</button>
+            <span className="text-xs text-gray-300 font-mono">{reservationDate}</span>
+            <button onClick={() => shiftDate(1)} className="text-gray-500 hover:text-gray-300 text-sm px-2">→</button>
+          </div>
+          {reservationsLoading ? (
+            <p className="text-gray-600 text-xs text-center pt-4">Loading…</p>
+          ) : reservations.length === 0 ? (
+            <p className="text-gray-600 text-xs text-center pt-4">No reservations</p>
+          ) : (
+            <div className="p-2 space-y-1.5">
+              {reservations.map(r => (
+                <div key={r.id} className="px-3 py-2.5 rounded-lg bg-gray-800/50 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-200 font-medium">{r.time} — {r.name}</span>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono uppercase ${
+                      r.status === 'confirmed' ? 'bg-green-900/50 text-green-400' :
+                      r.status === 'cancelled' ? 'bg-red-900/50 text-red-400' :
+                      r.status === 'completed' ? 'bg-gray-700 text-gray-400' :
+                      'bg-yellow-900/50 text-yellow-400'
+                    }`}>{r.status}</span>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {r.party_size}名{r.floor_preference ? ` · ${r.floor_preference}` : ''} · {r.contact}
+                  </div>
+                  {r.notes && <p className="text-xs text-gray-600 italic">{r.notes}</p>}
+                  {r.status === 'pending' && (
+                    <div className="flex gap-2 pt-1">
+                      <button onClick={() => updateReservationStatus(r.id, 'confirmed')}
+                        className="text-[10px] px-2 py-1 rounded bg-green-900/30 text-green-400 hover:bg-green-900/50 transition-colors">
+                        Confirm
+                      </button>
+                      <button onClick={() => updateReservationStatus(r.id, 'cancelled')}
+                        className="text-[10px] px-2 py-1 rounded bg-red-900/30 text-red-400 hover:bg-red-900/50 transition-colors">
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                  {r.status === 'confirmed' && (
+                    <div className="flex gap-2 pt-1">
+                      <button onClick={() => updateReservationStatus(r.id, 'completed')}
+                        className="text-[10px] px-2 py-1 rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors">
+                        Complete
+                      </button>
+                      <button onClick={() => updateReservationStatus(r.id, 'cancelled')}
+                        className="text-[10px] px-2 py-1 rounded bg-red-900/30 text-red-400 hover:bg-red-900/50 transition-colors">
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </>
