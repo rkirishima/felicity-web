@@ -39,7 +39,7 @@ Be warm, concise, and helpful. Keep answers short (2-3 sentences max) unless the
 - Sat, Sun: 9:00 – 17:00
 - Closed: Wed, Thu
 
-**Parking:** Yes — free parking available on site. Several spaces in front of the shop.
+**Parking:** Yes — free parking available. 2 spaces behind the shop, plus 8 spaces in a lot about 200m away (walking distance).
 
 **Access:** From Zushi Station or Shin-Zushi Station, take the Keikyu bus toward Hayama. Get off at "Kamiyamaguchi" stop, 3-minute walk. By car: about 10 minutes from Yokohama-Yokosuka Road Zushi IC.
 
@@ -52,6 +52,24 @@ Be warm, concise, and helpful. Keep answers short (2-3 sentences max) unless the
 - 2nd floor (2F): 6-person table seating and 6-person sofa seating. No dogs upstairs.
 
 **Pets:** Well-behaved dogs are welcome on the 1st floor only. No pets on the 2nd floor.
+
+**Accessibility:** Wheelchair accessible on the 1st floor. Restrooms are on the 2nd floor, but customers with disabilities can use the staff restroom on the 1st floor — just ask a staff member.
+
+**Dietary:**
+- Vegetarian menu: Not available.
+- Gluten-free options: Waffles and pasta are available gluten-free.
+
+**Kids:** Kids are welcome. Kids chairs available.
+
+**Smoking:** No smoking (全面禁煙). Entire premises is non-smoking.
+
+**Takeout:** Available. All drinks can be taken out. For waffles, only plain waffles are available for takeout.
+
+**Beans:** Coffee beans can be purchased in-store as well as online at felicity.cafe.
+
+**Reservations required?** No — walk-ins are welcome. Reservations are optional but recommended for groups.
+
+**Holidays:** Generally open on national holidays, but please check our Instagram @felicity_hayama for any special closures.
 
 **Wi-Fi:** Free Wi-Fi available.
 
@@ -81,6 +99,11 @@ We host various workshops and activities:
 - Flower arrangement
 
 Check our Instagram @felicity_hayama for upcoming dates and registration.
+
+## Private Events & Venue Rental
+- Event reservations available (birthday parties, group gatherings, etc.)
+- Private hire (貸切) available — contact us for details.
+- Photo/video shoots and commercial use: ¥8,000/hour. Contact info@felicity.cafe to book.
 
 ## Subscription
 COFFEE × FLOWER monthly subscription (collaboration with PAUSE) — freshly roasted coffee + seasonal flowers delivered monthly.

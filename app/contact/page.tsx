@@ -73,7 +73,7 @@ export default function ContactPage() {
                 神奈川県三浦郡葉山町上山口2432-3
               </p>
               <p className="text-[13px] text-[#8C7B6B] mt-2">
-                駐車場あり（無料）
+                駐車場あり（裏2台 + 徒歩200m先に8台・無料）
               </p>
             </div>
 

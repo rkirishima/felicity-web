@@ -74,7 +74,7 @@ export default function ContactPageEN() {
                 Kanagawa 240-0115, Japan
               </p>
               <p className="text-[13px] text-[#8C7B6B] mt-2">
-                Free parking available
+                Free parking (2 behind shop + 8 spaces 200m away)
               </p>
             </div>
 
