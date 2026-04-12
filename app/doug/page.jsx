@@ -18,8 +18,8 @@ const PROJECTS = [
   { id: 'ys-body',        name: "Y's Body Factory",    desc: '張力フレックストレーニング® studio — Hayama',     status: 'plan',  url: null,                                 tech: 'Proposal stage' },
 ];
 
-const STATUS_DOT = { open: 'bg-blue-500', done: 'bg-green-500', waiting: 'bg-yellow-500' };
-const PROJECT_DOT = { live: 'bg-green-500', local: 'bg-yellow-500', build: 'bg-gray-600', plan: 'bg-gray-700' };
+const STATUS_DOT = { open: 'bg-blue-400', done: 'bg-emerald-400', waiting: 'bg-amber-400' };
+const PROJECT_DOT = { live: 'bg-emerald-400', local: 'bg-amber-400', build: 'bg-slate-500', plan: 'bg-slate-600' };
 
 function relativeTime(ts) {
   if (!ts) return '';
@@ -635,6 +635,10 @@ export default function DougPage() {
 
   const threadListContent = (
     <>
+      {/* desktop header */}
+      <div className="hidden md:flex items-center px-4 py-3 border-b border-gray-800 flex-shrink-0">
+        <span className="text-base font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Doug</span>
+      </div>
       {/* search */}
       <div className="p-2 border-b border-gray-800 flex-shrink-0">
         <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
@@ -644,12 +648,12 @@ export default function DougPage() {
       {/* project filter pills */}
       <div className="flex gap-1.5 px-2 py-2 overflow-x-auto border-b border-gray-800 flex-shrink-0" style={{ scrollbarWidth: 'none' }}>
         <button onClick={() => setProjectFilter(null)}
-          className={`flex-shrink-0 px-3 py-1 rounded-full text-xs transition-colors ${!projectFilter ? 'bg-gray-600 text-white' : 'bg-gray-800 text-gray-400'}`}>
+          className={`flex-shrink-0 px-3 py-1 rounded-full text-xs transition-colors ${!projectFilter ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-gray-200'}`}>
           All
         </button>
         {PROJECTS.map(p => (
           <button key={p.id} onClick={() => setProjectFilter(projectFilter === p.id ? null : p.id)}
-            className={`flex-shrink-0 px-3 py-1 rounded-full text-xs transition-colors ${projectFilter === p.id ? 'bg-gray-600 text-white' : 'bg-gray-800 text-gray-400'}`}>
+            className={`flex-shrink-0 px-3 py-1 rounded-full text-xs transition-colors ${projectFilter === p.id ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-gray-200'}`}>
             {p.name}
           </button>
         ))}
@@ -657,7 +661,7 @@ export default function DougPage() {
       {/* new thread */}
       <div className="p-2 border-b border-gray-800 flex-shrink-0">
         <button onClick={() => createThread(projectFilter)}
-          className="w-full py-2 px-3 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg text-sm transition-colors text-left">
+          className="w-full py-2 px-3 bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-700/40 text-indigo-300 rounded-lg text-sm transition-colors text-left">
           + New Thread{projectFilter ? ` in ${PROJECTS.find(p => p.id === projectFilter)?.name}` : ''}
         </button>
       </div>
@@ -857,9 +861,9 @@ export default function DougPage() {
           messages.map(msg => (
             <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[78%] rounded-2xl text-sm leading-relaxed overflow-hidden ${
-                msg.role === 'user'  ? 'bg-gray-700 text-gray-100 rounded-br-sm' :
+                msg.role === 'user'  ? 'bg-blue-600 text-white rounded-br-sm' :
                 msg.role === 'error' ? 'bg-red-900/50 text-red-300 rounded-bl-sm px-4 py-2.5 whitespace-pre-wrap' :
-                                      'bg-gray-800 text-gray-200 rounded-bl-sm'
+                                      'bg-indigo-950/80 border border-indigo-900/50 text-gray-200 rounded-bl-sm'
               }`}>
                 {msg.image_url && (
                   <a href={msg.image_url} target="_blank" rel="noreferrer">
@@ -873,7 +877,7 @@ export default function DougPage() {
                         <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
                           {msg.content}
                         </ReactMarkdown>
-                        {msg.streaming && <span className="inline-block w-0.5 h-3.5 bg-gray-400 ml-0.5 align-middle animate-pulse" />}
+                        {msg.streaming && <span className="inline-block w-0.5 h-3.5 bg-indigo-400 ml-0.5 align-middle animate-pulse" />}
                       </>
                     ) : (
                       <span className="whitespace-pre-wrap">{msg.content}</span>
@@ -892,7 +896,7 @@ export default function DougPage() {
         <span className="text-gray-600 text-xs">Model</span>
         {['haiku', 'sonnet'].map(m => (
           <button key={m} onClick={() => setModel(m)}
-            className={`px-2.5 py-0.5 rounded-full text-xs transition-colors ${model === m ? 'bg-gray-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>
+            className={`px-2.5 py-0.5 rounded-full text-xs transition-colors ${model === m ? (m === 'sonnet' ? 'bg-violet-600 text-white' : 'bg-teal-700 text-white') : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>
             {m.charAt(0).toUpperCase() + m.slice(1)}
           </button>
         ))}
@@ -962,7 +966,7 @@ export default function DougPage() {
             style={{ minHeight: '2.75rem', maxHeight: '8rem' }}
             onInput={e => { e.target.style.height = 'auto'; e.target.style.height = `${Math.min(e.target.scrollHeight, 128)}px`; }} />
           <button onClick={sendMessage} disabled={!selectedThread || (!draft.trim() && !selectedImage) || sending}
-            className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-gray-700 hover:bg-gray-600 disabled:opacity-30 text-gray-200 rounded-xl text-sm transition-colors">
+            className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-blue-600 hover:bg-blue-500 disabled:opacity-30 disabled:bg-gray-700 text-white rounded-xl text-sm transition-colors">
             {sending ? '…' : (
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 -rotate-90">
                 <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
@@ -984,7 +988,7 @@ export default function DougPage() {
         {/* header */}
         <div className="flex items-center justify-between px-4 bg-gray-900 border-b border-gray-800 flex-shrink-0"
           style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))', paddingBottom: '0.75rem' }}>
-          <span className="text-base font-semibold text-gray-100">Doug</span>
+          <span className="text-base font-semibold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Doug</span>
           <div className="flex items-center gap-2">
             <button onClick={() => setMobileView('info')} className="text-gray-400 hover:text-gray-200 p-1">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
@@ -1035,7 +1039,7 @@ export default function DougPage() {
 
       {/* ── DESKTOP: three-column layout ─────────────────────────────────── */}
       {/* Left: thread list */}
-      <aside className="hidden md:flex md:flex-col md:w-64 md:flex-shrink-0 bg-gray-900 border-r border-gray-800">
+      <aside className="hidden md:flex md:flex-col md:w-64 md:flex-shrink-0 bg-gray-900 border-r border-gray-800 border-t-2 border-t-indigo-600">
         {threadListContent}
       </aside>
 
@@ -1060,7 +1064,7 @@ export default function DougPage() {
           <span className="text-gray-500 text-xs">Model</span>
           {['haiku', 'sonnet'].map(m => (
             <button key={m} onClick={() => setModel(m)}
-              className={`px-3 py-1 rounded-full text-xs transition-colors ${model === m ? 'bg-gray-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>
+              className={`px-3 py-1 rounded-full text-xs transition-colors ${model === m ? (m === 'sonnet' ? 'bg-violet-600 text-white' : 'bg-teal-700 text-white') : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>
               {m.charAt(0).toUpperCase() + m.slice(1)}
             </button>
           ))}

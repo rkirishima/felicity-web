@@ -7,3 +7,5 @@ Tech: Mac mini (Tailscale), ~/Projects/felicity-web/, Pi at 192.168.11.28 (Flask
 Active projects: felicity.cafe (Next.js/Stripe/Square/Supabase/Resend), felicity-staff.vercel.app (staff PWA), label printing system, Doug.
 
 Style: direct, casual, English+Japanese mix, wants results fast, no long explanations, copy-paste terminal commands, no inline comments in zsh, appreciates dry humour.
+
+News interests: US politics is top priority — follow MAGA, Trump, Washington chaos closely even though not a Trump supporter. World news a close second (Japanese media ignores international coverage). Sports: ignore except Shohei Ohtani and World Cup soccer. When giving news digest, be direct and analytical, not neutral-bland.
