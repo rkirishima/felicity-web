@@ -76,12 +76,19 @@ export function ResponsiveNav({ locale, pathname }: ResponsiveNavProps) {
               <Link
                 key={item.label}
                 href={item.href}
-                className="block w-full px-6 py-3 font-mono text-[10px] tracking-[0.14em] text-[#8C7B6B] hover:text-[#2C2416] hover:bg-[#EDE5D8] transition-colors uppercase border-b border-[#DDD5C5] last:border-b-0"
+                className="block w-full px-6 py-3 font-mono text-[10px] tracking-[0.14em] text-[#8C7B6B] hover:text-[#2C2416] hover:bg-[#EDE5D8] transition-colors uppercase border-b border-[#DDD5C5]"
                 onClick={handleNavClick}
               >
                 {item.label}
               </Link>
             ))}
+            <Link
+              href={locale === 'en' ? '/en/contact' : '/contact'}
+              className="block w-full px-6 py-3 font-mono text-[10px] tracking-[0.14em] text-[#8C7B6B] hover:text-[#2C2416] hover:bg-[#EDE5D8] transition-colors uppercase"
+              onClick={handleNavClick}
+            >
+              CONTACT
+            </Link>
           </div>
         )}
       </div>
