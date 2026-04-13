@@ -2,6 +2,8 @@ import { NextRequest } from 'next/server';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import Anthropic from '@anthropic-ai/sdk';
+import { createClient } from '@supabase/supabase-js';
+import { getAvailability } from '../../lib/capacity';
 
 // Load ANTHROPIC_API_KEY from doug/.env if not already set
 if (!process.env.ANTHROPIC_API_KEY) {
@@ -22,6 +24,10 @@ if (!process.env.ANTHROPIC_API_KEY) {
 }
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 const SYSTEM_PROMPT = `You are the friendly virtual concierge for FELICITY COFFEE ROASTERS, a specialty coffee roastery and cafe in Hayama, Kanagawa, Japan.
 
@@ -118,9 +124,9 @@ You can help customers make reservation requests. When a customer wants to reser
 
 You may also ask about seating preference (1F or 2F) and note it. If they have dogs, recommend 1F and note it.
 
-Once you have ALL required info, use the make_reservation tool. Confirm the details with the customer before calling the tool. If they're missing info, ask for it naturally.
+Once you have ALL required info, ALWAYS use the check_availability tool first to verify seats are available. If the requested time/floor is full, suggest alternative times or the other floor. Only call make_reservation after confirming availability.
 
-Note: Reservations are requests — we'll confirm availability. Let the customer know this.
+If availability is limited, let the customer know and offer alternatives.
 
 ## Important Rules
 - Never discuss the cafe owner's personal life or background
@@ -144,6 +150,21 @@ const RESERVATION_TOOL: Anthropic.Tool = {
       notes: { type: 'string', description: 'Any special requests or notes' },
     },
     required: ['name', 'date', 'time', 'party_size', 'contact'],
+  },
+};
+
+const CHECK_AVAILABILITY_TOOL: Anthropic.Tool = {
+  name: 'check_availability',
+  description: 'Check seat availability at Felicity Coffee Roasters for a given date and time. Always call this before making a reservation.',
+  input_schema: {
+    type: 'object' as const,
+    properties: {
+      date: { type: 'string', description: 'Date to check (YYYY-MM-DD format)' },
+      time: { type: 'string', description: 'Time to check (HH:MM format)' },
+      party_size: { type: 'number', description: 'Number of guests' },
+      floor_preference: { type: 'string', description: 'Optional floor preference: 1F or 2F' },
+    },
+    required: ['date', 'time', 'party_size'],
   },
 };
 
@@ -171,7 +192,7 @@ export async function POST(request: NextRequest) {
             model: 'claude-haiku-4-5-20251001',
             max_tokens: 512,
             system: SYSTEM_PROMPT,
-            tools: [RESERVATION_TOOL],
+            tools: [CHECK_AVAILABILITY_TOOL, RESERVATION_TOOL],
             messages: currentMessages,
             stream: true,
           });
@@ -204,25 +225,51 @@ export async function POST(request: NextRequest) {
           }
 
           if (stopReason === 'tool_use' && toolUseBlock) {
-            // Execute the reservation tool
             const input = JSON.parse(toolUseBlock.input);
             let toolResult: string;
 
             try {
-              const res = await fetch(
-                new URL('/api/reservations', request.url).toString(),
-                {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(input),
+              if (toolUseBlock.name === 'check_availability') {
+                // Execute availability check directly
+                const availability = await getAvailability(
+                  supabase,
+                  input.date,
+                  input.time
+                );
+                const partySize = input.party_size || 1;
+                const floor = input.floor_preference;
+
+                let canBook = false;
+                if (floor && (floor === '1F' || floor === '2F')) {
+                  canBook = availability[floor].available >= partySize;
+                } else {
+                  canBook =
+                    availability['1F'].available >= partySize ||
+                    availability['2F'].available >= partySize;
                 }
-              );
-              const data = await res.json();
-              toolResult = data.success
-                ? `Reservation request saved successfully. ID: ${data.reservation?.id}`
-                : `Failed to save reservation: ${data.error}`;
+
+                toolResult = JSON.stringify({ availability, canBook });
+              } else {
+                // Execute the reservation tool
+                const res = await fetch(
+                  new URL('/api/reservations', request.url).toString(),
+                  {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...input, source: 'chatbot', created_by: 'ai-concierge' }),
+                  }
+                );
+                const data = await res.json();
+                if (data.success) {
+                  toolResult = `Reservation request saved successfully. ID: ${data.reservation?.id}`;
+                } else if (data.availability) {
+                  toolResult = `Not enough seats available. Current availability: ${JSON.stringify(data.availability)}`;
+                } else {
+                  toolResult = `Failed to save reservation: ${data.error}`;
+                }
+              }
             } catch (err: any) {
-              toolResult = `Error saving reservation: ${err.message}`;
+              toolResult = `Error: ${err.message}`;
             }
 
             // Build the assistant message with tool use for the next turn
