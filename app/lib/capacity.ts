@@ -42,13 +42,13 @@ export async function getAvailability(
   // 1. Floor capacity
   const { data: floors, error: floorErr } = await supabase
     .from('floor_capacity')
-    .select('floor, seats');
+    .select('floor, total_seats');
 
   if (floorErr) throw new Error(`floor_capacity query failed: ${floorErr.message}`);
 
   const capacity: Record<string, number> = {};
   for (const row of floors || []) {
-    capacity[row.floor] = row.seats;
+    capacity[row.floor] = row.total_seats;
   }
 
   // Initialise result
@@ -75,14 +75,17 @@ export async function getAvailability(
     const evEnd = (inst.end_time as string) || addMinutes(evStart, 120);
     if (evStart >= queryEnd || evEnd <= startTime) continue;
 
-    const floor = event.floor_block as string;
-    if (!floor || !(floor in result)) continue;
+    const floorBlock = event.floor_block as string;
+    if (!floorBlock) continue;
 
-    if ((event.seats_blocked || 0) === 0) {
-      // Block entire floor
-      result[floor as '1F' | '2F'].eventBlocked = result[floor as '1F' | '2F'].total;
-    } else {
-      result[floor as '1F' | '2F'].eventBlocked += event.seats_blocked;
+    const floorsToBlock = floorBlock === 'both' ? ['1F', '2F'] : [floorBlock];
+    for (const floor of floorsToBlock) {
+      if (!(floor in result)) continue;
+      if ((event.seats_blocked || 0) === 0) {
+        result[floor as '1F' | '2F'].eventBlocked = result[floor as '1F' | '2F'].total;
+      } else {
+        result[floor as '1F' | '2F'].eventBlocked += event.seats_blocked;
+      }
     }
   }
 
