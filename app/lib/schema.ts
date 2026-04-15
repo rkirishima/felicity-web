@@ -159,8 +159,7 @@ export function getProductSchema(
   gtin: string,
   locale: "en" | "ja" = "ja"
 ) {
-  const priceMatch = price.match(/(\d+)/);
-  const priceValue = priceMatch ? priceMatch[1] : "0";
+  const priceValue = price.replace(/[^\d]/g, "") || "0";
 
   return {
     "@context": "https://schema.org",
