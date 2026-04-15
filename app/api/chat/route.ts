@@ -241,7 +241,7 @@ export async function POST(request: NextRequest) {
 
                 let canBook = false;
                 if (floor && (floor === '1F' || floor === '2F')) {
-                  canBook = availability[floor].available >= partySize;
+                  canBook = availability[floor as '1F' | '2F'].available >= partySize;
                 } else {
                   canBook =
                     availability['1F'].available >= partySize ||
