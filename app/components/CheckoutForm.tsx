@@ -92,12 +92,23 @@ function StripePaymentForm({
   onError,
   formData,
   total,
+  orderDetails,
 }: {
   language: 'ja' | 'en';
   onSuccess?: (orderId: string) => void;
   onError?: (error: string) => void;
   formData: { email: string; fullName: string };
   total: number;
+  orderDetails: {
+    phone: string;
+    postalCode: string;
+    prefecture: string;
+    city: string;
+    streetAddress: string;
+    building: string;
+    items: Array<{ name: string; qty: number; price: number }>;
+    amount: number;
+  };
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -135,8 +146,32 @@ function StripePaymentForm({
     }
 
     if (paymentIntent?.status === 'succeeded') {
-      const orderId = `FLC-${Date.now()}`;
-      if (onSuccess) onSuccess(orderId);
+      // Save order to Supabase + Square immediately
+      try {
+        const confirmRes = await fetch('/api/confirm-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            paymentIntentId: paymentIntent.id,
+            email: formData.email,
+            fullName: formData.fullName,
+            phone: orderDetails.phone,
+            postalCode: orderDetails.postalCode,
+            prefecture: orderDetails.prefecture,
+            city: orderDetails.city,
+            streetAddress: orderDetails.streetAddress,
+            building: orderDetails.building,
+            items: orderDetails.items,
+            amount: orderDetails.amount,
+          }),
+        });
+        if (!confirmRes.ok) {
+          console.error('Order confirmation failed:', await confirmRes.text());
+        }
+      } catch (err) {
+        console.error('Order confirmation request failed:', err);
+      }
+      if (onSuccess) onSuccess(paymentIntent.id);
     } else {
       setError(t.paymentNotCompleted);
       if (onError) onError('Payment not completed');
@@ -416,6 +451,16 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
                   onError={onError}
                   formData={{ email, fullName }}
                   total={total}
+                  orderDetails={{
+                    phone,
+                    postalCode,
+                    prefecture,
+                    city,
+                    streetAddress,
+                    building,
+                    items: items.map((i) => ({ name: i.name, qty: i.quantity ?? 1, price: i.price })),
+                    amount: total,
+                  }}
                 />
               </Elements>
             )}
