@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
         .map((i: { name: string; qty: number }) => `<li>${i.name} × ${i.qty}</li>`)
         .join('');
 
-      await resend.emails.send({
+      const { error: emailError } = await resend.emails.send({
         from: 'FELICITY <orders@felicity.cafe>',
         to: email,
         subject: '【FELICITY】ご注文ありがとうございます',
@@ -186,9 +186,13 @@ export async function POST(request: NextRequest) {
 </body>
 </html>`,
       });
-      console.log('Order confirmation email sent to:', email);
+      if (emailError) {
+        console.error('Order confirmation email failed (Resend):', JSON.stringify(emailError));
+      } else {
+        console.log('Order confirmation email sent to:', email);
+      }
     } catch (emailErr) {
-      console.error('Order confirmation email failed:', emailErr);
+      console.error('Order confirmation email threw:', emailErr);
       // Don't fail the order — email is secondary
     }
   }
