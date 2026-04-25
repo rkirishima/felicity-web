@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
         .join('');
 
       const { error: emailError } = await resend.emails.send({
-        from: 'FELICITY <orders@felicity.cafe>',
+        from: 'FELICITY <info@felicity.cafe>',
         to: email,
         subject: '【FELICITY】ご注文ありがとうございます',
         html: `<!DOCTYPE html>
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
     <p style="font-size: 12px; color: #78716c; line-height: 1.7; margin: 0;">
       FELICITY COFFEE ROASTERS<br>
       〒240-0112 神奈川県三浦郡葉山町上山口2432-3<br>
-      hello@felicity.cafe
+      info@felicity.cafe
     </p>
   </div>
 </body>
