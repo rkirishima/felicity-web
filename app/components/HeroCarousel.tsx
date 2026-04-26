@@ -6,7 +6,7 @@ const videos = [
 
 export default function HeroCarousel() {
   return (
-    <div className="absolute inset-0 w-full h-full z-50 overflow-hidden">
+    <div className="absolute inset-0 w-full h-full z-50 overflow-hidden bg-black">
       {videos.map((video, idx) => (
         <div
           key={video.id}
@@ -23,7 +23,6 @@ export default function HeroCarousel() {
             loop
             playsInline
             preload={idx === 0 ? "auto" : "none"}
-            poster="/og-image.jpg"
             className="hidden md:block w-full h-full object-cover"
           >
             <source src={video.landscape} type="video/mp4" />
@@ -36,7 +35,6 @@ export default function HeroCarousel() {
             loop
             playsInline
             preload={idx === 0 ? "auto" : "none"}
-            poster="/og-image.jpg"
             className="md:hidden w-full h-full object-cover"
           >
             <source src={video.portrait} type="video/mp4" />
