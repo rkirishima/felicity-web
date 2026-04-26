@@ -17,6 +17,17 @@ export async function POST(request: NextRequest) {
 
     const email = voter_email.toLowerCase().trim();
 
+    // Pre-check: reject if event is already full
+    const { data: preCheck } = await supabase
+      .from('events')
+      .select('status')
+      .eq('id', event_id)
+      .single();
+
+    if (preCheck?.status === 'full') {
+      return NextResponse.json({ error: '満員御礼。募集を締め切りました。', status: 'full' }, { status: 409 });
+    }
+
     // Upsert each vote
     for (const vote of votes) {
       const { date_id, response } = vote;
@@ -58,37 +69,68 @@ export async function POST(request: NextRequest) {
         .eq('id', dateId);
     }
 
-    // Check if any date reached the threshold
+    // Check if event should auto-confirm (min_votes reached) or be marked full (max_attendees reached)
     const { data: event } = await supabase
       .from('events')
-      .select('min_votes, status')
+      .select('min_votes, max_attendees, status, confirmed_date')
       .eq('id', event_id)
       .single();
 
-    if (event && event.status === 'open') {
-      const { data: dates } = await supabase
-        .from('event_dates')
-        .select('id, date, yes_count')
-        .eq('event_id', event_id)
-        .gte('yes_count', event.min_votes)
-        .order('yes_count', { ascending: false })
-        .limit(1);
+    if (event) {
+      // Auto-confirm when min_votes reached (only if still 'open')
+      if (event.status === 'open') {
+        const { data: dates } = await supabase
+          .from('event_dates')
+          .select('id, date, yes_count')
+          .eq('event_id', event_id)
+          .gte('yes_count', event.min_votes)
+          .order('yes_count', { ascending: false })
+          .limit(1);
 
-      if (dates && dates.length > 0) {
-        await supabase
-          .from('events')
-          .update({ status: 'confirmed', confirmed_date: dates[0].date })
-          .eq('id', event_id);
+        if (dates && dates.length > 0) {
+          await supabase
+            .from('events')
+            .update({ status: 'confirmed', confirmed_date: dates[0].date })
+            .eq('id', event_id);
+          event.status = 'confirmed';
+          event.confirmed_date = dates[0].date;
 
-        // Trigger integrations (staff schedule + Google Calendar)
-        const { data: fullEvent } = await supabase
-          .from('events')
-          .select('id, title, title_en, description, confirmed_date')
-          .eq('id', event_id)
-          .single();
+          const { data: fullEvent } = await supabase
+            .from('events')
+            .select('id, title, title_en, description, confirmed_date')
+            .eq('id', event_id)
+            .single();
+          if (fullEvent) onEventConfirmed(fullEvent).catch(console.error);
+        }
+      }
 
-        if (fullEvent) {
-          onEventConfirmed(fullEvent).catch(console.error);
+      // Mark full when max_attendees reached on the confirmed/leading date
+      if ((event.status === 'open' || event.status === 'confirmed') && event.max_attendees && event.max_attendees > 0) {
+        // Use confirmed_date if available, otherwise highest yes_count date
+        let targetDate;
+        if (event.confirmed_date) {
+          const { data } = await supabase
+            .from('event_dates')
+            .select('yes_count')
+            .eq('event_id', event_id)
+            .eq('date', event.confirmed_date)
+            .single();
+          targetDate = data;
+        } else {
+          const { data } = await supabase
+            .from('event_dates')
+            .select('yes_count')
+            .eq('event_id', event_id)
+            .order('yes_count', { ascending: false })
+            .limit(1)
+            .single();
+          targetDate = data;
+        }
+        if (targetDate && targetDate.yes_count >= event.max_attendees) {
+          await supabase
+            .from('events')
+            .update({ status: 'full' })
+            .eq('id', event_id);
         }
       }
     }

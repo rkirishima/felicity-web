@@ -20,6 +20,7 @@ interface Event {
   description_en: string | null;
   photo: string | null;
   min_votes: number;
+  max_attendees?: number;
   status: string;
   confirmed_date: string | null;
   event_dates: EventDate[];
@@ -47,9 +48,22 @@ export function WorkshopCard({ event, locale, onUpdate }: Props) {
   const isEn = locale === 'en';
   const title = isEn ? event.title_en : event.title;
   const desc = isEn ? event.description_en : event.description;
-  const isConfirmed = event.status === 'confirmed';
+  const isConfirmed = event.status === 'confirmed' || event.status === 'full';
+  const isFull = event.status === 'full';
+  const maxAttendees = event.max_attendees && event.max_attendees > 0 ? event.max_attendees : null;
 
   const sortedDates = [...event.event_dates].sort((a, b) => a.date.localeCompare(b.date));
+
+  // Count of registered attendees (yes votes on confirmed date, or max yes_count if not confirmed)
+  const registeredCount = (() => {
+    if (event.confirmed_date) {
+      const d = sortedDates.find((x) => x.date === event.confirmed_date);
+      return d?.yes_count || 0;
+    }
+    return Math.max(0, ...sortedDates.map((d) => d.yes_count));
+  })();
+
+  const remainingSeats = maxAttendees ? Math.max(0, maxAttendees - registeredCount) : null;
 
   return (
     <>
@@ -70,11 +84,23 @@ export function WorkshopCard({ event, locale, onUpdate }: Props) {
           {/* Content */}
           <div className="flex-1 p-5 md:p-6">
             {/* Status badge */}
-            {isConfirmed && (
-              <span className="inline-block bg-[#7AAFC4] text-white font-mono text-[9px] tracking-[0.16em] uppercase px-2.5 py-1 rounded-sm mb-3">
-                {isEn ? 'Confirmed!' : '\u958B\u50AC\u6C7A\u5B9A\uFF01'}
-              </span>
-            )}
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
+              {isConfirmed && !isFull && (
+                <span className="inline-block bg-[#7AAFC4] text-white font-mono text-[9px] tracking-[0.16em] uppercase px-2.5 py-1 rounded-sm">
+                  {isEn ? 'Confirmed!' : '\u958B\u50AC\u6C7A\u5B9A\uFF01'}
+                </span>
+              )}
+              {isFull && (
+                <span className="inline-block bg-[#C87A7A] text-white font-mono text-[9px] tracking-[0.16em] uppercase px-2.5 py-1 rounded-sm">
+                  {isEn ? 'Sold Out' : '\u6E80\u54E1\u5FA1\u793C'}
+                </span>
+              )}
+              {maxAttendees && !isFull && (
+                <span className="inline-block font-mono text-[10px] text-[#8C7B6B]">
+                  {registeredCount}/{maxAttendees}{isEn ? '' : '\u540D'}
+                </span>
+              )}
+            </div>
 
             <h4 className="text-[18px] font-light text-[#2C2416] mb-2">{title}</h4>
             {desc && (
@@ -111,21 +137,37 @@ export function WorkshopCard({ event, locale, onUpdate }: Props) {
               })}
             </div>
 
-            {/* Vote button — only for open events */}
-            {!isConfirmed && (
+            {/* Confirmed date display */}
+            {isConfirmed && event.confirmed_date && (
+              <p className="text-[13px] text-[#2C2416] font-light mb-3">
+                {isEn ? 'Date: ' : '\u65E5\u7A0B\uFF1A'}
+                <span className="font-mono">{formatDateShort(event.confirmed_date, locale)}</span>
+                {remainingSeats !== null && remainingSeats > 0 && (
+                  <span className="ml-2 text-[#7AAFC4] font-mono text-[11px]">
+                    {isEn
+                      ? `(${remainingSeats} seat${remainingSeats === 1 ? '' : 's'} left)`
+                      : `\uFF08\u3042\u3068${remainingSeats}\u540D\uFF09`}
+                  </span>
+                )}
+              </p>
+            )}
+
+            {/* Vote/Register button — show unless full */}
+            {!isFull && (
               <button
                 onClick={() => setShowVote(true)}
                 className="border border-[#7AAFC4] text-[#7AAFC4] font-mono text-[10px] tracking-[0.16em] uppercase px-5 py-2.5 hover:bg-[#7AAFC4] hover:text-white transition-colors"
               >
-                {isEn ? 'Vote on dates' : '\u65E5\u7A0B\u306B\u6295\u7968\u3059\u308B'}
+                {isConfirmed
+                  ? (isEn ? 'Register' : '\u53C2\u52A0\u3092\u767B\u9332')
+                  : (isEn ? 'Vote on dates' : '\u65E5\u7A0B\u306B\u6295\u7968\u3059\u308B')}
               </button>
             )}
 
-            {/* Confirmed date display */}
-            {isConfirmed && event.confirmed_date && (
-              <p className="text-[13px] text-[#2C2416] font-light">
-                {isEn ? 'Date: ' : '\u65E5\u7A0B\uFF1A'}
-                <span className="font-mono">{formatDateShort(event.confirmed_date, locale)}</span>
+            {/* Sold out message */}
+            {isFull && (
+              <p className="text-[13px] text-[#C87A7A] font-light">
+                {isEn ? 'Registration closed.' : '\u52DF\u96C6\u3092\u7DE0\u3081\u5207\u308A\u307E\u3057\u305F\u3002'}
               </p>
             )}
           </div>
