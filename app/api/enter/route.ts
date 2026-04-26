@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const key = searchParams.get('k');
+export async function GET(request: NextRequest) {
+  const key = request.nextUrl.searchParams.get('k');
   const secret = process.env.DOUG_ACCESS_SECRET;
 
   if (!secret || !key || key !== secret) {
