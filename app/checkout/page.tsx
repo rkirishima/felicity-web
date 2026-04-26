@@ -12,8 +12,17 @@ const translations = {
     orderConfirmed: '注文確認',
     thankYou: 'ご注文ありがとうございます',
     orderID: '注文番号',
-    confirmationEmail: '確認メールをお送りしました。',
-    processingTime: 'お気に入りからのご注文をいただき、ありがとうございます。',
+    confirmationEmail: 'ご注文を受け付けました。',
+    processingTime: '1〜2営業日以内に発送準備を開始いたします。',
+    bankTransferNote: '下記の口座にお振込みをお願いいたします。',
+    bankTransferDeadline: 'ご注文から7日以内にお振込みください。',
+    bankTransferRef: '振込時のご依頼人名にご注文番号をご記載ください。',
+    bankName: '銀行名',
+    branchName: '支店名',
+    accountType: '口座種別',
+    accountNumber: '口座番号',
+    accountHolder: '口座名義',
+    transferAmount: 'お振込み金額',
     returnHome: 'ホームに戻る',
     checkout: 'チェックアウト',
     reviewOrder: 'ご注文内容をご確認いただき、お支払い情報をご入力ください',
@@ -23,8 +32,17 @@ const translations = {
     orderConfirmed: 'Order Confirmed',
     thankYou: 'Thank you for your purchase!',
     orderID: 'Order ID',
-    confirmationEmail: 'A confirmation email has been sent to your inbox.',
+    confirmationEmail: 'Your order has been received.',
     processingTime: 'Please allow 1-2 business days for processing.',
+    bankTransferNote: 'Please transfer the payment to the following account.',
+    bankTransferDeadline: 'Please complete the transfer within 7 days.',
+    bankTransferRef: 'Include your Order ID as the transfer reference.',
+    bankName: 'Bank',
+    branchName: 'Branch',
+    accountType: 'Account Type',
+    accountNumber: 'Account Number',
+    accountHolder: 'Account Holder',
+    transferAmount: 'Transfer Amount',
     returnHome: 'Return to Home',
     checkout: 'Checkout',
     reviewOrder: 'Review your order and enter your payment details',
@@ -40,15 +58,21 @@ function CheckoutPageContent({ language = 'ja' }: { language: 'ja' | 'en' }) {
   const _hasHydrated = useCart((state) => state._hasHydrated);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  const [orderAmount, setOrderAmount] = useState<string | null>(null);
   const t = translations[language];
 
   // Check if we're showing confirmation (from search params)
   useEffect(() => {
     const confirmed = searchParams?.get('confirmed') === 'true';
     const id = searchParams?.get('orderId');
+    const method = searchParams?.get('method');
+    const amt = searchParams?.get('amount');
     if (confirmed && id) {
       setOrderConfirmed(true);
       setOrderId(id);
+      setPaymentMethod(method);
+      setOrderAmount(amt);
       clearCart();
     }
   }, [searchParams, clearCart]);
@@ -89,14 +113,33 @@ function CheckoutPageContent({ language = 'ja' }: { language: 'ja' | 'en' }) {
                   <p className="text-[17px] text-[#2C2416] font-mono">{orderId}</p>
                 </div>
 
-                <div className="text-center space-y-2">
-                  <p className="text-[14px] text-[#8C7B6B]">
-                    {t.confirmationEmail}
-                  </p>
-                  <p className="text-[14px] text-[#8C7B6B]">
-                    {t.processingTime}
-                  </p>
-                </div>
+                {paymentMethod === 'bank-transfer' ? (
+                  <div className="text-left space-y-4">
+                    <p className="text-[14px] text-[#2C2416] font-light">{t.bankTransferNote}</p>
+                    <div className="space-y-2 text-[14px] text-[#8C7B6B]">
+                      <div className="flex justify-between"><span>{t.bankName}:</span><span>住信SBIネット銀行</span></div>
+                      <div className="flex justify-between"><span>{t.branchName}:</span><span>法人第一支店</span></div>
+                      <div className="flex justify-between"><span>{t.accountType}:</span><span>普通</span></div>
+                      <div className="flex justify-between"><span>{t.accountNumber}:</span><span>2373525</span></div>
+                      <div className="flex justify-between"><span>{t.accountHolder}:</span><span>フェリシティ</span></div>
+                      {orderAmount && (
+                        <div className="flex justify-between font-light text-[#2C2416]">
+                          <span>{t.transferAmount}:</span>
+                          <span>¥{Number(orderAmount).toLocaleString('ja-JP')}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-[13px] pt-4 border-t border-[#DDD5C5] space-y-2">
+                      <p className="text-[#B8860B]">{t.bankTransferDeadline}</p>
+                      <p className="text-[#8C7B6B]">{t.bankTransferRef}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center space-y-2">
+                    <p className="text-[14px] text-[#8C7B6B]">{t.confirmationEmail}</p>
+                    <p className="text-[14px] text-[#8C7B6B]">{t.processingTime}</p>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-3">
@@ -125,8 +168,9 @@ function CheckoutPageContent({ language = 'ja' }: { language: 'ja' | 'en' }) {
                 <div className="lg:col-span-2">
                   <CheckoutForm
                     language={language}
-                    onSuccess={(id) => {
-                      router.push(`${checkoutUrl}?confirmed=true&orderId=${id}`);
+                    onSuccess={(id, method) => {
+                      const totalAmount = items.reduce((sum, item) => sum + item.price * (item.quantity ?? 1), 0);
+                      router.push(`${checkoutUrl}?confirmed=true&orderId=${id}&method=${method}&amount=${totalAmount}`);
                     }}
                     onError={(error) => {
                       console.error('Checkout error:', error);
