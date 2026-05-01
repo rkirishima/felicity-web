@@ -106,7 +106,7 @@ function StripePaymentForm({
     city: string;
     streetAddress: string;
     building: string;
-    items: Array<{ name: string; qty: number; price: number }>;
+    items: Array<{ id?: string; name: string; qty: number; price: number }>;
     amount: number;
   };
 }) {
@@ -307,7 +307,7 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email, fullName, phone, postalCode, prefecture, city, streetAddress, building,
-          items: items.map((item) => ({ name: item.name, quantity: item.quantity ?? 1, price: item.price })),
+          items: items.map((item) => ({ id: item.id, name: item.name, quantity: item.quantity ?? 1, price: item.price })),
           amount: total,
         }),
       });
@@ -458,7 +458,7 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
                     city,
                     streetAddress,
                     building,
-                    items: items.map((i) => ({ name: i.name, qty: i.quantity ?? 1, price: i.price })),
+                    items: items.map((i) => ({ id: i.id, name: i.name, qty: i.quantity ?? 1, price: i.price })),
                     amount: total,
                   }}
                 />

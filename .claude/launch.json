@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "felicity-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "/Users/doug/Projects/felicity-web/.claude/worktrees/xenodochial-robinson", "run", "dev"],
+      "port": 3000,
+      "autoPort": true
+    },
+    {
+      "name": "felicity-staff",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "/Users/doug/Projects/felicity-web/felicity-staff", "run", "dev", "--", "-p", "3001"],
+      "port": 3001
+    }
+  ]
+}
