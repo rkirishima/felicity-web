@@ -46,9 +46,18 @@ export function ApparelCard({ item, language }: ApparelCardProps) {
 
   const handleAddToCart = () => {
     if (!selectedVariant) return;
+    // Build a name that includes color + size so the order record (and the
+    // confirmation email + shipping page) makes the variant unambiguous.
+    // Otherwise multiple-variant items like "Staff Cap" lose Grey/Black/Beige
+    // info and staff can't tell which one to ship.
+    const parts = [item.name];
+    if (selectedVariant.color) parts.push(selectedVariant.color);
+    if (selectedVariant.size && (item.sizes?.length ?? 0) > 1) parts.push(selectedVariant.size);
+    const cartName = parts.join(' — ');
+
     addItem({
       id: selectedVariantId,
-      name: item.name,
+      name: cartName,
       price: selectedVariant?.basePrice || item.basePrice,
       quantity: 1,
     });
