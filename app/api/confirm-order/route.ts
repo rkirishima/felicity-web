@@ -39,7 +39,11 @@ export async function POST(request: NextRequest) {
   }
 
   const shippingAddress = `〒${postalCode} ${prefecture}${city}${streetAddress}${building ? ' ' + building : ''}`;
-  const orderItems = items?.map((i: { name: string; qty: number }) => ({ name: i.name, qty: i.qty || 1 })) || [];
+  const orderItems = items?.map((i: { id?: string; name: string; qty: number }) => ({
+    id: i.id,
+    name: i.name,
+    qty: i.qty || 1,
+  })) || [];
 
   // --- Square Order with fulfillment ---
   const lineItems = orderItems.length > 0
