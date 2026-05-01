@@ -77,6 +77,7 @@ export async function POST(request: NextRequest) {
     items,
     amount,
     status: 'pending_bank_transfer',
+    payment_method: 'bank_transfer',
   });
 
   if (dbError) {

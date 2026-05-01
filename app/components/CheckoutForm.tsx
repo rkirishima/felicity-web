@@ -10,7 +10,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 
 interface CheckoutFormProps {
   language?: 'ja' | 'en';
-  onSuccess?: (orderId: string) => void;
+  onSuccess?: (orderId: string, paymentMethod: 'stripe' | 'bank-transfer') => void;
   onError?: (error: string) => void;
 }
 
@@ -95,7 +95,7 @@ function StripePaymentForm({
   orderDetails,
 }: {
   language: 'ja' | 'en';
-  onSuccess?: (orderId: string) => void;
+  onSuccess?: (orderId: string, paymentMethod: 'stripe' | 'bank-transfer') => void;
   onError?: (error: string) => void;
   formData: { email: string; fullName: string };
   total: number;
@@ -171,7 +171,7 @@ function StripePaymentForm({
       } catch (err) {
         console.error('Order confirmation request failed:', err);
       }
-      if (onSuccess) onSuccess(paymentIntent.id);
+      if (onSuccess) onSuccess(paymentIntent.id, 'stripe');
     } else {
       setError(t.paymentNotCompleted);
       if (onError) onError('Payment not completed');
@@ -313,7 +313,7 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
       });
       if (!res.ok) throw new Error('Order failed');
       const data = await res.json();
-      if (onSuccess) onSuccess(data.orderId);
+      if (onSuccess) onSuccess(data.orderId, 'bank-transfer');
     } catch {
       setFormError(language === 'ja' ? '注文の処理中にエラーが発生しました。もう一度お試しください。' : 'An error occurred while processing your order. Please try again.');
     } finally {
