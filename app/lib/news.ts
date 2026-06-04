@@ -1,5 +1,7 @@
 export interface NewsArticle {
   id: string;
+  /** ISO date (YYYY-MM-DD) used for sitemap lastmod and Article datePublished. */
+  published: string;
   date: string;
   date_en: string;
   title: string;
@@ -13,6 +15,7 @@ export interface NewsArticle {
 export const newsArticles: NewsArticle[] = [
   {
     id: 'fcr-launch-2026-03',
+    published: '2026-03-30',
     date: '2026年3月30日',
     date_en: 'March 30, 2026',
     title: 'Felicity Coffee Roasters / キッチンカーがスタート',
@@ -36,3 +39,17 @@ export const newsArticles: NewsArticle[] = [
 ];
 
 export const latestArticle = newsArticles[0];
+
+/** Look up a single article by its slug (the `id` field doubles as the URL slug). */
+export function getArticleBySlug(slug: string): NewsArticle | undefined {
+  return newsArticles.find((a) => a.id === slug);
+}
+
+/** Plain-text excerpt for meta descriptions / OG (trimmed to ~155 chars). */
+export function articleExcerpt(
+  article: NewsArticle,
+  locale: 'ja' | 'en' = 'ja'
+): string {
+  const text = (locale === 'en' ? article.body_en : article.body).join(' ');
+  return text.length > 155 ? `${text.slice(0, 152).trimEnd()}…` : text;
+}

@@ -27,7 +27,7 @@ export default function Disclosure() {
             <div className="space-y-2">
               <p>代表者：桐島象太郎</p>
               <p>住所：〒240-0115 神奈川県三浦郡葉山町上山口2432-3</p>
-              <p>TEL：08087584368</p>
+              <p>TEL：080-8758-4368</p>
               <p>MAIL：info@felicity.cafe</p>
             </div>
           </section>

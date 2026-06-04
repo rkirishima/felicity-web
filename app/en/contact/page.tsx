@@ -84,9 +84,8 @@ export default function ContactPageEN() {
                 Hours
               </h2>
               <div className="space-y-1 text-[15px] text-[#2C2416]">
-                <p>Mon, Tue, Fri — 11:00 – 17:00</p>
-                <p>Sat, Sun — 9:00 – 17:00</p>
-                <p className="text-[#8C7B6B]">Closed: Wed, Thu</p>
+                <p>Mon – Fri — 11:00 – 17:00</p>
+                <p>Sat, Sun &amp; public holidays — 9:00 – 17:00</p>
               </div>
             </div>
 
@@ -96,6 +95,14 @@ export default function ContactPageEN() {
                 Contact
               </h2>
               <div className="space-y-2 text-[15px]">
+                <p>
+                  <a
+                    href="tel:+818087584368"
+                    className="text-[#2C2416] hover:text-[#7AAFC4] transition-colors"
+                  >
+                    080-8758-4368
+                  </a>
+                </p>
                 <p>
                   <a
                     href="mailto:info@felicity.cafe"

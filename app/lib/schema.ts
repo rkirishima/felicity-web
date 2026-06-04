@@ -23,17 +23,17 @@ const BUSINESS_INFO = {
     streetAddress: "2432-3 Kamiyamaguchi",
     addressLocality: "Hayama-cho",
     addressRegion: "Kanagawa",
-    postalCode: "240-0112",
+    postalCode: "240-0115",
     addressCountry: "JP",
-    name: "2432-3 Kamiyamaguchi, Hayama-cho, Miura-gun, Kanagawa, 240-0112 Japan",
+    name: "2432-3 Kamiyamaguchi, Hayama-cho, Miura-gun, Kanagawa, 240-0115 Japan",
   },
-  phone: "+81-90-XXXX-XXXX",
-  email: "hello@felicity.cafe",
+  phone: "+81-80-8758-4368",
+  email: "info@felicity.cafe",
   priceRange: "¥¥",
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",
-      dayOfWeek: ["Monday", "Tuesday", "Friday"],
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
       opens: "11:00",
       closes: "17:00",
     },
@@ -43,8 +43,14 @@ const BUSINESS_INFO = {
       opens: "09:00",
       closes: "17:00",
     },
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: "https://schema.org/PublicHolidays",
+      opens: "09:00",
+      closes: "17:00",
+    },
   ],
-  closedDays: ["Wednesday", "Thursday"],
+  closedDays: [],
 };
 
 /**
@@ -61,7 +67,7 @@ export function getCafeSchema(locale: "en" | "ja" = "ja") {
     description: BUSINESS_INFO.description[locale],
     image: BUSINESS_INFO.image,
     address: BUSINESS_INFO.address,
-    telephone: BUSINESS_INFO.phone,
+    ...(BUSINESS_INFO.phone ? { telephone: BUSINESS_INFO.phone } : {}),
     email: BUSINESS_INFO.email,
     priceRange: BUSINESS_INFO.priceRange,
     servesCuisine: "Specialty Coffee",
@@ -136,13 +142,13 @@ export function getLocalBusinessSchema(locale: "en" | "ja" = "ja") {
     description: BUSINESS_INFO.description[locale],
     image: BUSINESS_INFO.image,
     address: BUSINESS_INFO.address,
-    telephone: BUSINESS_INFO.phone,
+    ...(BUSINESS_INFO.phone ? { telephone: BUSINESS_INFO.phone } : {}),
     email: BUSINESS_INFO.email,
     openingHoursSpecification: BUSINESS_INFO.openingHoursSpecification,
     geo: {
       "@type": "GeoCoordinates",
-      latitude: 35.1571,
-      longitude: 139.5721,
+      latitude: 35.26735426386272,
+      longitude: 139.61026716170105,
     },
   };
 }
@@ -205,6 +211,8 @@ export function getEventSchema(locale: "en" | "ja" = "ja") {
     name: eventName,
     description: eventDescription,
     image: "https://felicity.cafe/og-image.jpg",
+    // TODO: drive these from real upcoming-workshop data. A past startDate is
+    // treated as a stale/expired event by Google and should never ship.
     startDate: "2026-04-11T10:00:00+09:00",
     endDate: "2026-04-11T12:30:00+09:00",
     organizer: {
@@ -246,13 +254,45 @@ export function getOrganizationSchema(locale: "en" | "ja" = "ja") {
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "Customer Service",
-      telephone: BUSINESS_INFO.phone,
+      ...(BUSINESS_INFO.phone ? { telephone: BUSINESS_INFO.phone } : {}),
       email: BUSINESS_INFO.email,
       areaServed: "JP",
       availableLanguage: ["en", "ja"],
     },
     address: BUSINESS_INFO.address,
     foundingDate: "2024",
+  };
+}
+
+/**
+ * Article / BlogPosting schema for individual news posts.
+ */
+export function getArticleSchema(params: {
+  headline: string;
+  description: string;
+  url: string;
+  image: string;
+  datePublished: string; // ISO (YYYY-MM-DD)
+  locale?: "en" | "ja";
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "@id": `${params.url}#article`,
+    headline: params.headline,
+    description: params.description,
+    image: params.image,
+    datePublished: params.datePublished,
+    dateModified: params.datePublished,
+    inLanguage: params.locale === "en" ? "en" : "ja",
+    mainEntityOfPage: { "@type": "WebPage", "@id": params.url },
+    author: { "@type": "Organization", name: BUSINESS_INFO.name, url: BUSINESS_INFO.url },
+    publisher: {
+      "@type": "Organization",
+      name: BUSINESS_INFO.name,
+      url: BUSINESS_INFO.url,
+      logo: { "@type": "ImageObject", url: "https://felicity.cafe/favicon.png" },
+    },
   };
 }
 

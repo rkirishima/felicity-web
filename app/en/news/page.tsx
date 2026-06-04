@@ -33,10 +33,15 @@ export default function NewsPageEn() {
                 <BulletinBoard photos={article.photos} alts={article.alts} />
                 <div>
                   <p className="text-[11px] text-[#8C7B6B] mb-3 uppercase tracking-widest font-mono">{article.date_en}</p>
-                  <h2 className="text-[22px] font-light text-[#2C2416] mb-6 leading-snug">{article.title_en}</h2>
+                  <h2 className="text-[22px] font-light text-[#2C2416] mb-6 leading-snug">
+                    <Link href={`/en/news/${article.id}`} className="hover:text-[#8C7B6B] transition-colors">{article.title_en}</Link>
+                  </h2>
                   <div className="text-[14px] text-[#5C5451] leading-relaxed space-y-4">
                     {article.body_en.map((p, i) => <p key={i}>{p}</p>)}
                   </div>
+                  <Link href={`/en/news/${article.id}`} className="inline-block mt-6 font-mono text-[11px] tracking-[0.16em] text-[#8C7B6B] hover:text-[#2C2416] uppercase transition-colors">
+                    Read more →
+                  </Link>
                 </div>
               </div>
             </article>

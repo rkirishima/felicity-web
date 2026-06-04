@@ -1,11 +1,23 @@
 import type { MetadataRoute } from "next";
 import { products } from "./lib/products";
+import { newsArticles } from "./lib/news";
 
 export const dynamic = "force-static";
 
 const BASE_URL = "https://felicity.cafe";
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const newsEntries: MetadataRoute.Sitemap = newsArticles.flatMap((article) => {
+    const lastModified = new Date(article.published);
+    const ja = `${BASE_URL}/news/${article.id}`;
+    const en = `${BASE_URL}/en/news/${article.id}`;
+    const languages = { ja, en };
+    return [
+      { url: ja, lastModified, changeFrequency: "monthly" as const, priority: 0.6, alternates: { languages } },
+      { url: en, lastModified, changeFrequency: "monthly" as const, priority: 0.6, alternates: { languages } },
+    ];
+  });
+
   const productEntries: MetadataRoute.Sitemap = products.flatMap((product) => [
     // Japanese version (root)
     {
@@ -151,6 +163,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly" as const,
       priority: 0.3,
     },
+    // News articles (individual)
+    ...newsEntries,
     // Product listings
     ...productEntries,
   ];
