@@ -894,6 +894,46 @@ async function askDoug(threadId, userMessage, model = 'claude-haiku-4-5-20251001
 
 // ── morning briefing (called by Vercel Cron) ─────────────────────────────────
 
+async function fetchFelicityEventsContext() {
+  // Pull upcoming events from the main Felicity Supabase (separate from
+  // Doug's own DB) so the briefing can call them out without needing tools.
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return '';
+
+  try {
+    const client = createClient(url, key);
+    const todayStr = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Tokyo' }).format(new Date());
+    const horizon = new Date(Date.now() + 31 * 86_400_000);
+    const horizonStr = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Tokyo' }).format(horizon);
+
+    const { data: events, error } = await client
+      .from('events')
+      .select('title, confirmed_date, max_attendees, event_dates(date, start_time, end_time, yes_count)')
+      .eq('event_type', 'one_off')
+      .in('status', ['confirmed', 'open'])
+      .gte('confirmed_date', todayStr)
+      .lte('confirmed_date', horizonStr)
+      .order('confirmed_date');
+
+    if (error || !events || events.length === 0) {
+      return '\n\nUpcoming Felicity cafe events (next 31 days): none scheduled.';
+    }
+
+    const lines = events.map(e => {
+      const sameDay = (e.event_dates || []).filter(d => d.date === e.confirmed_date);
+      const slots = sameDay
+        .map(d => `${(d.start_time || '').slice(0, 5)}–${(d.end_time || '').slice(0, 5)} (参加${d.yes_count}${e.max_attendees ? `/${e.max_attendees}` : ''})`)
+        .join(', ');
+      return `- ${e.confirmed_date}: ${e.title}${slots ? ' — ' + slots : ''}`;
+    });
+    return '\n\nUpcoming Felicity cafe events (next 31 days):\n' + lines.join('\n');
+  } catch (err) {
+    console.error('Failed to fetch Felicity events for briefing:', err.message);
+    return '';
+  }
+}
+
 async function morningBriefing(userId = 'doug') {
   // Find or create a dedicated "Daily Briefing" thread
   let { data: thread } = await supabase
@@ -914,14 +954,18 @@ async function morningBriefing(userId = 'doug') {
   }
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'Asia/Tokyo' });
+  const isMondayJST = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Tokyo', weekday: 'short' }).format(new Date()) === 'Mon';
+  const eventsContext = await fetchFelicityEventsContext();
+
   const prompt = `Good morning. It's ${today} in Japan. Give me my morning briefing:
 
 1. Check my Google Calendar — what's on today and tomorrow?
 2. Get the latest US politics news (Trump/MAGA/Washington). What's the biggest story right now?
 3. Any major world news I should know about?
 4. Weather in Hayama, Kanagawa today.
+5. Felicity cafe events: if something is happening today or tomorrow, lead with it (time, attendance, what's needed). ${isMondayJST ? "It's Monday — also summarise the upcoming month's events at the end of the briefing." : "Otherwise just mention the next upcoming event briefly so I keep it on my radar."}${eventsContext}
 
-Be direct and concise. No fluff. If there's something genuinely crazy happening in US politics, lead with that.`;
+Be direct and concise. No fluff. If there's something genuinely crazy happening in US politics, lead with that — unless a cafe event is today or tomorrow, in which case lead with the event.`;
 
   return await askDoug(thread.id, prompt, 'claude-haiku-4-5-20251001', { userId });
 }
