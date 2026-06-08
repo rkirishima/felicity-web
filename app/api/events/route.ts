@@ -14,7 +14,7 @@ export async function GET() {
 
     const { data: events, error } = await supabase
       .from('events')
-      .select('id, title, title_en, description, description_en, photo, min_votes, max_attendees, status, confirmed_date, created_at, event_dates(*)')
+      .select('id, title, title_en, description, description_en, photo, min_votes, max_attendees, status, confirmed_date, external_url, created_at, event_dates(*)')
       .in('status', ['open', 'confirmed', 'full'])
       .eq('event_type', 'one_off')
       .or(`confirmed_date.is.null,confirmed_date.gte.${todayJST}`)

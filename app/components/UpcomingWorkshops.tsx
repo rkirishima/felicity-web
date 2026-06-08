@@ -21,6 +21,7 @@ interface Event {
   min_votes: number;
   status: string;
   confirmed_date: string | null;
+  external_url: string | null;
   event_dates: EventDate[];
 }
 
