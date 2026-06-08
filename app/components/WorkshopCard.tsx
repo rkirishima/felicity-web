@@ -23,7 +23,7 @@ interface Event {
   max_attendees?: number;
   status: string;
   confirmed_date: string | null;
-  external_url?: string | null;
+  external_url: string | null;
   event_dates: EventDate[];
 }
 
