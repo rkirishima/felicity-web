@@ -77,7 +77,9 @@ export async function GET(request: NextRequest) {
 
   const today = jstDateString(0);
   const tomorrow = jstDateString(1);
-  const twoWeeks = jstDateString(14);
+  // Look ahead ~1 month so the next event always surfaces (events are
+  // expected to run twice monthly — a 14-day window would miss them).
+  const horizon = jstDateString(31);
   const dow = jstWeekday();
   const isMonday = dow === 1;
   // Allow ?force=weekly|tomorrow to test manually
@@ -89,7 +91,7 @@ export async function GET(request: NextRequest) {
     .eq('event_type', 'one_off')
     .in('status', ['confirmed', 'open'])
     .gte('confirmed_date', today)
-    .lte('confirmed_date', twoWeeks)
+    .lte('confirmed_date', horizon)
     .order('confirmed_date');
 
   if (error) {
@@ -123,7 +125,7 @@ export async function GET(request: NextRequest) {
   if (isMonday || force === 'weekly') {
     if (all.length > 0) {
       const lines = [
-        `📅 <b>今週・来週のイベント</b>`,
+        `📅 <b>この先1ヶ月のフェリシティイベント</b>`,
         ``,
         ...all.map(e => {
           const total = e.event_dates.reduce((s, d) => s + (d.yes_count || 0), 0);
@@ -136,7 +138,7 @@ export async function GET(request: NextRequest) {
       const r = await sendTelegram(lines);
       (r.ok ? sent : skipped).push(`weekly${r.ok ? '' : `(${r.err})`}`);
     } else if (force === 'weekly') {
-      const r = await sendTelegram('📅 今週・来週はフェリシティイベントの予定なし');
+      const r = await sendTelegram('📅 この先1ヶ月はフェリシティイベントの予定なし');
       (r.ok ? sent : skipped).push(`weekly-empty${r.ok ? '' : `(${r.err})`}`);
     }
   }
