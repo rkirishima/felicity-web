@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const _url = process.env.SUPABASE_URL_DOUG || process.env.NEXT_PUBLIC_DOUG_SUPABASE_URL || '';
-const _key = process.env.SUPABASE_SERVICE_KEY_DOUG || process.env.SUPABASE_SERVICE_KEY || '';
+const _url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL_DOUG || process.env.NEXT_PUBLIC_DOUG_SUPABASE_URL || '';
+const _key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY_DOUG || process.env.SUPABASE_SERVICE_KEY || '';
 const supabase = _url && _key ? createClient(_url, _key) : null;
 
 export async function GET(request) {

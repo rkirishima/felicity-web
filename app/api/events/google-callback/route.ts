@@ -42,13 +42,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Token exchange failed', details: tokens }, { status: 500 });
   }
 
-  // Store tokens in Doug's Supabase
-  const dougUrl = process.env.NEXT_PUBLIC_DOUG_SUPABASE_URL;
-  const dougKey = process.env.SUPABASE_SERVICE_KEY_DOUG;
+  // Store tokens in doug_google_tokens (lives in main Supabase since the
+  // standalone Doug project was decommissioned).
+  const dougUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_DOUG_SUPABASE_URL;
+  const dougKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY_DOUG;
 
   if (!dougUrl || !dougKey) {
     return NextResponse.json({
-      error: 'Doug Supabase not configured',
+      error: 'Supabase not configured',
       tokens: { refresh_token: tokens.refresh_token },
     });
   }

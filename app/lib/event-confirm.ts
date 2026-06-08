@@ -74,13 +74,11 @@ async function addToGoogleCalendar(event: ConfirmedEvent) {
       return;
     }
 
-    // Get stored refresh token from Doug's Supabase
-    const dougSupabase = process.env.NEXT_PUBLIC_DOUG_SUPABASE_URL
-      ? createClient(
-          process.env.NEXT_PUBLIC_DOUG_SUPABASE_URL,
-          process.env.SUPABASE_SERVICE_KEY_DOUG!
-        )
-      : null;
+    // Get stored refresh token from doug_google_tokens (now lives in main Supabase
+    // after the standalone Doug project was decommissioned).
+    const dougUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_DOUG_SUPABASE_URL;
+    const dougKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY_DOUG;
+    const dougSupabase = dougUrl && dougKey ? createClient(dougUrl, dougKey) : null;
 
     if (!dougSupabase) {
       console.log('Doug Supabase not configured — skipping Google Calendar');
