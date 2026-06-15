@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { onEventConfirmed } from '@/app/lib/event-confirm';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -104,6 +105,13 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Event ID required' }, { status: 400 });
     }
 
+    // Snapshot pre-update state to detect confirmation transitions for GCal sync.
+    const { data: before } = await supabase
+      .from('events')
+      .select('status, confirmed_date')
+      .eq('id', id)
+      .single();
+
     // Update event fields
     if (Object.keys(updates).length > 0) {
       const { error } = await supabase
@@ -141,6 +149,24 @@ export async function PATCH(request: NextRequest) {
       .select('*, event_dates(*), event_votes(*)')
       .eq('id', id)
       .single();
+
+    // Fire Google Calendar + staff schedule sync when the event has just been
+    // confirmed, or its confirmed_date moved while in confirmed/full status.
+    if (data?.status && data.confirmed_date) {
+      const isConfirmedState = data.status === 'confirmed' || data.status === 'full';
+      const justConfirmed = isConfirmedState && before?.status !== 'confirmed' && before?.status !== 'full';
+      const dateChanged = isConfirmedState && before?.confirmed_date && before.confirmed_date !== data.confirmed_date;
+
+      if (justConfirmed || dateChanged) {
+        onEventConfirmed({
+          id: data.id,
+          title: data.title,
+          title_en: data.title_en,
+          description: data.description,
+          confirmed_date: data.confirmed_date,
+        }).catch(console.error);
+      }
+    }
 
     return NextResponse.json(data);
   } catch (err: any) {

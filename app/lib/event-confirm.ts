@@ -14,14 +14,15 @@ interface ConfirmedEvent {
 }
 
 /**
- * Called when an event reaches its vote threshold and is confirmed.
+ * Called when an event reaches its vote threshold and is confirmed,
+ * or when an admin manually confirms an event.
  * 1. Adds the event to the staff shifts table (as a special "event" shift)
- * 2. Creates a Google Calendar event (if OAuth tokens are available)
+ * 2. Creates/updates a Google Calendar event (if OAuth tokens are available)
  */
 export async function onEventConfirmed(event: ConfirmedEvent) {
   await Promise.allSettled([
     addToStaffSchedule(event),
-    addToGoogleCalendar(event),
+    syncGoogleCalendar(event),
   ]);
 }
 
@@ -59,12 +60,14 @@ async function addToStaffSchedule(event: ConfirmedEvent) {
 }
 
 /**
- * Create a Google Calendar event using stored OAuth2 tokens.
- * Tokens are stored in doug_google_tokens table.
+ * Create or update a Google Calendar event using stored OAuth2 tokens.
+ * - Reads start_time/end_time from the event_dates row for confirmed_date.
+ *   When both are set, a timed event is created; otherwise all-day.
+ * - Stores google_calendar_event_id on the event so re-confirmation (e.g. date
+ *   change) updates the same calendar entry instead of creating a duplicate.
  */
-async function addToGoogleCalendar(event: ConfirmedEvent) {
+async function syncGoogleCalendar(event: ConfirmedEvent) {
   try {
-    // Check if we have Google Calendar credentials
     const clientId = process.env.GOOGLE_CALENDAR_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CALENDAR_CLIENT_SECRET;
     const calendarId = process.env.GOOGLE_CALENDAR_ID || 'primary';
@@ -74,8 +77,6 @@ async function addToGoogleCalendar(event: ConfirmedEvent) {
       return;
     }
 
-    // Get stored refresh token from doug_google_tokens (now lives in main Supabase
-    // after the standalone Doug project was decommissioned).
     const dougUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_DOUG_SUPABASE_URL;
     const dougKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY_DOUG;
     const dougSupabase = dougUrl && dougKey ? createClient(dougUrl, dougKey) : null;
@@ -96,7 +97,6 @@ async function addToGoogleCalendar(event: ConfirmedEvent) {
       return;
     }
 
-    // Refresh access token if needed
     let accessToken = tokens.access_token;
     if (!accessToken || Date.now() > (tokens.expiry_date || 0)) {
       const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
@@ -118,7 +118,6 @@ async function addToGoogleCalendar(event: ConfirmedEvent) {
 
       accessToken = tokenData.access_token;
 
-      // Update stored token
       await dougSupabase
         .from('doug_google_tokens')
         .update({
@@ -128,38 +127,68 @@ async function addToGoogleCalendar(event: ConfirmedEvent) {
         .eq('user_id', 'doug');
     }
 
-    // Create calendar event
+    // Look up the chosen date row to pick up start_time/end_time and any
+    // previously synced calendar event id.
+    const [{ data: chosenDate }, { data: row }] = await Promise.all([
+      supabase
+        .from('event_dates')
+        .select('start_time, end_time')
+        .eq('event_id', event.id)
+        .eq('date', event.confirmed_date)
+        .maybeSingle(),
+      supabase
+        .from('events')
+        .select('google_calendar_event_id')
+        .eq('id', event.id)
+        .single(),
+    ]);
+
+    // Postgres `time` returns "HH:MM:SS"; normalize to HH:MM:SS for RFC3339.
+    const normalize = (t: string | null | undefined) =>
+      t ? (t.length === 5 ? `${t}:00` : t) : null;
+    const start = normalize(chosenDate?.start_time as string | null | undefined);
+    const end = normalize(chosenDate?.end_time as string | null | undefined);
+    const timed = !!start && !!end;
+
     const calendarEvent = {
       summary: `${event.title} / ${event.title_en}`,
       description: event.description || '',
-      start: {
-        date: event.confirmed_date,
-        timeZone: 'Asia/Tokyo',
-      },
-      end: {
-        date: event.confirmed_date,
-        timeZone: 'Asia/Tokyo',
-      },
+      start: timed
+        ? { dateTime: `${event.confirmed_date}T${start}`, timeZone: 'Asia/Tokyo' }
+        : { date: event.confirmed_date, timeZone: 'Asia/Tokyo' },
+      end: timed
+        ? { dateTime: `${event.confirmed_date}T${end}`, timeZone: 'Asia/Tokyo' }
+        : { date: event.confirmed_date, timeZone: 'Asia/Tokyo' },
     };
 
-    const res = await fetch(
-      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(calendarEvent),
-      }
-    );
+    const existingId = row?.google_calendar_event_id;
+    const base = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`;
+    const url = existingId ? `${base}/${encodeURIComponent(existingId)}` : base;
+    const method = existingId ? 'PATCH' : 'POST';
 
-    if (res.ok) {
-      console.log('Google Calendar event created for:', event.title);
-    } else {
-      const err = await res.text();
-      console.error('Google Calendar error:', err);
+    const res = await fetch(url, {
+      method,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(calendarEvent),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('Google Calendar error:', errText);
+      return;
     }
+
+    const data = await res.json();
+    if (!existingId && data.id) {
+      await supabase
+        .from('events')
+        .update({ google_calendar_event_id: data.id })
+        .eq('id', event.id);
+    }
+    console.log(`Google Calendar event ${existingId ? 'updated' : 'created'} for:`, event.title);
   } catch (err) {
     console.error('Google Calendar error:', err);
   }
