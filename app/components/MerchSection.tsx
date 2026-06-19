@@ -34,6 +34,7 @@ interface MerchSectionProps {
     sweatshirt?: ApparelItem;
     beanie?: ApparelItem;
     tumbler?: ApparelItem;
+    pantry?: ApparelItem[];
   };
 }
 
@@ -48,6 +49,7 @@ export function MerchSection({ language = 'en', apparel }: MerchSectionProps) {
     if (apparel.sweatshirt) allItems.push(apparel.sweatshirt);
     if (apparel.beanie) allItems.push(apparel.beanie);
     if (apparel.tumbler) allItems.push(apparel.tumbler);
+    if (apparel.pantry) allItems.push(...apparel.pantry);
   }
 
   return (

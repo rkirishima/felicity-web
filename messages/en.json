@@ -154,12 +154,39 @@
             "description": "An owner's tribute to their beloved VW Thing—the vehicle that carries memories of coastal drives with Doug & Julie through Hayama's winding roads. This white tee captures the spirit of those unhurried journeys, where every turn reveals new light on familiar paths. Inspired by conversations under Hayama sky, with gratitude to Hanna Kirishima for the story these moments tell. Medium weight, 100% cotton—a piece for those who understand that the best drives aren't about the destination.",
             "descriptionJa": "オーナーが愛してやまないVW Thing—葉山の曲がりくねった道を、Doug & Julieとドライブした思い出を乗せた一台。この白いTシャツは、馴染みの道を走るたびに新しい光が見える、その悠々とした時間を映し出している。葉山の空の下での会話に着想を得、桐島ハンナへの感謝を込めて。この瞬間が語る物語に捧ぐ一枚。100%コットン素材—目的地よりも、ドライブそのものの価値を知る人のための逸品。",
             "color": "White",
-            "sizes": ["M", "L", "XL"],
-            "images": ["/apparel/drive-date.jpg"],
+            "sizes": [
+              "M",
+              "L",
+              "XL"
+            ],
+            "images": [
+              "/apparel/drive-date.jpg"
+            ],
             "variants": [
-              { "id": "tshirt-drive-date-m", "productId": "tshirt-drive-date", "name": "Drive Date on Thing", "basePrice": 4500, "color": "White", "size": "M" },
-              { "id": "tshirt-drive-date-l", "productId": "tshirt-drive-date", "name": "Drive Date on Thing", "basePrice": 4500, "color": "White", "size": "L" },
-              { "id": "tshirt-drive-date-xl", "productId": "tshirt-drive-date", "name": "Drive Date on Thing", "basePrice": 4500, "color": "White", "size": "XL" }
+              {
+                "id": "tshirt-drive-date-m",
+                "productId": "tshirt-drive-date",
+                "name": "Drive Date on Thing",
+                "basePrice": 4500,
+                "color": "White",
+                "size": "M"
+              },
+              {
+                "id": "tshirt-drive-date-l",
+                "productId": "tshirt-drive-date",
+                "name": "Drive Date on Thing",
+                "basePrice": 4500,
+                "color": "White",
+                "size": "L"
+              },
+              {
+                "id": "tshirt-drive-date-xl",
+                "productId": "tshirt-drive-date",
+                "name": "Drive Date on Thing",
+                "basePrice": 4500,
+                "color": "White",
+                "size": "XL"
+              }
             ]
           },
           {
@@ -170,13 +197,48 @@
             "description": "Illustrated by Kirishima Hanna, this peaceful chopper design captures the essence of the open road. 100% cotton, comfortable fit.",
             "descriptionJa": "桐島ハンナのイラストによる穏やかなチョッパーライダー。シンプルで素朴な一枚。100%コットン。",
             "color": "White",
-            "sizes": ["M", "L", "XL", "XXL"],
-            "images": ["/apparel/peace-biker.jpg"],
+            "sizes": [
+              "M",
+              "L",
+              "XL",
+              "XXL"
+            ],
+            "images": [
+              "/apparel/peace-biker.jpg"
+            ],
             "variants": [
-              { "id": "tshirt-peace-biker-m", "productId": "tshirt-peace-biker", "name": "Peace Biker", "basePrice": 4500, "color": "White", "size": "M" },
-              { "id": "tshirt-peace-biker-l", "productId": "tshirt-peace-biker", "name": "Peace Biker", "basePrice": 4500, "color": "White", "size": "L" },
-              { "id": "tshirt-peace-biker-xl", "productId": "tshirt-peace-biker", "name": "Peace Biker", "basePrice": 4500, "color": "White", "size": "XL" },
-              { "id": "tshirt-peace-biker-xxl", "productId": "tshirt-peace-biker", "name": "Peace Biker", "basePrice": 4500, "color": "White", "size": "XXL" }
+              {
+                "id": "tshirt-peace-biker-m",
+                "productId": "tshirt-peace-biker",
+                "name": "Peace Biker",
+                "basePrice": 4500,
+                "color": "White",
+                "size": "M"
+              },
+              {
+                "id": "tshirt-peace-biker-l",
+                "productId": "tshirt-peace-biker",
+                "name": "Peace Biker",
+                "basePrice": 4500,
+                "color": "White",
+                "size": "L"
+              },
+              {
+                "id": "tshirt-peace-biker-xl",
+                "productId": "tshirt-peace-biker",
+                "name": "Peace Biker",
+                "basePrice": 4500,
+                "color": "White",
+                "size": "XL"
+              },
+              {
+                "id": "tshirt-peace-biker-xxl",
+                "productId": "tshirt-peace-biker",
+                "name": "Peace Biker",
+                "basePrice": 4500,
+                "color": "White",
+                "size": "XXL"
+              }
             ]
           },
           {
@@ -187,13 +249,48 @@
             "description": "Inspired by Marianne Faithfull, illustrated by world-renowned fashion illustrator Hiroshi Tanabe. Features a Triumph racer in bold, timeless design.",
             "descriptionJa": "マリアンヌ・フェイスフルに着想を得て、ファッション・イラストレーター・田辺ヒロシが描いたトリアンフ・レーサー。クラシカルで大胆なデザイン。100%コットン。",
             "color": "Grey",
-            "sizes": ["M", "L", "XL", "XXL"],
-            "images": ["/apparel/tshirt-la-motarde.jpg"],
+            "sizes": [
+              "M",
+              "L",
+              "XL",
+              "XXL"
+            ],
+            "images": [
+              "/apparel/tshirt-la-motarde.jpg"
+            ],
             "variants": [
-              { "id": "tshirt-la-motarde-m", "productId": "tshirt-la-motarde", "name": "La Motarde", "basePrice": 4500, "color": "Grey", "size": "M" },
-              { "id": "tshirt-la-motarde-l", "productId": "tshirt-la-motarde", "name": "La Motarde", "basePrice": 4500, "color": "Grey", "size": "L" },
-              { "id": "tshirt-la-motarde-xl", "productId": "tshirt-la-motarde", "name": "La Motarde", "basePrice": 4500, "color": "Grey", "size": "XL" },
-              { "id": "tshirt-la-motarde-xxl", "productId": "tshirt-la-motarde", "name": "La Motarde", "basePrice": 4500, "color": "Grey", "size": "XXL" }
+              {
+                "id": "tshirt-la-motarde-m",
+                "productId": "tshirt-la-motarde",
+                "name": "La Motarde",
+                "basePrice": 4500,
+                "color": "Grey",
+                "size": "M"
+              },
+              {
+                "id": "tshirt-la-motarde-l",
+                "productId": "tshirt-la-motarde",
+                "name": "La Motarde",
+                "basePrice": 4500,
+                "color": "Grey",
+                "size": "L"
+              },
+              {
+                "id": "tshirt-la-motarde-xl",
+                "productId": "tshirt-la-motarde",
+                "name": "La Motarde",
+                "basePrice": 4500,
+                "color": "Grey",
+                "size": "XL"
+              },
+              {
+                "id": "tshirt-la-motarde-xxl",
+                "productId": "tshirt-la-motarde",
+                "name": "La Motarde",
+                "basePrice": 4500,
+                "color": "Grey",
+                "size": "XXL"
+              }
             ]
           }
         ],
@@ -206,9 +303,18 @@
             "description": "The Felicity staff cap is a functional piece born from necessity: protection from sun and salt spray while working the espresso bar, mixing coffee, or serving guests outdoors. Unstructured, breathable, and minimal—it carries the aesthetic of working culture. Available in grey, black, and beige.",
             "descriptionJa": "Felicityのスタッフキャップは、必要性から生まれた実用的なピース。エスプレッソバーでの作業、コーヒーのブレンド、屋外でのサービス—日差しと塩水の影響から身を守る。アンストラクチャード、通気性、最小限のデザイン。ワーキングカルチャーの美学を体現しています。グレー、ブラック、ベージュ3色展開。",
             "color": "Grey",
-            "images": ["/apparel/cap-grey.jpg"],
+            "images": [
+              "/apparel/cap-grey.jpg"
+            ],
             "variants": [
-              { "id": "cap-grey-regular", "productId": "cap-grey", "name": "Staff Cap Grey", "basePrice": 3000, "color": "Grey", "size": "Regular" }
+              {
+                "id": "cap-grey-regular",
+                "productId": "cap-grey",
+                "name": "Staff Cap Grey",
+                "basePrice": 3000,
+                "color": "Grey",
+                "size": "Regular"
+              }
             ]
           },
           {
@@ -219,9 +325,18 @@
             "description": "The Felicity staff cap is a functional piece born from necessity: protection from sun and salt spray while working the espresso bar, mixing coffee, or serving guests outdoors. Unstructured, breathable, and minimal—it carries the aesthetic of working culture. Available in grey and black.",
             "descriptionJa": "Felicityのスタッフキャップは、必要性から生まれた実用的なピース。エスプレッソバーでの作業、コーヒーのブレンド、屋外でのサービス—日差しと塩水の影響から身を守る。アンストラクチャード、通気性、最小限のデザイン。ワーキングカルチャーの美学を体現しています。グレー、ブラック両色展開。",
             "color": "Black",
-            "images": ["/apparel/cap-black.jpg"],
+            "images": [
+              "/apparel/cap-black.jpg"
+            ],
             "variants": [
-              { "id": "cap-black-regular", "productId": "cap-black", "name": "Staff Cap Black", "basePrice": 3000, "color": "Black", "size": "Regular" }
+              {
+                "id": "cap-black-regular",
+                "productId": "cap-black",
+                "name": "Staff Cap Black",
+                "basePrice": 3000,
+                "color": "Black",
+                "size": "Regular"
+              }
             ]
           },
           {
@@ -232,9 +347,18 @@
             "description": "The Felicity staff cap is a functional piece born from necessity: protection from sun and salt spray while working the espresso bar, mixing coffee, or serving guests outdoors. Unstructured, breathable, and minimal—it carries the aesthetic of working culture. Available in grey, black, and beige.",
             "descriptionJa": "Felicityのスタッフキャップは、必要性から生まれた実用的なピース。エスプレッソバーでの作業、コーヒーのブレンド、屋外でのサービス—日差しと塩水の影響から身を守る。アンストラクチャード、通気性、最小限のデザイン。ワーキングカルチャーの美学を体現しています。グレー、ブラック、ベージュ3色展開。",
             "color": "Beige",
-            "images": ["/apparel/cap-beige.jpg"],
+            "images": [
+              "/apparel/cap-beige.jpg"
+            ],
             "variants": [
-              { "id": "cap-beige-regular", "productId": "cap-beige", "name": "Staff Cap Beige", "basePrice": 3000, "color": "Beige", "size": "Regular" }
+              {
+                "id": "cap-beige-regular",
+                "productId": "cap-beige",
+                "name": "Staff Cap Beige",
+                "basePrice": 3000,
+                "color": "Beige",
+                "size": "Regular"
+              }
             ]
           }
         ],
@@ -245,13 +369,44 @@
           "basePrice": 11000,
           "description": "A substantial piece for coastal living. The pullover hoodie is engineered for layering in Hayama's temperamental weather—wind, rain, salt air. Premium heavyweight cotton-blend construction, thoughtfully sized for comfortable wearing over long-sleeves or tees. The muted color palette and understated branding position it as a versatile essential.",
           "descriptionJa": "沿岸生活のための実質的なピース。プルオーバーパーカーは、葉山の気まぐれな気候—風、雨、塩を含む空気—でのレイヤリングを想定した設計。プレミアムなヘビーウェイト綿混素材、長袖やTシャツの上に快適に着用できるサイジング。控えめな色合いと目立たないブランディングが、万能な必需品として機能します。",
-          "sizes": ["M", "L", "XL", "XXL"],
-          "images": ["/apparel/hoodie-pullover.jpg"],
+          "sizes": [
+            "M",
+            "L",
+            "XL",
+            "XXL"
+          ],
+          "images": [
+            "/apparel/hoodie-pullover.jpg"
+          ],
           "variants": [
-            { "id": "hoodie-m", "productId": "hoodie", "name": "Pullover Hoodie", "basePrice": 11000, "size": "M" },
-            { "id": "hoodie-l", "productId": "hoodie", "name": "Pullover Hoodie", "basePrice": 11000, "size": "L" },
-            { "id": "hoodie-xl", "productId": "hoodie", "name": "Pullover Hoodie", "basePrice": 11000, "size": "XL" },
-            { "id": "hoodie-xxl", "productId": "hoodie", "name": "Pullover Hoodie", "basePrice": 11000, "size": "XXL" }
+            {
+              "id": "hoodie-m",
+              "productId": "hoodie",
+              "name": "Pullover Hoodie",
+              "basePrice": 11000,
+              "size": "M"
+            },
+            {
+              "id": "hoodie-l",
+              "productId": "hoodie",
+              "name": "Pullover Hoodie",
+              "basePrice": 11000,
+              "size": "L"
+            },
+            {
+              "id": "hoodie-xl",
+              "productId": "hoodie",
+              "name": "Pullover Hoodie",
+              "basePrice": 11000,
+              "size": "XL"
+            },
+            {
+              "id": "hoodie-xxl",
+              "productId": "hoodie",
+              "name": "Pullover Hoodie",
+              "basePrice": 11000,
+              "size": "XXL"
+            }
           ]
         },
         "sweatshirt": {
@@ -261,13 +416,44 @@
           "basePrice": 8000,
           "description": "Inspired by the heritage of American college culture and the nostalgia of shared identity, this sweatshirt is a statement of belonging. Built from durable, brushed-back cotton-blend fabric designed to feel softer with each wash. Roomier cut, perfect for layering or wearing solo.",
           "descriptionJa": "アメリカのカレッジ文化と共有のノスタルジアにインスパイアされたスウェット。ブラッシュバック綿混素材で、洗うたびに柔らかくなるように設計。ゆったりとしたカット、レイヤリングでも単品でも。",
-          "sizes": ["M", "L", "XL", "XXL"],
-          "images": ["/apparel/sweatshirt-college.jpg"],
+          "sizes": [
+            "M",
+            "L",
+            "XL",
+            "XXL"
+          ],
+          "images": [
+            "/apparel/sweatshirt-college.jpg"
+          ],
           "variants": [
-            { "id": "sweatshirt-m", "productId": "sweatshirt", "name": "College Sweatshirt", "basePrice": 8000, "size": "M" },
-            { "id": "sweatshirt-l", "productId": "sweatshirt", "name": "College Sweatshirt", "basePrice": 8000, "size": "L" },
-            { "id": "sweatshirt-xl", "productId": "sweatshirt", "name": "College Sweatshirt", "basePrice": 8000, "size": "XL" },
-            { "id": "sweatshirt-xxl", "productId": "sweatshirt", "name": "College Sweatshirt", "basePrice": 8000, "size": "XXL" }
+            {
+              "id": "sweatshirt-m",
+              "productId": "sweatshirt",
+              "name": "College Sweatshirt",
+              "basePrice": 8000,
+              "size": "M"
+            },
+            {
+              "id": "sweatshirt-l",
+              "productId": "sweatshirt",
+              "name": "College Sweatshirt",
+              "basePrice": 8000,
+              "size": "L"
+            },
+            {
+              "id": "sweatshirt-xl",
+              "productId": "sweatshirt",
+              "name": "College Sweatshirt",
+              "basePrice": 8000,
+              "size": "XL"
+            },
+            {
+              "id": "sweatshirt-xxl",
+              "productId": "sweatshirt",
+              "name": "College Sweatshirt",
+              "basePrice": 8000,
+              "size": "XXL"
+            }
           ]
         },
         "beanie": {
@@ -277,10 +463,20 @@
           "basePrice": 5000,
           "description": "The essentials of winter at the coast: a warm, functional beanie born from staff experience. Timeless grey, knit from soft merino-wool blend for temperature regulation and comfort. Minimal branding, maximum utility.",
           "descriptionJa": "冬の海岸生活に必須なビーニー。スタッフの日常から生まれた、暖かく実用的な一枚。タイムレスなグレー。ソフトなメリノウール混で、温度調整と快適性を実現。最小限のブランディング、最大限の実用性。",
-          "colors": ["Grey"],
-          "images": ["/apparel/beanie-staff.jpg"],
+          "colors": [
+            "Grey"
+          ],
+          "images": [
+            "/apparel/beanie-staff.jpg"
+          ],
           "variants": [
-            { "id": "beanie-staff-grey", "productId": "beanie-staff", "name": "Staff Beanie — Grey Only", "basePrice": 5000, "color": "Grey" }
+            {
+              "id": "beanie-staff-grey",
+              "productId": "beanie-staff",
+              "name": "Staff Beanie — Grey Only",
+              "basePrice": 5000,
+              "color": "Grey"
+            }
           ]
         },
         "tumbler": {
@@ -290,11 +486,39 @@
           "basePrice": 3300,
           "description": "Rivers stainless steel tumbler. Excellent heat retention and cooling performance. Easy to drink from, doesn't spill, easy to wash.",
           "descriptionJa": "コーヒー文化のためのステンレスタンブラー。Felicityラテを山道へ、朝のコーヒーを静かな時間へ。熱効率を設計の中心に、ホットはホットに、冷たいは冷たく保ちます。葉山の風景を潤す川にちなんだ名前。走行の瞬間にも、静寂の時間にも、相応しいコンパニオン。",
-          "images": ["/apparel/tumbler.jpg"],
+          "images": [
+            "/apparel/tumbler.jpg"
+          ],
           "variants": [
-            { "id": "tumbler-regular", "productId": "tumbler", "name": "Rivers Tumbler", "basePrice": 3300 }
+            {
+              "id": "tumbler-regular",
+              "productId": "tumbler",
+              "name": "Rivers Tumbler",
+              "basePrice": 3300
+            }
           ]
-        }
+        },
+        "pantry": [
+          {
+            "id": "maple-syrup-cosman-webb",
+            "name": "Cosman & Webb Pure Maple Syrup",
+            "nameJa": "Cosman & Webb メープルシロップ 250ml",
+            "basePrice": 3200,
+            "description": "A truly exceptional maple syrup recommended by our owner's sister in Canada. Cosman & Webb's Pure Maple Syrup — rich aroma, deep sweetness, elegant finish. One sip makes it clear: this is different from the maple syrup you're used to. Perfect on waffles and pancakes, or as a sweetener for yogurt, ice cream, toast, and lattes. Single Forest / Canada Grade A — Amber, Rich Taste / 250ml.",
+            "descriptionJa": "カナダに住む姉に「メイプルシロップなら、これは本当に別格」とレコメンドしてもらった、とっておきの一本。COSMAN & WEBB のピュアメイプルシロップ。豊かな香り、深みのある甘さ、そして後味の上品さ。ひと口で、\"いつものメイプルシロップとは違う\"と感じる最高峰クラスのおいしさです。ワッフルやパンケーキにはもちろん、ヨーグルト、アイス、トースト、ラテの甘みづけにもおすすめ。Single Forest / Canada Grade A — Amber, Rich Taste / 250ml。",
+            "images": [
+              "/pantry/cosman-webb-maple-syrup.jpg"
+            ],
+            "variants": [
+              {
+                "id": "maple-syrup-cosman-webb-250ml",
+                "productId": "maple-syrup-cosman-webb",
+                "name": "Cosman & Webb Pure Maple Syrup 250ml",
+                "basePrice": 3200
+              }
+            ]
+          }
+        ]
       }
     },
     "visit": {

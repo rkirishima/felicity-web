@@ -347,7 +347,9 @@
             "description": "The Felicity staff cap is a functional piece born from necessity: protection from sun and salt spray while working the espresso bar, mixing coffee, or serving guests outdoors. Unstructured, breathable, and minimal—it carries the aesthetic of working culture. Available in grey, black, and beige.",
             "descriptionJa": "Felicityのスタッフキャップは、必要性から生まれた実用的なピース。エスプレッソバーでの作業、コーヒーのブレンド、屋外でのサービス—日差しと塩水の影響から身を守る。アンストラクチャード、通気性、最小限のデザイン。ワーキングカルチャーの美学を体現しています。グレー、ブラック、ベージュ3色展開。",
             "color": "Beige",
-            "images": ["/apparel/cap-beige.jpg"],
+            "images": [
+              "/apparel/cap-beige.jpg"
+            ],
             "variants": [
               {
                 "id": "cap-beige-regular",
@@ -495,7 +497,28 @@
               "basePrice": 3300
             }
           ]
-        }
+        },
+        "pantry": [
+          {
+            "id": "maple-syrup-cosman-webb",
+            "name": "Cosman & Webb Pure Maple Syrup",
+            "nameJa": "Cosman & Webb メープルシロップ 250ml",
+            "basePrice": 3200,
+            "description": "A truly exceptional maple syrup recommended by our owner's sister in Canada. Cosman & Webb's Pure Maple Syrup — rich aroma, deep sweetness, elegant finish. One sip makes it clear: this is different from the maple syrup you're used to. Perfect on waffles and pancakes, or as a sweetener for yogurt, ice cream, toast, and lattes. Single Forest / Canada Grade A — Amber, Rich Taste / 250ml.",
+            "descriptionJa": "カナダに住む姉に「メイプルシロップなら、これは本当に別格」とレコメンドしてもらった、とっておきの一本。COSMAN & WEBB のピュアメイプルシロップ。豊かな香り、深みのある甘さ、そして後味の上品さ。ひと口で、\"いつものメイプルシロップとは違う\"と感じる最高峰クラスのおいしさです。ワッフルやパンケーキにはもちろん、ヨーグルト、アイス、トースト、ラテの甘みづけにもおすすめ。Single Forest / Canada Grade A — Amber, Rich Taste / 250ml。",
+            "images": [
+              "/pantry/cosman-webb-maple-syrup.jpg"
+            ],
+            "variants": [
+              {
+                "id": "maple-syrup-cosman-webb-250ml",
+                "productId": "maple-syrup-cosman-webb",
+                "name": "Cosman & Webb Pure Maple Syrup 250ml",
+                "basePrice": 3200
+              }
+            ]
+          }
+        ]
       }
     },
     "visit": {
