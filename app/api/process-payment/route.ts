@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
         customer_name: fullName || '',
         customer_email: email || '',
         customer_phone: phone || '',
-        items: JSON.stringify(items?.map((i: any) => ({ id: i.id, name: i.name, qty: i.quantity ?? 1 })) || []),
+        items: JSON.stringify(items?.map((i: any) => ({ id: i.id, name: i.name, qty: i.quantity ?? 1, grind: i.grind ?? 'whole' })) || []),
         shipping_address: `${postalCode} ${prefecture}${city}${streetAddress}${building ? ' ' + building : ''}`,
       },
     });

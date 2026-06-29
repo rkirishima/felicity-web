@@ -3,12 +3,17 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+import type { GrindOption } from '@/app/lib/grind';
+
 export interface CartItem {
   id: string;
   name: string;
   price: number;
   quantity?: number;
   image?: string;
+  // Grind choice for coffee beans: whole / drip / espresso. The id encodes the
+  // grind too, so the same bean in different grinds becomes separate line items.
+  grind?: GrindOption;
 }
 
 export interface CartState {

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useCart } from '@/app/hooks/useCart';
 import { getCoffeeMessages, Locale } from '@/app/lib/translations';
 import { RoastLevel } from '@/app/components/RoastLevel';
+import { GRIND_OPTIONS, GrindOption, DEFAULT_GRIND } from '@/app/lib/grind';
 
 interface CoffeeBean {
   name: string;
@@ -180,17 +181,23 @@ export function CoffeeGrid({ locale = 'ja' }: CoffeeGridProps) {
   const [addedId, setAddedId] = useState<string | null>(null);
   const [selectedBean, setSelectedBean] = useState<CoffeeBean | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  // Grind choice per bean (defaults to whole bean).
+  const [grinds, setGrinds] = useState<Record<string, GrindOption>>({});
 
   const coffeeMessages = getCoffeeMessages(locale);
+  const grindLabelKey = locale === 'en' ? 'en' : 'ja';
 
   const handleAddToCart = (bean: CoffeeBean) => {
-    const itemId = `coffee-${bean.name.toLowerCase().replace(/\s+/g, '-')}`;
-    
+    const grind = grinds[bean.key] ?? DEFAULT_GRIND;
+    const baseId = `coffee-${bean.name.toLowerCase().replace(/\s+/g, '-')}`;
+    const itemId = `${baseId}-${grind}`;
+
     addItem({
       id: itemId,
       name: `${bean.name} 200g`,
       price: bean.priceYen,
       quantity: 1,
+      grind,
     });
 
     setAddedId(itemId);
@@ -211,7 +218,8 @@ export function CoffeeGrid({ locale = 'ja' }: CoffeeGridProps) {
     <>
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-px bg-[#DDD5C5]">
         {COFFEE_BEANS.map((bean) => {
-          const itemId = `coffee-${bean.name.toLowerCase().replace(/\s+/g, '-')}`;
+          const grind = grinds[bean.key] ?? DEFAULT_GRIND;
+          const itemId = `coffee-${bean.name.toLowerCase().replace(/\s+/g, '-')}-${grind}`;
           const isAdded = addedId === itemId;
           const fullDescription = getFullDescription(bean);
           
@@ -282,6 +290,31 @@ export function CoffeeGrid({ locale = 'ja' }: CoffeeGridProps) {
                     200g{'\u00A0'}{'\u2014'}{'\u00A0'}
                     <span className="text-[#7AAFC4] font-semibold">{bean.price}</span>
                   </p>
+                </div>
+
+                {/* Grind selector */}
+                <div className="mb-3">
+                  <label
+                    htmlFor={`grind-${bean.key}`}
+                    className="block font-mono text-[9px] tracking-[0.12em] uppercase text-[#8C7B6B] mb-1.5"
+                  >
+                    {locale === 'en' ? 'Grind' : '挽き方'}
+                  </label>
+                  <select
+                    id={`grind-${bean.key}`}
+                    value={grind}
+                    onChange={(e) =>
+                      setGrinds((prev) => ({ ...prev, [bean.key]: e.target.value as GrindOption }))
+                    }
+                    className="w-full bg-[#F4EFE4] border border-[#DDD5C5] rounded-sm px-3 py-2 text-[13px] text-[#2C2416] font-light focus:outline-none focus:border-[#7AAFC4] transition-colors"
+                  >
+                    {GRIND_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt[grindLabelKey]}
+                        {opt.value === 'whole' ? '' : `（${opt[grindLabelKey === 'en' ? 'subEn' : 'subJa']}）`}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Add to Cart Button */}

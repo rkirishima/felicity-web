@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { notifyOrderToTelegram } from '@/lib/telegram';
 
 export async function POST(request: NextRequest) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -89,6 +90,17 @@ export async function POST(request: NextRequest) {
       console.error('Supabase insert error:', dbError);
       return NextResponse.json({ error: 'Database insert failed' }, { status: 500 });
     }
+
+    await notifyOrderToTelegram({
+      orderId: pi.id,
+      paymentMethod: 'card',
+      customerName,
+      customerEmail,
+      customerPhone,
+      shippingAddress,
+      items,
+      amount: amountYen,
+    });
   }
 
   return NextResponse.json({ received: true });

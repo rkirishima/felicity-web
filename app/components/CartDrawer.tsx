@@ -3,6 +3,7 @@
 import { useCart } from '@/app/hooks/useCart';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { grindLabel } from '@/app/lib/grind';
 
 const translations = {
   ja: {
@@ -98,6 +99,11 @@ export function CartDrawer() {
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <h3 className="text-[16px] font-light text-[#2C2416] flex-1">{item.name}</h3>
+                    {item.grind && (
+                      <p className="mt-1 font-mono text-[10px] tracking-[0.08em] uppercase text-[#7AAFC4]">
+                        {grindLabel(item.grind, language)}
+                      </p>
+                    )}
                   </div>
                   <p className="font-mono text-[13px] text-[#7AAFC4] flex-shrink-0 ml-4">
                     ¥{item.price.toLocaleString()}

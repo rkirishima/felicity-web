@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import { GrindOption, grindNote, withGrindNote } from '@/app/lib/grind';
 
 export async function POST(request: NextRequest) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -39,19 +40,22 @@ export async function POST(request: NextRequest) {
   }
 
   const shippingAddress = `〒${postalCode} ${prefecture}${city}${streetAddress}${building ? ' ' + building : ''}`;
-  const orderItems = items?.map((i: { id?: string; name: string; qty: number }) => ({
+  const orderItems = items?.map((i: { id?: string; name: string; qty: number; grind?: GrindOption }) => ({
     id: i.id,
     name: i.name,
     qty: i.qty || 1,
+    grind: i.grind ?? 'whole',
   })) || [];
 
   // --- Square Order with fulfillment ---
+  // Grind choice is appended to the line-item name so it appears on the staff
+  // order ticket (e.g. "Brazil Santa Alina 200g（粉・ドリップ用）").
   const lineItems = orderItems.length > 0
-    ? orderItems.map((item: { name: string; qty: number }) => ({
-        name: item.name,
+    ? orderItems.map((item: { name: string; qty: number; grind?: GrindOption }) => ({
+        name: withGrindNote(item.name, item.grind),
         quantity: String(item.qty),
         base_price_money: { amount: 0, currency: 'JPY' },
-        note: 'ECサイト注文',
+        note: `ECサイト注文｜挽き方: ${grindNote(item.grind)}`,
       }))
     : [{
         name: `EC注文 ¥${amount}`,
@@ -138,7 +142,7 @@ export async function POST(request: NextRequest) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
       const itemsHtml = orderItems
-        .map((i: { name: string; qty: number }) => `<li>${i.name} × ${i.qty}</li>`)
+        .map((i: { name: string; qty: number; grind?: GrindOption }) => `<li>${withGrindNote(i.name, i.grind)} × ${i.qty}</li>`)
         .join('');
 
       const { error: emailError } = await resend.emails.send({

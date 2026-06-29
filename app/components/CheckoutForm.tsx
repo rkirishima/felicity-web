@@ -5,6 +5,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useCart } from '@/app/hooks/useCart';
 import { PREFECTURES } from '@/lib/prefectures';
+import { GrindOption, grindLabel } from '@/app/lib/grind';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -106,7 +107,7 @@ function StripePaymentForm({
     city: string;
     streetAddress: string;
     building: string;
-    items: Array<{ id?: string; name: string; qty: number; price: number }>;
+    items: Array<{ id?: string; name: string; qty: number; price: number; grind?: GrindOption }>;
     amount: number;
   };
 }) {
@@ -307,7 +308,7 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email, fullName, phone, postalCode, prefecture, city, streetAddress, building,
-          items: items.map((item) => ({ id: item.id, name: item.name, quantity: item.quantity ?? 1, price: item.price })),
+          items: items.map((item) => ({ id: item.id, name: item.name, quantity: item.quantity ?? 1, price: item.price, grind: item.grind })),
           amount: total,
         }),
       });
@@ -329,7 +330,11 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
         <div className="space-y-2 text-[14px] text-[#8C7B6B]">
           {items.map((item) => (
             <div key={item.id} className="flex justify-between">
-              <span>{item.name} × {item.quantity ?? 1}</span>
+              <span>
+                {item.name}
+                {item.grind && <span className="text-[#7AAFC4]">（{grindLabel(item.grind, language)}）</span>}
+                {' '}× {item.quantity ?? 1}
+              </span>
               <span>¥{(item.price * (item.quantity ?? 1)).toLocaleString('ja-JP')}</span>
             </div>
           ))}
@@ -458,7 +463,7 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
                     city,
                     streetAddress,
                     building,
-                    items: items.map((i) => ({ id: i.id, name: i.name, qty: i.quantity ?? 1, price: i.price })),
+                    items: items.map((i) => ({ id: i.id, name: i.name, qty: i.quantity ?? 1, price: i.price, grind: i.grind })),
                     amount: total,
                   }}
                 />

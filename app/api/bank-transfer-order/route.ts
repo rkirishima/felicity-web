@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { notifyOrderToTelegram } from '@/lib/telegram';
+import { GrindOption, grindNote, withGrindNote } from '@/app/lib/grind';
 
 export async function POST(request: NextRequest) {
   const squareToken = process.env.SQUARE_ACCESS_TOKEN!;
@@ -26,11 +28,11 @@ export async function POST(request: NextRequest) {
   const shippingAddress = `〒${postalCode} ${prefecture}${city}${streetAddress}${building ? ' ' + building : ''}`;
 
   // Create Square order
-  const lineItems = items.map((item: { name: string; quantity: number; price: number }) => ({
-    name: item.name,
+  const lineItems = items.map((item: { name: string; quantity: number; price: number; grind?: GrindOption }) => ({
+    name: withGrindNote(item.name, item.grind),
     quantity: String(item.quantity || 1),
     base_price_money: { amount: 0, currency: 'JPY' },
-    note: '銀行振込注文',
+    note: `銀行振込注文｜挽き方: ${grindNote(item.grind)}`,
   }));
 
   const orderPayload = {
@@ -84,6 +86,17 @@ export async function POST(request: NextRequest) {
     console.error('Supabase insert error (bank transfer):', dbError);
     return NextResponse.json({ error: 'Database insert failed' }, { status: 500 });
   }
+
+  await notifyOrderToTelegram({
+    orderId,
+    paymentMethod: 'bank_transfer',
+    customerName: fullName,
+    customerEmail: email,
+    customerPhone: phone,
+    shippingAddress,
+    items,
+    amount,
+  });
 
   return NextResponse.json({ orderId, received: true });
 }
