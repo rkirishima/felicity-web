@@ -29,6 +29,7 @@ interface Event {
   status: string;
   confirmed_date: string | null;
   created_at: string;
+  organizer_token: string | null;
   event_dates: EventDate[];
   event_votes: Vote[];
 }
@@ -446,6 +447,29 @@ export default function StaffEventsPage() {
                         Delete
                       </button>
                     </div>
+
+                    {/* Organizer share link */}
+                    {event.organizer_token && (
+                      <div className="mt-4 p-3 bg-[#F4EFE4] border border-[#DDD5C5]">
+                        <p className="font-mono text-[9px] text-[#8C7B6B] uppercase tracking-wider mb-1.5">
+                          Organizer URL
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <code className="text-[11px] text-[#2C2416] font-mono break-all flex-1">
+                            {typeof window !== 'undefined' ? window.location.origin : ''}/events/organizer/{event.organizer_token}
+                          </code>
+                          <button
+                            onClick={() => {
+                              const url = `${window.location.origin}/events/organizer/${event.organizer_token}`;
+                              navigator.clipboard.writeText(url);
+                            }}
+                            className="font-mono text-[10px] tracking-wider uppercase border border-[#7AAFC4] text-[#7AAFC4] px-3 py-1.5 hover:bg-[#7AAFC4] hover:text-white transition-colors shrink-0"
+                          >
+                            Copy
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Add date inline */}
                     <AddDateForm eventId={event.id} onAdd={addDate} />
