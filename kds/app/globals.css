@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Prevent text selection on iPad — kitchen staff tap, not select */
+* {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Large tap targets for greasy fingers */
+button {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Smooth card transitions */
+.order-card {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Pulse animation for new orders */
+@keyframes pulse-border {
+  0%, 100% { border-color: #eab308; }
+  50% { border-color: #f97316; }
+}
+
+.new-order {
+  animation: pulse-border 1.5s ease-in-out 3;
+}
+
+/* Age warning colors */
+.age-warning { border-color: #f97316 !important; }
+.age-critical { border-color: #ef4444 !important; }
