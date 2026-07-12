@@ -517,6 +517,25 @@
                 "basePrice": 3200
               }
             ]
+          },
+          {
+            "id": "yokosuka-jizakana-jerky",
+            "basePrice": 1000,
+            "images": [
+              "/pantry/yokosuka-jizakana-jerky.jpg"
+            ],
+            "name": "Yokosuka Local Fish Jerky (for pets)",
+            "nameJa": "よこすか地魚ジャーキー（クロダイ）",
+            "description": "millelien (ミルシエ) Yokosuka local fish jerky for dogs — made from black sea bream (クロダイ) caught off Yokosuka. Additive-free, a healthy natural treat for your dog.",
+            "descriptionJa": "millelien（ミルシエ）の「よこすか地魚ジャーキー」。横須賀で獲れたクロダイを使った、愛犬のためのペット用おやつです。無添加で素材そのもの。地元の海の恵みを、大切な家族のわんちゃんに。",
+            "variants": [
+              {
+                "id": "yokosuka-jizakana-jerky-1bag",
+                "productId": "yokosuka-jizakana-jerky",
+                "name": "Yokosuka Local Fish Jerky",
+                "basePrice": 1000
+              }
+            ]
           }
         ]
       }
