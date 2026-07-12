@@ -524,17 +524,53 @@
             "images": [
               "/pantry/yokosuka-jizakana-jerky.jpg"
             ],
-            "name": "Yokosuka Local Fish Jerky (for pets)",
-            "nameJa": "よこすか地魚ジャーキー（クロダイ）",
-            "description": "millelien (ミルシエ) Yokosuka local fish jerky for dogs — made from black sea bream (クロダイ) caught off Yokosuka. Additive-free, a healthy natural treat for your dog.",
-            "descriptionJa": "millelien（ミルシエ）の「よこすか地魚ジャーキー」。横須賀で獲れたクロダイを使った、愛犬のためのペット用おやつです。無添加で素材そのもの。地元の海の恵みを、大切な家族のわんちゃんに。",
+            "name": "Yokosuka Local Fish Jerky (for dogs)",
+            "nameJa": "よこすか地魚ジャーキー",
+            "description": "millelien Yokosuka local fish jerky for dogs — additive-free natural treats made from fish caught off Yokosuka. Choose from 5 kinds: Shark, Ishimochi, Beltfish, Hiiragi, Black Bream.",
+            "descriptionJa": "millelien（ミルシエ）の犬用おやつ「よこすか地魚ジャーキー」。横須賀で獲れた地魚を使った無添加の天然おやつです。5種の魚から選べます — サメ（低アレルギー・低カロリー。食にお悩みの子に。かたさ★★★★★） / イシモチ（皮の香りが食欲をそそる、かたさバランス良好。かたさ★★★☆☆） / タチウオ（脂乗りがよく、やわらか食感で食べやすい。かたさ★☆☆☆☆） / ヒイラギ（一口サイズで骨ごと食べられる、幅広い子に。かたさ★★★☆☆） / クロダイ（磯の香りと旨味が凝縮、食べ応えあり。かたさ★★★★★）。「希望のひとかけらを、横須賀から。」",
             "variants": [
               {
-                "id": "yokosuka-jizakana-jerky-1bag",
+                "id": "yokosuka-jizakana-jerky-shark",
                 "productId": "yokosuka-jizakana-jerky",
-                "name": "Yokosuka Local Fish Jerky",
-                "basePrice": 1000
+                "name": "よこすか地魚ジャーキー サメ",
+                "basePrice": 1000,
+                "variety": "サメ"
+              },
+              {
+                "id": "yokosuka-jizakana-jerky-ishimochi",
+                "productId": "yokosuka-jizakana-jerky",
+                "name": "よこすか地魚ジャーキー イシモチ",
+                "basePrice": 1000,
+                "variety": "イシモチ"
+              },
+              {
+                "id": "yokosuka-jizakana-jerky-tachiuo",
+                "productId": "yokosuka-jizakana-jerky",
+                "name": "よこすか地魚ジャーキー タチウオ",
+                "basePrice": 1000,
+                "variety": "タチウオ"
+              },
+              {
+                "id": "yokosuka-jizakana-jerky-hiiragi",
+                "productId": "yokosuka-jizakana-jerky",
+                "name": "よこすか地魚ジャーキー ヒイラギ",
+                "basePrice": 1000,
+                "variety": "ヒイラギ"
+              },
+              {
+                "id": "yokosuka-jizakana-jerky-kurodai",
+                "productId": "yokosuka-jizakana-jerky",
+                "name": "よこすか地魚ジャーキー クロダイ",
+                "basePrice": 1000,
+                "variety": "クロダイ"
               }
+            ],
+            "varieties": [
+              "サメ",
+              "イシモチ",
+              "タチウオ",
+              "ヒイラギ",
+              "クロダイ"
             ]
           }
         ]

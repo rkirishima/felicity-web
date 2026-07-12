@@ -10,6 +10,7 @@ interface ApparelVariant {
   basePrice: number;
   color?: string;
   size?: string;
+  variety?: string;
 }
 
 interface ApparelItem {
@@ -22,6 +23,7 @@ interface ApparelItem {
   color?: string;
   colors?: string[];
   sizes?: string[];
+  varieties?: string[];
   images: string[];
   variants: ApparelVariant[];
 }
@@ -53,6 +55,7 @@ export function ApparelCard({ item, language }: ApparelCardProps) {
     const parts = [item.name];
     if (selectedVariant.color) parts.push(selectedVariant.color);
     if (selectedVariant.size && (item.sizes?.length ?? 0) > 1) parts.push(selectedVariant.size);
+    if (selectedVariant.variety && (item.varieties?.length ?? 0) > 1) parts.push(selectedVariant.variety);
     const cartName = parts.join(' — ');
 
     addItem({
@@ -114,8 +117,19 @@ export function ApparelCard({ item, language }: ApparelCardProps) {
         </div>
 
         {/* Variant Selectors */}
-        {(item.colors || item.sizes) && (
+        {(item.colors || item.sizes || item.varieties) && (
           <div className="space-y-3">
+            {item.varieties && item.varieties.length > 1 && (
+              <div>
+                <label className="block text-[11px] font-mono tracking-[0.08em] text-[#8C7B6B] uppercase mb-2">
+                  {isEnglish ? 'Variety' : '種類'}
+                </label>
+                <select value={selectedVariantId} onChange={(e) => setSelectedVariantId(e.target.value)}
+                  className="w-full border border-[#DDD5C5] rounded px-3 py-2 text-[13px] text-[#2C2416] bg-white focus:outline-none focus:border-[#7AAFC4]">
+                  {item.variants.map(v => <option key={v.id} value={v.id}>{v.variety}</option>)}
+                </select>
+              </div>
+            )}
             {item.colors && item.colors.length > 1 && (
               <div>
                 <label className="block text-[11px] font-mono tracking-[0.08em] text-[#8C7B6B] uppercase mb-2">
