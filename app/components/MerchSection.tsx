@@ -34,6 +34,7 @@ interface MerchSectionProps {
     sweatshirt?: ApparelItem;
     beanie?: ApparelItem;
     tumbler?: ApparelItem;
+    gift?: ApparelItem[];
     pantry?: ApparelItem[];
   };
 }
@@ -43,6 +44,8 @@ export function MerchSection({ language = 'en', apparel }: MerchSectionProps) {
   const allItems: ApparelItem[] = [];
   
   if (apparel) {
+    // Gift boxes lead — they're the seasonal/giftable items people scroll for.
+    if (apparel.gift) allItems.push(...apparel.gift);
     if (apparel.tshirts) allItems.push(...apparel.tshirts);
     if (apparel.caps) allItems.push(...apparel.caps);
     if (apparel.hoodie) allItems.push(apparel.hoodie);

@@ -498,6 +498,27 @@
             }
           ]
         },
+        "gift": [
+          {
+            "id": "drip-coffee-gift-box",
+            "name": "Felicity Original Drip Coffee Gift Box",
+            "nameJa": "Felicityカフェ オリジナル ドリップコーヒーギフトボックス",
+            "basePrice": 4320,
+            "description": "Our own drip packs, boxed. Ethiopia Yirgacheffe G1 (Natural), Guatemala Gualvador (Washed) and Papua New Guinea Baroida (Peaberry) — six packs of each, 18 in all — roasted in Hayama and sealed one cup at a time. Comes in the Felicity logo box, so it's ready to give as it is. Just set a pack on your cup and pour hot water.",
+            "descriptionJa": "店頭でも人気だった、Felicityオリジナルのドリップパック詰め合わせ。エチオピア イルガチェフェ G1（ナチュラル）、グアテマラ グアルバドール（ウォッシュド）、パプアニューギニア バロイダ農園（ピーベリー）の3種を各6パック、計18パック。葉山の焙煎所で焼いた豆を、一杯分ずつ挽いて密封しています。Felicityロゴ入りのオリジナルボックス入りなので、そのまま贈りものに。カップにセットしてお湯を注ぐだけです。",
+            "images": [
+              "/gift/felicity-drip-coffee-gift-box.jpg"
+            ],
+            "variants": [
+              {
+                "id": "drip-coffee-gift-box-18",
+                "productId": "drip-coffee-gift-box",
+                "name": "Felicity Original Drip Coffee Gift Box (18 packs)",
+                "basePrice": 4320
+              }
+            ]
+          }
+        ],
         "pantry": [
           {
             "id": "maple-syrup-cosman-webb",
