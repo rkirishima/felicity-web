@@ -21,6 +21,29 @@ export async function POST(request: NextRequest) {
 
   if (event.type === 'payment_intent.succeeded') {
     const pi = event.data.object as Stripe.PaymentIntent;
+
+    // Wholesale orders carry their own metadata shape and are fulfilled by
+    // /api/wholesale/confirm. Handle them there and return, so this route never
+    // builds a retail-shaped Square order out of a trade payment. If the
+    // browser never reached the confirm route, this is the backstop that still
+    // marks the order paid.
+    if (pi.metadata?.order_type === 'wholesale') {
+      const wholesaleOrderId = pi.metadata?.wholesale_order_id;
+      if (wholesaleOrderId) {
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+        const { error } = await supabase
+          .from('wholesale_orders')
+          .update({ status: 'paid', paid_at: new Date().toISOString() })
+          .eq('id', wholesaleOrderId)
+          .neq('status', 'paid');
+        if (error) console.error('[wholesale] webhook paid-update failed:', error);
+      }
+      return NextResponse.json({ received: true });
+    }
+
     const customerName = pi.metadata?.customer_name || '不明';
     const customerEmail = pi.metadata?.customer_email || pi.receipt_email || '';
     const customerPhone = pi.metadata?.customer_phone || '';
