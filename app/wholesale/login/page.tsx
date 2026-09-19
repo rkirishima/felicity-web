@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 export default function WholesaleLoginPage() {
   const router = useRouter();
-  const [code, setCode] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -18,7 +18,7 @@ export default function WholesaleLoginPage() {
       const res = await fetch('/api/wholesale/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, password }),
+        body: JSON.stringify({ email, password }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -44,24 +44,29 @@ export default function WholesaleLoginPage() {
           <h1 className="text-[24px] text-[#2C2416] font-light tracking-[0.08em]">業販ログイン</h1>
           <p className="mt-3 text-[13px] text-[#8C7B6B] font-light">
             取引先さま専用ページです。
+            <br />
+            ご登録のメールアドレスでログインしてください。
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-[#EDE5D8] p-8 rounded-sm space-y-5">
           <div>
-            <label htmlFor="code" className="block text-[12px] text-[#8C7B6B] font-mono tracking-[0.08em] uppercase mb-2">
-              取引先コード
+            <label htmlFor="email" className="block text-[12px] text-[#8C7B6B] font-mono tracking-[0.08em] uppercase mb-2">
+              メールアドレス
             </label>
             <input
-              id="code"
-              name="code"
-              type="text"
+              id="email"
+              name="email"
+              type="email"
+              inputMode="email"
               autoComplete="username"
-              autoCapitalize="characters"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full bg-[#F4EFE4] border border-[#DDD5C5] px-4 py-3 text-[15px] text-[#2C2416] font-mono tracking-[0.08em] rounded-sm focus:outline-none focus:border-[#8C7B6B]"
+              className="w-full bg-[#F4EFE4] border border-[#DDD5C5] px-4 py-3 text-[15px] text-[#2C2416] rounded-sm focus:outline-none focus:border-[#8C7B6B]"
             />
           </div>
 
@@ -99,7 +104,14 @@ export default function WholesaleLoginPage() {
         <p className="mt-8 text-center text-[12px] text-[#8C7B6B] font-light leading-relaxed">
           初回ログイン時にパスワードの変更をお願いしております。
           <br />
-          アカウントの発行・パスワードの再設定は担当者までご連絡ください。
+          アカウントの発行・パスワードの再設定は{' '}
+          <a
+            href="mailto:info@felicity.cafe?subject=%E6%A5%AD%E8%B2%A9%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"
+            className="text-[#2C2416] underline underline-offset-2 hover:text-[#7AAFC4] transition-colors"
+          >
+            info@felicity.cafe
+          </a>{' '}
+          までご連絡ください。
         </p>
       </div>
     </main>

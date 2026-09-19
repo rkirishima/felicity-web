@@ -24,6 +24,14 @@ export function Footer({ locale }: FooterProps) {
             >
               {locale === 'ja' ? 'メール' : 'Email'}
             </a>
+            {/* The trade section itself stays unlinked; this points at the
+                enquiry block on the contact page. */}
+            <a
+              href={locale === 'ja' ? '/contact#wholesale' : '/en/contact#wholesale'}
+              className="text-[#8C7B6B] hover:text-[#2C2416] transition-colors"
+            >
+              {locale === 'ja' ? '業販・卸売' : 'Wholesale'}
+            </a>
             <a
               href="https://www.instagram.com/felicity_hayama"
               target="_blank"

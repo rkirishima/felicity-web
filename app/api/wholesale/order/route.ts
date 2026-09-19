@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { MIN_ORDER_KG, isHandDelivery, quote } from '@/app/lib/wholesale';
+import { MIN_ORDER_KG, beanBySlug, isHandDelivery, isOrderable, quote } from '@/app/lib/wholesale';
 import { notifyWholesaleOrderToTelegram } from '@/lib/telegram';
 import {
   createSquareWholesaleOrder,
@@ -50,12 +50,28 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '配送先をすべて入力してください。' }, { status: 400 });
   }
 
+  const special = specialPricingOf(account);
+
+  // quote() drops quote-on-request beans silently so the live form stays
+  // editable; ordering one is still a mistake worth naming.
+  const askOnly = items.find((it: { slug?: string; kg?: number }) => {
+    const bean = it?.slug ? beanBySlug(it.slug) : undefined;
+    return bean && Number(it.kg) > 0 && !isOrderable(bean, special);
+  });
+  if (askOnly) {
+    const bean = beanBySlug(askOnly.slug)!;
+    return NextResponse.json(
+      { error: `${bean.nameJa}は都度お見積りです。お手数ですがメールにてご相談ください。` },
+      { status: 400 },
+    );
+  }
+
   // Prices are recomputed here from the account record. Anything the browser
   // sent about money is ignored.
-  const q = quote(items, specialPricingOf(account), terms);
+  const q = quote(items, special, terms);
 
   if (q.totalKg < MIN_ORDER_KG) {
-    return NextResponse.json({ error: `ご注文は${MIN_ORDER_KG}kgから承ります。` }, { status: 400 });
+    return NextResponse.json({ error: `ご注文は合計${MIN_ORDER_KG}kgから承ります。` }, { status: 400 });
   }
 
   const orderId = `WS-${account.code}-${Date.now().toString(36).toUpperCase()}`;
@@ -101,7 +117,7 @@ export async function POST(request: NextRequest) {
     items: q.lines,
     total_kg: q.totalKg,
     total_green_kg: q.totalGreenKg,
-    tier_label: q.tier.label,
+    tier_label: q.priceBasis,
     special_pricing: q.usesSpecialPricing,
     subtotal: q.subtotal,
     shipping: q.shipping,

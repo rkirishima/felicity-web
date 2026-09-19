@@ -4,9 +4,10 @@
 // runs inside `proxy.ts` as well as in route handlers, and proxy code must not
 // depend on a Node-only runtime.
 //
-// Trade accounts each get their own code + password (see the
+// Trade accounts each sign in with their own email + password (see the
 // `wholesale_accounts` table) so a leaked password invalidates one customer
-// rather than exposing the whole price sheet.
+// rather than exposing the whole price sheet. The session still carries the
+// account `code`, which is what orders and invoices are keyed by.
 
 const PBKDF2_ITERATIONS = 210_000;
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 days

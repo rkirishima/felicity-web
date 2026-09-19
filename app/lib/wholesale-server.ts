@@ -7,7 +7,7 @@
 import { cookies } from 'next/headers';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { WHOLESALE_COOKIE, verifySession } from '@/app/lib/wholesale-auth';
-import type { DeliveryMethod, QuoteTerms, SpecialPricing } from '@/app/lib/wholesale';
+import type { BeanPrices, DeliveryMethod, QuoteTerms } from '@/app/lib/wholesale';
 
 export type AccountRecord = {
   code: string;
@@ -15,9 +15,8 @@ export type AccountRecord = {
   contact_name: string | null;
   email: string;
   phone: string | null;
-  special_price_economy: number | null;
-  special_price_standard: number | null;
-  special_price_premium: number | null;
+  /** 銘柄別のお取り決め単価。{ slug: 税抜/kg }。空なら価格表どおり。 */
+  special_prices: BeanPrices | null;
   free_shipping: boolean;
   delivery_method: DeliveryMethod;
   active: boolean;
@@ -44,7 +43,7 @@ export async function currentAccount(
   const { data } = await supabase
     .from('wholesale_accounts')
     .select(
-      'code, company, contact_name, email, phone, special_price_economy, special_price_standard, special_price_premium, free_shipping, delivery_method, active'
+      'code, company, contact_name, email, phone, special_prices, free_shipping, delivery_method, active'
     )
     .eq('code', session.code)
     .maybeSingle();
@@ -53,11 +52,16 @@ export async function currentAccount(
   return data as AccountRecord;
 }
 
-export function specialPricingOf(account: AccountRecord): SpecialPricing | null {
-  const special: SpecialPricing = {};
-  if (account.special_price_economy) special.economy = account.special_price_economy;
-  if (account.special_price_standard) special.standard = account.special_price_standard;
-  if (account.special_price_premium) special.premium = account.special_price_premium;
+// jsonb comes back as whatever was stored, so anything that isn't a positive
+// number is dropped rather than trusted into the arithmetic.
+export function specialPricingOf(account: AccountRecord): BeanPrices | null {
+  const raw = account.special_prices;
+  if (!raw || typeof raw !== 'object') return null;
+
+  const special: BeanPrices = {};
+  for (const [slug, price] of Object.entries(raw)) {
+    if (typeof price === 'number' && Number.isFinite(price) && price > 0) special[slug] = price;
+  }
   return Object.keys(special).length > 0 ? special : null;
 }
 

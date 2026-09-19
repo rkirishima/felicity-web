@@ -7,16 +7,16 @@ import {
   verifyPassword,
 } from '@/app/lib/wholesale-auth';
 
-// A throwaway hash verified when the account code is unknown, so a wrong code
-// and a wrong password take the same time and the login form can't be used to
+// A throwaway hash verified when the address is unknown, so a wrong address and
+// a wrong password take the same time and the login form can't be used to
 // enumerate which companies we supply.
 const DUMMY_HASH =
   'pbkdf2$210000$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
 export async function POST(request: NextRequest) {
-  const { code, password } = await request.json().catch(() => ({ code: '', password: '' }));
-  if (typeof code !== 'string' || typeof password !== 'string' || !code || !password) {
-    return NextResponse.json({ error: '取引先コードとパスワードを入力してください。' }, { status: 400 });
+  const { email, password } = await request.json().catch(() => ({ email: '', password: '' }));
+  if (typeof email !== 'string' || typeof password !== 'string' || !email || !password) {
+    return NextResponse.json({ error: 'メールアドレスとパスワードを入力してください。' }, { status: 400 });
   }
 
   const supabase = createClient(
@@ -24,16 +24,19 @@ export async function POST(request: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
+  // Stored addresses are normalised to lowercase (see migration 011), so an
+  // exact match on the normalised input is enough — and unlike ILIKE it can't
+  // be tricked by `_` or `%` inside an address.
   const { data: account } = await supabase
     .from('wholesale_accounts')
     .select('code, company, password_hash, active')
-    .eq('code', code.trim().toUpperCase())
+    .eq('email', email.trim().toLowerCase())
     .maybeSingle();
 
   const ok = await verifyPassword(password, account?.password_hash ?? DUMMY_HASH);
 
   if (!account || !account.active || !ok) {
-    return NextResponse.json({ error: '取引先コードまたはパスワードが正しくありません。' }, { status: 401 });
+    return NextResponse.json({ error: 'メールアドレスまたはパスワードが正しくありません。' }, { status: 401 });
   }
 
   const token = await signSession({ code: account.code, company: account.company });

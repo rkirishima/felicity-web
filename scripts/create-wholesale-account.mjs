@@ -4,7 +4,13 @@
 //   node scripts/create-wholesale-account.mjs \
 //     --code JOLT --company "JOLT the COFFEE" --contact "粂原 茂人" \
 //     --email jolt@example.com --password 'xxxxxxxx' \
-//     --special-standard 5200 --special-premium 6000
+//     --prices 'png-baroida=5200,colombia-decaf=6000'
+//
+// --prices はお取り決め価格（税抜/kg）。銘柄の slug は app/lib/wholesale.ts の
+// WHOLESALE_BEANS に合わせる。省略すれば価格表どおりの銘柄別卸価格になる。
+//
+// --email is what the customer types at the login screen; --code stays the
+// internal key used by orders and invoices.
 //
 // The password is hashed here and only the hash is stored. The stored format
 // must stay in sync with `hashPassword` in app/lib/wholesale-auth.ts.
@@ -35,6 +41,22 @@ async function hashPassword(password) {
   return `pbkdf2$${PBKDF2_ITERATIONS}$${toBase64Url(salt)}$${toBase64Url(new Uint8Array(bits))}`;
 }
 
+// "slug=5200,other-slug=6000" → { slug: 5200, 'other-slug': 6000 }
+function parsePrices(spec) {
+  if (!spec) return {};
+  const prices = {};
+  for (const pair of spec.split(',')) {
+    const [slug, value] = pair.split('=').map((s) => s?.trim());
+    const price = Number(value);
+    if (!slug || !Number.isFinite(price) || price <= 0) {
+      console.error(`--prices の書式が不正です: "${pair}"（例: png-baroida=5200）`);
+      process.exit(1);
+    }
+    prices[slug] = price;
+  }
+  return prices;
+}
+
 const args = {};
 for (let i = 2; i < process.argv.length; i += 2) {
   const k = process.argv[i].replace(/^--/, '');
@@ -59,7 +81,8 @@ const row = {
   code: args.code.trim().toUpperCase(),
   company: args.company,
   contact_name: args.contact ?? null,
-  email: args.email,
+  // ログインIDになるアドレス。小文字に揃えて保存する（DB側も CHECK で強制）。
+  email: args.email.trim().toLowerCase(),
   phone: args.phone ?? null,
   password_hash: await hashPassword(args.password),
   postal_code: args['postal-code'] ?? null,
@@ -67,9 +90,7 @@ const row = {
   city: args.city ?? null,
   street_address: args['street-address'] ?? null,
   building: args.building ?? null,
-  special_price_economy: args['special-economy'] ? Number(args['special-economy']) : null,
-  special_price_standard: args['special-standard'] ? Number(args['special-standard']) : null,
-  special_price_premium: args['special-premium'] ? Number(args['special-premium']) : null,
+  special_prices: parsePrices(args.prices),
   free_shipping: args['free-shipping'] === 'true',
   delivery_method: args['delivery'] === 'hand' ? 'hand_delivery' : 'shipping',
   // 発行・再発行したパスワードは常に一時的なもの。取引先が自分で決め直すまで注文画面には入れない。
@@ -87,11 +108,13 @@ if (error) {
 }
 
 console.log(`✅ ${row.code} — ${row.company}`);
+console.log(`   ログインID: ${row.email}`);
 console.log('   初期パスワードです。取引先の初回ログイン時に本人が変更します。');
-if (row.special_price_standard) {
-  console.log(`   固定価格: スタンダード ¥${row.special_price_standard}/kg・プレミアム ¥${row.special_price_premium}/kg（税抜）`);
+const pinned = Object.entries(row.special_prices);
+if (pinned.length > 0) {
+  console.log(`   お取り決め価格（税抜/kg）: ${pinned.map(([slug, p]) => `${slug} ¥${p}`).join('・')}`);
 } else {
-  console.log('   数量ティア価格を適用');
+  console.log('   価格表どおりの銘柄別卸価格を適用');
 }
 console.log(
   row.delivery_method === 'hand_delivery'

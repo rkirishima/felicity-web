@@ -1,23 +1,27 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { PREFECTURES } from '@/lib/prefectures';
 import {
-  GRADE_LABEL,
+  FREE_SHIPPING_THRESHOLD,
+  LEAD_TIME_DAYS,
+  MIN_CUSTOM_BLEND_KG,
+  MIN_KG_PER_BEAN,
   MIN_ORDER_KG,
-  PRICE_TIERS,
   SHIPPING_BOXES,
   WHOLESALE_BEANS,
-  priceBreakHint,
+  freeShippingHint,
   quote,
+  unitPrice,
   yen,
+  type BeanPrices,
   type DeliveryMethod,
-  type PriceBreakHint,
-  type SpecialPricing,
-  type WholesaleGrade,
+  type FreeShippingHint,
+  type WholesaleBean,
 } from '@/app/lib/wholesale';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
@@ -33,7 +37,7 @@ export type WholesaleAccount = {
   city: string;
   streetAddress: string;
   building: string;
-  specialPricing: SpecialPricing | null;
+  specialPricing: BeanPrices | null;
   freeShipping: boolean;
   deliveryMethod: DeliveryMethod;
 };
@@ -46,10 +50,16 @@ type Confirmation = {
   amount: number;
 };
 
+// 印刷版ガイドと揃えた配色。紙の地色に、焙煎の深さを思わせる緑を一色だけ差す。
+const INK = '#2C2416';
+const MUTED = '#8C7B6B';
+const GREEN = '#2E4A3E';
+
 const panel = 'bg-[#EDE5D8] rounded-sm';
 const label = 'block text-[12px] text-[#8C7B6B] font-mono tracking-[0.08em] uppercase mb-2';
 const input =
   'w-full bg-[#F4EFE4] border border-[#DDD5C5] px-4 py-3 text-[15px] text-[#2C2416] rounded-sm focus:outline-none focus:border-[#8C7B6B]';
+const eyebrow = 'font-mono text-[11px] tracking-[0.24em] uppercase text-[#8C7B6B]';
 
 export function WholesaleOrder({ account }: { account: WholesaleAccount }) {
   const router = useRouter();
@@ -82,10 +92,9 @@ export function WholesaleOrder({ account }: { account: WholesaleAccount }) {
   const handDelivery = account.deliveryMethod === 'hand_delivery';
   const q = useMemo(() => quote(items, account.specialPricing, terms), [items, account.specialPricing, terms]);
 
-  // Only shown when topping up would genuinely make the order cheaper — the
-  // ladder inverts near a break (19kg costs more than 20kg).
+  // 3万円の手前で止まっている注文にだけ、あといくらで送料が消えるかを出す。
   const hint = useMemo(
-    () => priceBreakHint(items, account.specialPricing, terms),
+    () => freeShippingHint(items, account.specialPricing, terms),
     [items, account.specialPricing, terms],
   );
 
@@ -105,7 +114,7 @@ export function WholesaleOrder({ account }: { account: WholesaleAccount }) {
   const bumpKg = (slug: string, delta: number) => updateKg(slug, (current) => current + delta);
 
   function validate(): string | null {
-    if (q.totalKg < MIN_ORDER_KG) return `ご注文は${MIN_ORDER_KG}kgから承ります。`;
+    if (q.totalKg < MIN_ORDER_KG) return `ご注文は合計${MIN_ORDER_KG}kgから承ります。`;
     if (!contactName.trim()) return 'ご担当者名を入力してください。';
     if (!email.trim()) return 'メールアドレスを入力してください。';
     if (!handDelivery && (!postalCode.trim() || !prefecture || !city.trim() || !streetAddress.trim()))
@@ -183,294 +192,583 @@ export function WholesaleOrder({ account }: { account: WholesaleAccount }) {
   }
 
   return (
-    <main className="max-w-4xl mx-auto px-6 py-14">
-      <header className="flex items-start justify-between gap-6 mb-12">
-        <div>
-          <p className="text-[12px] text-[#8C7B6B] font-mono tracking-[0.18em] uppercase mb-2">
-            Wholesale — 業販ご注文
-          </p>
-          <h1 className="text-[24px] text-[#2C2416] font-light tracking-[0.06em]">{account.company}</h1>
-          <p className="mt-1 text-[13px] text-[#8C7B6B] font-mono tracking-[0.08em]">{account.code}</p>
-        </div>
-        <div className="flex items-center gap-4 flex-shrink-0">
-          <a
-            href="/wholesale/password"
-            className="text-[12px] text-[#8C7B6B] font-mono tracking-[0.08em] uppercase hover:text-[#2C2416] transition-colors"
-          >
-            パスワード変更
-          </a>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="text-[12px] text-[#8C7B6B] font-mono tracking-[0.08em] uppercase hover:text-[#2C2416] transition-colors"
-          >
-            ログアウト
-          </button>
+    <div className="pb-24">
+      <header className="border-b border-[#DDD5C5]">
+        <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between gap-6">
+          <div className="min-w-0">
+            <p className={`${eyebrow} whitespace-nowrap`}>Wholesale</p>
+            <p className="mt-1 text-[15px] text-[#2C2416] font-light truncate">{account.company}</p>
+          </div>
+          <div className="flex items-center gap-4 flex-shrink-0">
+            <a
+              href="/wholesale/password"
+              className="text-[11px] text-[#8C7B6B] font-mono tracking-[0.08em] uppercase hover:text-[#2C2416] transition-colors"
+            >
+              パスワード変更
+            </a>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="text-[11px] text-[#8C7B6B] font-mono tracking-[0.08em] uppercase hover:text-[#2C2416] transition-colors"
+            >
+              ログアウト
+            </button>
+          </div>
         </div>
       </header>
 
-      <form onSubmit={handleSubmit} className="space-y-10">
-        <section>
-          <h2 className="text-[13px] text-[#8C7B6B] font-mono tracking-[0.12em] uppercase mb-4">
-            銘柄・数量（1kg単位）
+      <Hero />
+      <WhyFelicity />
+      <RoastingQuality />
+      <FlavourMap />
+
+      <form onSubmit={handleSubmit}>
+        <section className="max-w-5xl mx-auto px-6 pt-20">
+          <p className={eyebrow}>Coffee Collection</p>
+          <h2 className="mt-3 text-[clamp(24px,3.4vw,34px)] font-light text-[#2C2416] tracking-tight">
+            産地とつくり手の個性を、一杯に。
           </h2>
+          <p className="mt-4 max-w-2xl text-[14px] text-[#8C7B6B] font-light leading-relaxed">
+            価格はすべて1kgあたり・税抜です。{MIN_KG_PER_BEAN}kg単位でご指定いただけます
+            （1回のご注文は合計{MIN_ORDER_KG}kgから）。挽き・個包装の追加料金はいただきません。
+          </p>
 
-          <div className={`${panel} divide-y divide-[#DDD5C5]`}>
-            {WHOLESALE_BEANS.map((bean) => {
-              const kg = kgBySlug[bean.slug] ?? 0;
-              const line = q.lines.find((l) => l.slug === bean.slug);
-              return (
-                <div key={bean.slug} className="flex items-center gap-4 px-6 py-4">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[15px] text-[#2C2416] font-light truncate">{bean.name}</p>
-                    <p className="text-[12px] text-[#8C7B6B] font-light truncate">
-                      {bean.nameJa}
-                      {bean.grade === 'premium' && (
-                        <span className="ml-2 text-[#B8860B] font-mono tracking-[0.08em] uppercase">Premium</span>
-                      )}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <button
-                      type="button"
-                      aria-label={`${bean.name} を1kg減らす`}
-                      onClick={() => bumpKg(bean.slug, -1)}
-                      className="w-8 h-8 border border-[#DDD5C5] bg-[#F4EFE4] text-[#8C7B6B] rounded-sm hover:text-[#2C2416] transition-colors"
-                    >
-                      −
-                    </button>
-                    <input
-                      type="number"
-                      min={0}
-                      step={1}
-                      inputMode="numeric"
-                      aria-label={`${bean.name} の数量（kg）`}
-                      value={kg === 0 ? '' : kg}
-                      placeholder="0"
-                      onChange={(e) => setKg(bean.slug, Number(e.target.value))}
-                      className="w-16 text-center bg-[#F4EFE4] border border-[#DDD5C5] px-2 py-1.5 text-[15px] text-[#2C2416] font-mono rounded-sm focus:outline-none focus:border-[#8C7B6B]"
-                    />
-                    <button
-                      type="button"
-                      aria-label={`${bean.name} を1kg増やす`}
-                      onClick={() => bumpKg(bean.slug, 1)}
-                      className="w-8 h-8 border border-[#DDD5C5] bg-[#F4EFE4] text-[#8C7B6B] rounded-sm hover:text-[#2C2416] transition-colors"
-                    >
-                      +
-                    </button>
-                    <span className="text-[12px] text-[#8C7B6B] font-mono w-6">kg</span>
-                  </div>
-
-                  <div className="w-32 text-right flex-shrink-0">
-                    {line ? (
-                      <>
-                        <p className="text-[15px] text-[#2C2416] font-mono">{yen(line.amount)}</p>
-                        <p className="text-[11px] text-[#8C7B6B] font-mono">{yen(line.unitPrice)}/kg</p>
-                      </>
-                    ) : (
-                      <p className="text-[12px] text-[#8C7B6B] font-mono">—</p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <PriceLadder
-            special={account.specialPricing}
-            freeShipping={account.freeShipping}
-            handDelivery={handDelivery}
-          />
-        </section>
-
-        <section>
-          <h2 className="text-[13px] text-[#8C7B6B] font-mono tracking-[0.12em] uppercase mb-4">
-            {handDelivery ? 'ご連絡先' : '配送先'}
-          </h2>
-          {handDelivery && (
-            <p className="mb-4 text-[12px] text-[#8C7B6B] font-light">
-              御社へは当社が直接お届けするため、配送先住所のご入力は不要です。
-            </p>
-          )}
-          <div className={`${panel} p-6 space-y-5`}>
-            <div className="grid sm:grid-cols-2 gap-5">
-              <div>
-                <label className={label} htmlFor="contactName">ご担当者名</label>
-                <input id="contactName" className={input} value={contactName} onChange={(e) => setContactName(e.target.value)} required />
-              </div>
-              <div>
-                <label className={label} htmlFor="email">メールアドレス</label>
-                <input id="email" type="email" className={input} value={email} onChange={(e) => setEmail(e.target.value)} required />
-              </div>
-              <div>
-                <label className={label} htmlFor="phone">電話番号</label>
-                <input id="phone" type="tel" className={input} value={phone} onChange={(e) => setPhone(e.target.value)} />
-              </div>
-              {!handDelivery && (
-                <>
-                  <div>
-                    <label className={label} htmlFor="postalCode">郵便番号</label>
-                    <input id="postalCode" className={input} placeholder="XXX-XXXX" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} required />
-                  </div>
-                  <div>
-                    <label className={label} htmlFor="prefecture">都道府県</label>
-                    <select id="prefecture" className={input} value={prefecture} onChange={(e) => setPrefecture(e.target.value)} required>
-                      <option value="">選択してください</option>
-                      {PREFECTURES.map((pref) => (
-                        <option key={pref} value={pref}>{pref}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className={label} htmlFor="city">市区町村</label>
-                    <input id="city" className={input} value={city} onChange={(e) => setCity(e.target.value)} required />
-                  </div>
-                </>
-              )}
-            </div>
-            {!handDelivery && (
-              <>
-                <div>
-                  <label className={label} htmlFor="streetAddress">住所</label>
-                  <input id="streetAddress" className={input} value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} required />
-                </div>
-                <div>
-                  <label className={label} htmlFor="building">建物名・号室（任意）</label>
-                  <input id="building" className={input} value={building} onChange={(e) => setBuilding(e.target.value)} />
-                </div>
-              </>
-            )}
-            <div>
-              <label className={label} htmlFor="note">備考（挽き方・納品希望日など）</label>
-              <textarea id="note" rows={3} className={input} value={note} onChange={(e) => setNote(e.target.value)} />
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-[13px] text-[#8C7B6B] font-mono tracking-[0.12em] uppercase mb-4">お支払い方法</h2>
-          <div className={`${panel} p-6 space-y-3`}>
-            {([
-              { value: 'bank_transfer' as const, title: '銀行振込（前払い）', sub: 'ご注文後に振込先をご案内します。ご入金確認後に焙煎・発送いたします。' },
-              { value: 'card' as const, title: 'クレジットカード', sub: 'この場でお支払いが完了します。' },
-            ]).map((option) => (
-              <label
-                key={option.value}
-                className={`flex gap-3 p-4 rounded-sm cursor-pointer border transition-colors ${
-                  paymentMethod === option.value
-                    ? 'border-[#7AAFC4] bg-[#F4EFE4]'
-                    : 'border-[#DDD5C5] hover:bg-[#F4EFE4]'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value={option.value}
-                  checked={paymentMethod === option.value}
-                  onChange={() => setPaymentMethod(option.value)}
-                  className="mt-1"
-                />
-                <span>
-                  <span className="block text-[15px] text-[#2C2416] font-light">{option.title}</span>
-                  <span className="block text-[12px] text-[#8C7B6B] font-light">{option.sub}</span>
-                </span>
-              </label>
+          <div className="mt-10 space-y-px">
+            {WHOLESALE_BEANS.map((bean) => (
+              <BeanCard
+                key={bean.slug}
+                bean={bean}
+                kg={kgBySlug[bean.slug] ?? 0}
+                price={unitPrice(bean, account.specialPricing)}
+                pinned={account.specialPricing?.[bean.slug] !== undefined}
+                onSet={(kg) => setKg(bean.slug, kg)}
+                onBump={(delta) => bumpKg(bean.slug, delta)}
+              />
             ))}
           </div>
         </section>
 
-        <OrderSummary q={q} hint={hint} />
+        <OrderTerms freeShipping={account.freeShipping} handDelivery={handDelivery} />
 
-        {error && (
-          <p role="alert" className="text-[14px] text-[#A34A3A] font-light">
-            {error}
-          </p>
-        )}
+        <section className="max-w-3xl mx-auto px-6 pt-20 space-y-10">
+          <div>
+            <h2 className="text-[13px] text-[#8C7B6B] font-mono tracking-[0.12em] uppercase mb-4">
+              {handDelivery ? 'ご連絡先' : '配送先'}
+            </h2>
+            {handDelivery && (
+              <p className="mb-4 text-[12px] text-[#8C7B6B] font-light">
+                御社へは当社が直接お届けするため、配送先住所のご入力は不要です。
+              </p>
+            )}
+            <div className={`${panel} p-6 space-y-5`}>
+              <div className="grid sm:grid-cols-2 gap-5">
+                <div>
+                  <label className={label} htmlFor="contactName">ご担当者名</label>
+                  <input id="contactName" className={input} value={contactName} onChange={(e) => setContactName(e.target.value)} required />
+                </div>
+                <div>
+                  <label className={label} htmlFor="email">メールアドレス</label>
+                  <input id="email" type="email" className={input} value={email} onChange={(e) => setEmail(e.target.value)} required />
+                </div>
+                <div>
+                  <label className={label} htmlFor="phone">電話番号</label>
+                  <input id="phone" type="tel" className={input} value={phone} onChange={(e) => setPhone(e.target.value)} />
+                </div>
+                {!handDelivery && (
+                  <>
+                    <div>
+                      <label className={label} htmlFor="postalCode">郵便番号</label>
+                      <input id="postalCode" className={input} placeholder="XXX-XXXX" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} required />
+                    </div>
+                    <div>
+                      <label className={label} htmlFor="prefecture">都道府県</label>
+                      <select id="prefecture" className={input} value={prefecture} onChange={(e) => setPrefecture(e.target.value)} required>
+                        <option value="">選択してください</option>
+                        {PREFECTURES.map((pref) => (
+                          <option key={pref} value={pref}>{pref}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className={label} htmlFor="city">市区町村</label>
+                      <input id="city" className={input} value={city} onChange={(e) => setCity(e.target.value)} required />
+                    </div>
+                  </>
+                )}
+              </div>
+              {!handDelivery && (
+                <>
+                  <div>
+                    <label className={label} htmlFor="streetAddress">住所</label>
+                    <input id="streetAddress" className={input} value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} required />
+                  </div>
+                  <div>
+                    <label className={label} htmlFor="building">建物名・号室（任意）</label>
+                    <input id="building" className={input} value={building} onChange={(e) => setBuilding(e.target.value)} />
+                  </div>
+                </>
+              )}
+              <div>
+                <label className={label} htmlFor="note">備考（挽き方・個包装・納品希望日など）</label>
+                <textarea id="note" rows={3} className={input} value={note} onChange={(e) => setNote(e.target.value)} />
+              </div>
+            </div>
+          </div>
 
-        <button
-          type="submit"
-          disabled={submitting || q.totalKg < MIN_ORDER_KG}
-          className="w-full sm:w-auto bg-[#7AAFC4] text-[#2C2416] font-mono text-[13px] tracking-[0.08em] uppercase px-10 py-4 rounded-sm hover:bg-[#6A9DB3] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {submitting ? '送信中...' : paymentMethod === 'card' ? 'お支払いへ進む' : '注文を確定する'}
-        </button>
-      </form>
-    </main>
-  );
-}
-
-const GRADES: WholesaleGrade[] = ['economy', 'standard', 'premium'];
-
-function PriceLadder({
-  special,
-  freeShipping,
-  handDelivery,
-}: {
-  special: SpecialPricing | null;
-  freeShipping: boolean;
-  handDelivery: boolean;
-}) {
-  const pinned = GRADES.filter((g) => special?.[g] !== undefined);
-
-  return (
-    <div className="mt-4 text-[12px] text-[#8C7B6B] font-light space-y-3">
-      {pinned.length > 0 && (
-        <p>
-          御社は個別のお取り決め価格を適用しております（
-          {pinned.map((g) => `${GRADE_LABEL[g]} ${yen(special![g]!)}/kg`).join('・')}
-          、いずれも税抜）。
-        </p>
-      )}
-
-      {pinned.length < GRADES.length && (
-        <div>
-          <p className="mb-2">数量割引（合計kgで自動適用・税抜・送料別）</p>
-          <table className="font-mono border-separate border-spacing-x-6 border-spacing-y-1 -ml-0">
-            <thead>
-              <tr className="text-[#8C7B6B]">
-                <th className="text-left font-normal">数量</th>
-                {GRADES.filter((g) => !pinned.includes(g)).map((g) => (
-                  <th key={g} className="text-right font-normal">{GRADE_LABEL[g]}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {[...PRICE_TIERS].reverse().map((tier) => (
-                <tr key={tier.minKg}>
-                  <td className="text-left">{tier.label}</td>
-                  {GRADES.filter((g) => !pinned.includes(g)).map((g) => (
-                    <td key={g} className="text-right">{yen(tier[g])}/kg</td>
-                  ))}
-                </tr>
+          <div>
+            <h2 className="text-[13px] text-[#8C7B6B] font-mono tracking-[0.12em] uppercase mb-4">お支払い方法</h2>
+            <div className={`${panel} p-6 space-y-3`}>
+              {([
+                { value: 'bank_transfer' as const, title: '銀行振込（前払い）', sub: 'ご注文後に振込先をご案内します。ご入金確認後に焙煎・発送いたします。' },
+                { value: 'card' as const, title: 'クレジットカード', sub: 'この場でお支払いが完了します。' },
+              ]).map((option) => (
+                <label
+                  key={option.value}
+                  className={`flex gap-3 p-4 rounded-sm cursor-pointer border transition-colors ${
+                    paymentMethod === option.value
+                      ? 'border-[#7AAFC4] bg-[#F4EFE4]'
+                      : 'border-[#DDD5C5] hover:bg-[#F4EFE4]'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value={option.value}
+                    checked={paymentMethod === option.value}
+                    onChange={() => setPaymentMethod(option.value)}
+                    className="mt-1"
+                  />
+                  <span>
+                    <span className="block text-[15px] text-[#2C2416] font-light">{option.title}</span>
+                    <span className="block text-[12px] text-[#8C7B6B] font-light">{option.sub}</span>
+                  </span>
+                </label>
               ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            </div>
+            <p className="mt-3 text-[12px] text-[#8C7B6B] font-light">
+              継続的にお取引いただいている場合の月末締め・翌月末払いをご希望のときは、備考欄にご記入ください。
+            </p>
+          </div>
 
-      {handDelivery ? (
-        <p>御社へは当社が直接お届けいたします（送料はかかりません）。</p>
-      ) : freeShipping ? (
-        <p>送料は当社が負担いたします。</p>
-      ) : (
-      <div>
-        <p className="mb-2">送料（税抜・全国一律・箱数分を加算）</p>
-        <div className="flex flex-wrap gap-x-6 gap-y-1 font-mono">
-          {SHIPPING_BOXES.map((box, i) => (
-            <span key={box.label}>
-              〜{box.maxKg}kg {box.label} {yen(box.fee)}
-              {i === SHIPPING_BOXES.length - 1 ? '（超過分は箱を追加）' : ''}
-            </span>
-          ))}
-        </div>
-      </div>
-      )}
+          <OrderSummary q={q} hint={hint} />
+
+          {error && (
+            <p role="alert" className="text-[14px] text-[#A34A3A] font-light">
+              {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={submitting || q.totalKg < MIN_ORDER_KG}
+            className="w-full sm:w-auto bg-[#7AAFC4] text-[#2C2416] font-mono text-[13px] tracking-[0.08em] uppercase px-10 py-4 rounded-sm hover:bg-[#6A9DB3] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {submitting ? '送信中...' : paymentMethod === 'card' ? 'お支払いへ進む' : '注文を確定する'}
+          </button>
+        </section>
+      </form>
     </div>
   );
 }
 
-function OrderSummary({ q, hint }: { q: ReturnType<typeof quote>; hint: PriceBreakHint | null }) {
+// --- Story ---------------------------------------------------------------
+
+function Hero() {
+  return (
+    <section className="max-w-5xl mx-auto px-6 pt-20 pb-4">
+      <div className="grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] gap-10 lg:gap-14 items-center">
+        <div>
+          <p className={eyebrow}>Coffee made for your place.</p>
+          <h1 className="mt-5 text-[clamp(28px,4.4vw,48px)] font-light text-[#2C2416] tracking-tight leading-[1.25]">
+            葉山から、
+            <br />
+            そのお店らしい一杯を。
+          </h1>
+          <div className="mt-8 space-y-4 text-[15px] text-[#2C2416] font-light leading-[1.9]">
+            <p>
+              FELICITY COFFEE ROASTERS は、神奈川県葉山町に店舗と自社焙煎所を持つ
+              コーヒーロースターです。世界各地の個性あるシングルオリジンを選び、
+              葉山で一つひとつ焙煎しています。
+            </p>
+            <p className="text-[#8C7B6B]">
+              料理、空間、お客様、提供方法。大切にしたいことを伺いながら、
+              そのお店に合う一杯を、一緒につくります。
+            </p>
+          </div>
+        </div>
+
+        <Image
+          src="/wholesale/storefront.jpg"
+          alt="葉山の FELICITY COFFEE ROASTERS 店舗外観"
+          width={960}
+          height={1200}
+          priority
+          sizes="(max-width: 1024px) 100vw, 420px"
+          className="w-full h-auto rounded-sm"
+        />
+      </div>
+    </section>
+  );
+}
+
+const WHY = [
+  { no: '01', en: 'Roasted in Hayama', ja: '葉山の自社焙煎所から', body: '一つひとつ焙煎し、お店の一杯へつなぎます。' },
+  { no: '02', en: 'Single Origin', ja: '世界各地の個性を選ぶ', body: '約10種類の中から、目指す味わいをご相談。' },
+  { no: '03', en: 'Roast Customization', ja: '抽出に合わせる焙煎', body: 'ライト〜フレンチまで、提供スタイルに応じて調整。' },
+  { no: '04', en: 'Original Blend', ja: 'その店だけのブレンド', body: `料理やお客様に合わせ、専用のコーヒーを開発（${MIN_CUSTOM_BLEND_KG}kg〜）。` },
+  { no: '05', en: 'Brewing Support', ja: '淹れ方から考える提案', body: 'レシピ作成、スタッフへのご説明、豆紹介文のご提供まで。' },
+  { no: '06', en: 'Flexible Delivery', ja: '使いやすい形でお届け', body: '豆・粉・個包装に対応。挽き目も指定できます。' },
+];
+
+function WhyFelicity() {
+  return (
+    <section className="max-w-5xl mx-auto px-6 pt-20">
+      <p className={eyebrow}>Why Felicity</p>
+      <h2 className="mt-3 text-[clamp(24px,3.4vw,34px)] font-light text-[#2C2416] tracking-tight">
+        お店に合わせて、選べる・つくれる。
+      </h2>
+
+      <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-9">
+        {WHY.map((item) => (
+          <div key={item.no} className="border-t border-[#DDD5C5] pt-5">
+            <p className="font-mono text-[18px] font-light" style={{ color: GREEN }}>{item.no}</p>
+            <p className="mt-2 font-mono text-[10px] tracking-[0.18em] uppercase text-[#8C7B6B]">{item.en}</p>
+            <p className="mt-2 text-[16px] text-[#2C2416] font-light">{item.ja}</p>
+            <p className="mt-2 text-[13px] text-[#8C7B6B] font-light leading-relaxed">{item.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function RoastingQuality() {
+  const specs = [
+    { en: 'Equipment', body: 'PROBAT P05III（5kg）／ ROEST L100 Plus（サンプルロースト用）' },
+    { en: 'Roast Log', body: '投入温度・1ハゼ・ドロップ温度・DTR などを全ロットで記録' },
+    { en: 'Custom Roast', body: '受注内容に合わせ、ライト〜フレンチまでご相談いただけます' },
+  ];
+
+  return (
+    <section className="max-w-5xl mx-auto px-6 pt-20">
+      <p className={eyebrow}>Roasting &amp; Quality</p>
+      <h2 className="mt-3 text-[clamp(24px,3.4vw,34px)] font-light text-[#2C2416] tracking-tight">
+        いつもの一杯を、安定して。
+      </h2>
+
+      <div className="mt-10 grid lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1fr)] gap-8 lg:gap-12">
+        <Image
+          src="/wholesale/roasting-trier.jpg"
+          alt="PROBAT P05III の前で、トライヤーに取った豆の香りを確認しているところ"
+          width={619}
+          height={1100}
+          sizes="(max-width: 1024px) 100vw, 380px"
+          className="w-full h-auto rounded-sm"
+        />
+
+        <div>
+          <Image
+            src="/wholesale/roasting.jpg"
+            alt="焙煎カーブを見ながらプロファイルを調整しているところ"
+            width={1100}
+            height={733}
+            sizes="(max-width: 1024px) 100vw, 560px"
+            className="w-full h-auto rounded-sm"
+          />
+
+          <p className="mt-6 font-mono text-[10px] tracking-[0.18em] uppercase text-[#8C7B6B]">
+            Roasted in Hayama
+          </p>
+          <p className="mt-3 text-[15px] text-[#2C2416] font-light leading-[1.9]">
+            全ロットの焙煎記録をもとに、同じプロファイルで再現します。
+            お店が大切にする味わいを、日々の提供につなげます。
+          </p>
+
+          <dl className="mt-6">
+            {specs.map((spec) => (
+              <div key={spec.en} className="border-t border-[#DDD5C5] py-4">
+                <dt className="font-mono text-[10px] tracking-[0.18em] uppercase text-[#8C7B6B]">{spec.en}</dt>
+                <dd className="mt-1.5 text-[14px] text-[#2C2416] font-light leading-relaxed">{spec.body}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <p className="text-[12px] text-[#8C7B6B] font-light">
+            ご指定がない場合は、各銘柄の FELICITY 標準プロファイルで焙煎します。
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// 印刷版ガイドの COFFEE MAP と同じ二軸。x: 軽やか↔重厚、y: 深み↔華やか。
+function FlavourMap() {
+  const W = 620;
+  const H = 460;
+  const cx = W / 2;
+  const cy = H / 2;
+  const sx = 232;
+  const sy = 178;
+
+  // 近い点どうしでラベルが重なるので、混み合う銘柄だけ上に出し、左右にも逃がす。
+  const LABEL_NUDGE: Record<string, { above?: boolean; dx?: number; dy?: number }> = {
+    'yemen-white-camel-matari': { above: true },
+    'ethiopia-yirgacheffe-g1': { above: true, dx: -40 },
+    // イルガチェフェとラ・ファニーに挟まれるので、上へ逃がしたうえで左へずらす。
+    'png-baroida': { above: true, dx: -46, dy: -16 },
+    'india-attikan': { above: true, dx: 46 },
+    'el-salvador-la-fany': { dx: -14 },
+  };
+
+  return (
+    <section className="max-w-5xl mx-auto px-6 pt-20">
+      <p className={eyebrow}>Coffee Map</p>
+      <h2 className="mt-3 text-[clamp(24px,3.4vw,34px)] font-light text-[#2C2416] tracking-tight">
+        お店の一杯を、味わいから探す。
+      </h2>
+
+      <div className={`${panel} mt-8 p-4 sm:p-8`}>
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" role="img" aria-label="銘柄の味わいマップ">
+          <line x1={cx} y1={28} x2={cx} y2={H - 28} stroke="#DDD5C5" strokeWidth="1" />
+          <line x1={28} y1={cy} x2={W - 28} y2={cy} stroke="#DDD5C5" strokeWidth="1" />
+
+          <text x={cx} y={16} textAnchor="middle" fontSize="12" fill={MUTED}>華やか</text>
+          <text x={cx} y={H - 6} textAnchor="middle" fontSize="12" fill={MUTED}>深み</text>
+          <text x={6} y={cy - 8} fontSize="12" fill={MUTED}>軽やか</text>
+          <text x={W - 6} y={cy - 8} textAnchor="end" fontSize="12" fill={MUTED}>重厚</text>
+
+          {WHOLESALE_BEANS.map((bean) => {
+            const x = cx + bean.map.x * sx;
+            const y = cy - bean.map.y * sy;
+            const nudge = LABEL_NUDGE[bean.slug] ?? {};
+            const above = nudge.above ?? false;
+            const lx = x + (nudge.dx ?? 0);
+            const ly = y + (nudge.dy ?? 0);
+            const fill = bean.roast === 'シティ' ? '#B08D57' : '#6B4A2F';
+            return (
+              <g key={bean.slug}>
+                <circle cx={x} cy={y} r="13" fill="none" stroke="#DDD5C5" strokeWidth="1" />
+                <circle cx={x} cy={y} r="7" fill={fill} />
+                <text
+                  x={lx}
+                  y={above ? ly - 22 : ly + 30}
+                  textAnchor="middle"
+                  fontSize="11"
+                  fontWeight="600"
+                  fill={INK}
+                >
+                  {bean.origin}
+                </text>
+                <text
+                  x={lx}
+                  y={above ? ly - 10 : ly + 42}
+                  textAnchor="middle"
+                  fontSize="10"
+                  fill={MUTED}
+                >
+                  {bean.name}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+
+        <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-[11px] text-[#8C7B6B] font-light">
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-3 h-3 rounded-full" style={{ background: '#B08D57' }} />
+            標準焙煎 シティ
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-3 h-3 rounded-full" style={{ background: '#6B4A2F' }} />
+            標準焙煎 フルシティ
+          </span>
+          <span>焙煎度合いはご相談に応じて調整できます。</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// --- Catalogue + order ---------------------------------------------------
+
+function BeanCard({
+  bean,
+  kg,
+  price,
+  pinned,
+  onSet,
+  onBump,
+}: {
+  bean: WholesaleBean;
+  kg: number;
+  price: number | null;
+  pinned: boolean;
+  onSet: (kg: number) => void;
+  onBump: (delta: number) => void;
+}) {
+  const selected = kg > 0;
+
+  return (
+    <article
+      className={`${panel} p-6 sm:p-8 transition-colors ${selected ? 'ring-1 ring-[#7AAFC4]' : ''}`}
+    >
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)_minmax(0,0.85fr)] gap-6 lg:gap-10">
+        {/* 銘柄と価格 */}
+        <div>
+          <p className="font-mono text-[12px] tracking-[0.14em] uppercase text-[#2C2416]">{bean.origin}</p>
+          <h3 className="mt-1 text-[21px] font-light" style={{ color: GREEN }}>{bean.name}</h3>
+          <p className="mt-1 text-[13px] text-[#8C7B6B] font-light">{bean.nameJa}</p>
+          <p className="mt-3 text-[12px] font-light" style={{ color: '#9A7B3F' }}>
+            標準焙煎：{bean.roast}
+          </p>
+          <p className="mt-3 text-[20px] text-[#2C2416] font-mono font-light">
+            {price === null ? (
+              <>
+                ASK <span className="text-[13px] text-[#8C7B6B] font-light">都度お見積り</span>
+              </>
+            ) : (
+              <>
+                {yen(price)} <span className="text-[13px] text-[#8C7B6B]">/ kg</span>
+              </>
+            )}
+          </p>
+          {pinned && (
+            <p className="mt-1 font-mono text-[10px] tracking-[0.14em] uppercase" style={{ color: GREEN }}>
+              お取り決め価格
+            </p>
+          )}
+        </div>
+
+        {/* 味わいと物語 */}
+        <div>
+          <p className="text-[14px] font-medium leading-relaxed" style={{ color: GREEN }}>
+            {bean.notes.join(' / ')}
+          </p>
+          <p className="mt-3 text-[14px] text-[#2C2416] font-light leading-[1.9]">{bean.story}</p>
+        </div>
+
+        {/* 生産背景 */}
+        <dl className="text-[12px] text-[#8C7B6B] font-light space-y-1.5">
+          <div>{bean.region}</div>
+          {bean.producer && <div>{bean.producer}</div>}
+          <div className="pt-1.5 flex gap-3">
+            <dt className="w-10 flex-shrink-0">標高</dt>
+            <dd className="text-[#2C2416]">{bean.elevation}</dd>
+          </div>
+          <div className="flex gap-3">
+            <dt className="w-10 flex-shrink-0">品種</dt>
+            <dd className="text-[#2C2416]">{bean.variety}</dd>
+          </div>
+          <div className="flex gap-3">
+            <dt className="w-10 flex-shrink-0">精製</dt>
+            <dd className="text-[#2C2416]">{bean.process}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div className="mt-6 pt-5 border-t border-[#DDD5C5] flex items-center justify-between gap-4 flex-wrap">
+        {price === null ? (
+          <p className="text-[13px] text-[#8C7B6B] font-light">
+            相場と入荷ロットにより価格が変わるため、ご希望の数量をメールでお知らせください。
+          </p>
+        ) : (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              aria-label={`${bean.name} を1kg減らす`}
+              onClick={() => onBump(-1)}
+              className="w-9 h-9 border border-[#DDD5C5] bg-[#F4EFE4] text-[#8C7B6B] rounded-sm hover:text-[#2C2416] transition-colors"
+            >
+              −
+            </button>
+            <input
+              type="number"
+              min={0}
+              step={1}
+              inputMode="numeric"
+              aria-label={`${bean.name} の数量（kg）`}
+              value={kg === 0 ? '' : kg}
+              placeholder="0"
+              onChange={(e) => onSet(Number(e.target.value))}
+              className="w-20 text-center bg-[#F4EFE4] border border-[#DDD5C5] px-2 py-2 text-[15px] text-[#2C2416] font-mono rounded-sm focus:outline-none focus:border-[#8C7B6B]"
+            />
+            <button
+              type="button"
+              aria-label={`${bean.name} を1kg増やす`}
+              onClick={() => onBump(1)}
+              className="w-9 h-9 border border-[#DDD5C5] bg-[#F4EFE4] text-[#8C7B6B] rounded-sm hover:text-[#2C2416] transition-colors"
+            >
+              +
+            </button>
+            <span className="text-[12px] text-[#8C7B6B] font-mono ml-1">kg</span>
+          </div>
+        )}
+
+        {price !== null && (
+          <p className="text-[15px] text-[#2C2416] font-mono">
+            {selected ? yen(price * kg) : <span className="text-[#8C7B6B] text-[13px]">—</span>}
+          </p>
+        )}
+      </div>
+    </article>
+  );
+}
+
+function OrderTerms({ freeShipping, handDelivery }: { freeShipping: boolean; handDelivery: boolean }) {
+  const rows: { en: string; value: string }[] = [
+    { en: 'Minimum Order', value: `1回 ${MIN_ORDER_KG}kg 〜・1銘柄につき ${MIN_KG_PER_BEAN}kg 〜（月間最低量はありません）` },
+    { en: 'Custom Blend', value: `オリジナルブレンドは ${MIN_CUSTOM_BLEND_KG}kg 〜` },
+    { en: 'Shipping', value: `ご注文から発送まで約${LEAD_TIME_DAYS}日` },
+    {
+      en: 'Delivery Fee',
+      value: handDelivery
+        ? '御社へは当社が直接お届けいたします（送料はかかりません）'
+        : freeShipping
+          ? '送料は当社が負担いたします'
+          : `ご注文金額（税抜）${yen(FREE_SHIPPING_THRESHOLD)}以上で送料無料。未満は下記の箱サイズで加算されます`,
+    },
+    { en: 'Payment', value: '銀行振込またはクレジットカード。継続のお客様は月末締め・翌月末払いもご相談ください' },
+    { en: 'Package', value: '標準はアロマバルブ付きの業務用アルミバッグ。豆・粉・個包装に対応し、追加料金はいただきません' },
+  ];
+
+  return (
+    <section className="max-w-5xl mx-auto px-6 pt-20">
+      <p className={eyebrow}>Wholesale / Order</p>
+      <h2 className="mt-3 text-[clamp(24px,3.4vw,34px)] font-light text-[#2C2416] tracking-tight">
+        必要な分から、継続しやすく。
+      </h2>
+
+      <dl className="mt-10">
+        {rows.map((row) => (
+          <div key={row.en} className="grid sm:grid-cols-[180px_minmax(0,1fr)] gap-2 sm:gap-8 border-t border-[#DDD5C5] py-5">
+            <dt className="font-mono text-[10px] tracking-[0.18em] uppercase text-[#8C7B6B] sm:pt-1">{row.en}</dt>
+            <dd className="text-[15px] text-[#2C2416] font-light leading-relaxed">{row.value}</dd>
+          </div>
+        ))}
+      </dl>
+
+      {!handDelivery && !freeShipping && (
+        <div className="mt-2 text-[12px] text-[#8C7B6B] font-light">
+          <p className="mb-2">送料（税抜・箱数分を加算・目安）</p>
+          <div className="flex flex-wrap gap-x-6 gap-y-1 font-mono">
+            {SHIPPING_BOXES.map((box, i) => (
+              <span key={box.label}>
+                〜{box.maxKg}kg {box.label} {yen(box.fee)}
+                {i === SHIPPING_BOXES.length - 1 ? '（超過分は箱を追加）' : ''}
+              </span>
+            ))}
+          </div>
+          <p className="mt-2">
+            北海道・沖縄・離島宛、および大口のお届けは実費が異なります。確定金額はご注文後にご案内します。
+          </p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function OrderSummary({ q, hint }: { q: ReturnType<typeof quote>; hint: FreeShippingHint | null }) {
   return (
     <section>
       <h2 className="text-[13px] text-[#8C7B6B] font-mono tracking-[0.12em] uppercase mb-4">ご注文内容</h2>
@@ -504,15 +802,12 @@ function OrderSummary({ q, hint }: { q: ReturnType<typeof quote>; hint: PriceBre
               </div>
             </div>
 
-            {!q.usesSpecialPricing && (
-              <p className="mt-4 text-[12px] text-[#8C7B6B] font-mono tracking-[0.06em]">
-                適用単価帯: {q.tier.label}
-              </p>
-            )}
+            <p className="mt-4 text-[12px] text-[#8C7B6B] font-mono tracking-[0.06em]">
+              適用価格: {q.priceBasis}
+            </p>
             {hint && (
               <p className="mt-1 text-[12px] text-[#B8860B] font-light">
-                あと {hint.addKg}kg 追加すると「{hint.nextTierLabel}」の単価が適用され、
-                合計が {yen(hint.saving)} 以上お安くなります。
+                あと {yen(hint.remaining)}（税抜）で送料無料になります（送料 {yen(hint.saving)} 分）。
               </p>
             )}
           </>
@@ -646,7 +941,7 @@ function OrderConfirmation({ confirmation, onReset }: { confirmation: Confirmati
             <div className="text-[13px] pt-4 border-t border-[#DDD5C5] space-y-2">
               <p className="text-[#B8860B]">ご注文から7日以内にお振込みください。</p>
               <p className="text-[#8C7B6B]">振込時のご依頼人名にご注文番号をご記載ください。</p>
-              <p className="text-[#8C7B6B]">ご入金確認後、焙煎の手配をいたします。</p>
+              <p className="text-[#8C7B6B]">ご入金確認後、焙煎の手配をいたします（発送まで約{LEAD_TIME_DAYS}日）。</p>
             </div>
           </div>
         ) : (
@@ -656,7 +951,7 @@ function OrderConfirmation({ confirmation, onReset }: { confirmation: Confirmati
               <span>お支払い金額:</span>
               <span className="font-mono">{yen(confirmation.amount)}</span>
             </div>
-            <p>焙煎の手配をいたします。</p>
+            <p>焙煎の手配をいたします（発送まで約{LEAD_TIME_DAYS}日）。</p>
           </div>
         )}
       </div>

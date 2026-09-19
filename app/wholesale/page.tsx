@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { WHOLESALE_COOKIE, verifySession } from '@/app/lib/wholesale-auth';
-import type { SpecialPricing } from '@/app/lib/wholesale';
+import type { BeanPrices } from '@/app/lib/wholesale';
 import { WholesaleOrder, type WholesaleAccount } from './WholesaleOrder';
 
 // Reads a session cookie and per-account pricing — never cache this page.
@@ -21,7 +21,7 @@ export default async function WholesalePage() {
   const { data } = await supabase
     .from('wholesale_accounts')
     .select(
-      'code, company, contact_name, email, phone, postal_code, prefecture, city, street_address, building, special_price_economy, special_price_standard, special_price_premium, free_shipping, delivery_method, must_change_password, active'
+      'code, company, contact_name, email, phone, postal_code, prefecture, city, street_address, building, special_prices, free_shipping, delivery_method, must_change_password, active'
     )
     .eq('code', session.code)
     .maybeSingle();
@@ -44,11 +44,14 @@ export default async function WholesalePage() {
     city: data.city ?? '',
     streetAddress: data.street_address ?? '',
     building: data.building ?? '',
+    // Same shape the order API recomputes from — see `specialPricingOf`.
     specialPricing: (() => {
-      const special: SpecialPricing = {};
-      if (data.special_price_economy) special.economy = data.special_price_economy;
-      if (data.special_price_standard) special.standard = data.special_price_standard;
-      if (data.special_price_premium) special.premium = data.special_price_premium;
+      const raw = data.special_prices;
+      if (!raw || typeof raw !== 'object') return null;
+      const special: BeanPrices = {};
+      for (const [slug, price] of Object.entries(raw)) {
+        if (typeof price === 'number' && Number.isFinite(price) && price > 0) special[slug] = price;
+      }
       return Object.keys(special).length > 0 ? special : null;
     })(),
     freeShipping: data.free_shipping,
