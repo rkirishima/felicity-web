@@ -4,10 +4,11 @@
 //   node scripts/create-wholesale-account.mjs \
 //     --code JOLT --company "JOLT the COFFEE" --contact "粂原 茂人" \
 //     --email jolt@example.com --password 'xxxxxxxx' \
-//     --prices 'png-baroida=5200,colombia-decaf=6000'
+//     --prices 'png-baroida=5200,colombia-decaf=6000' --min-kg 1
 //
 // --prices はお取り決め価格（税抜/kg）。銘柄の slug は app/lib/wholesale.ts の
 // WHOLESALE_BEANS に合わせる。省略すれば価格表どおりの銘柄別卸価格になる。
+// --min-kg は1回のご注文の最低数量。省略すれば3kg。
 //
 // --email is what the customer types at the login screen; --code stays the
 // internal key used by orders and invoices.
@@ -57,6 +58,16 @@ function parsePrices(spec) {
   return prices;
 }
 
+function parseMinKg(value) {
+  if (!value) return 3;
+  const kg = Number(value);
+  if (!Number.isInteger(kg) || kg < 1) {
+    console.error(`--min-kg は1以上の整数で指定してください: "${value}"`);
+    process.exit(1);
+  }
+  return kg;
+}
+
 const args = {};
 for (let i = 2; i < process.argv.length; i += 2) {
   const k = process.argv[i].replace(/^--/, '');
@@ -91,6 +102,8 @@ const row = {
   street_address: args['street-address'] ?? null,
   building: args.building ?? null,
   special_prices: parsePrices(args.prices),
+  // 最低ロットは既定3kg。ご要望のあった取引先だけ --min-kg で下げる。
+  min_order_kg: parseMinKg(args['min-kg']),
   free_shipping: args['free-shipping'] === 'true',
   delivery_method: args['delivery'] === 'hand' ? 'hand_delivery' : 'shipping',
   // 発行・再発行したパスワードは常に一時的なもの。取引先が自分で決め直すまで注文画面には入れない。
@@ -116,6 +129,7 @@ if (pinned.length > 0) {
 } else {
   console.log('   価格表どおりの銘柄別卸価格を適用');
 }
+console.log(`   最低ロット: ${row.min_order_kg}kg/回`);
 console.log(
   row.delivery_method === 'hand_delivery'
     ? '   直接お届け（送料なし）'

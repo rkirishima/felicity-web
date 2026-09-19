@@ -272,8 +272,17 @@ export function isOrderable(bean: WholesaleBean, special?: BeanPrices | null): b
 //
 // 価格表（WHOLESALE / ORDER）の条件をそのまま定数にしたもの。
 
-/** 1回のご注文の最低数量。 */
-export const MIN_ORDER_KG = 2;
+// 1回のご注文の最低数量。価格表は「1回 2kg〜」だが運用は3kgから縛り、
+// ご要望に応じて取引先ごとに下げ下ろす（wholesale_accounts.min_order_kg）。
+export const DEFAULT_MIN_ORDER_KG = 3;
+
+/** 取引先の最低ロット。未設定・不正値は既定に倒す。 */
+export function minOrderKg(accountMinKg?: number | null): number {
+  return Number.isInteger(accountMinKg) && (accountMinKg as number) >= 1
+    ? (accountMinKg as number)
+    : DEFAULT_MIN_ORDER_KG;
+}
+
 /** 1銘柄あたりの最低数量。 */
 export const MIN_KG_PER_BEAN = 1;
 /** オリジナルブレンドの最低数量（フォーム外・ご相談ベース）。 */

@@ -11,7 +11,7 @@ import {
   LEAD_TIME_DAYS,
   MIN_CUSTOM_BLEND_KG,
   MIN_KG_PER_BEAN,
-  MIN_ORDER_KG,
+  minOrderKg,
   SHIPPING_BOXES,
   WHOLESALE_BEANS,
   freeShippingHint,
@@ -38,6 +38,8 @@ export type WholesaleAccount = {
   streetAddress: string;
   building: string;
   specialPricing: BeanPrices | null;
+  /** 1回のご注文の最低数量(kg)。取引先ごとに異なる。 */
+  minOrderKg: number;
   freeShipping: boolean;
   deliveryMethod: DeliveryMethod;
 };
@@ -90,6 +92,8 @@ export function WholesaleOrder({ account }: { account: WholesaleAccount }) {
     [account.freeShipping, account.deliveryMethod],
   );
   const handDelivery = account.deliveryMethod === 'hand_delivery';
+  // サーバー側でも同じ値で弾く。ここは入力を止めるためだけのもの。
+  const minKg = minOrderKg(account.minOrderKg);
   const q = useMemo(() => quote(items, account.specialPricing, terms), [items, account.specialPricing, terms]);
 
   // 3万円の手前で止まっている注文にだけ、あといくらで送料が消えるかを出す。
@@ -114,7 +118,7 @@ export function WholesaleOrder({ account }: { account: WholesaleAccount }) {
   const bumpKg = (slug: string, delta: number) => updateKg(slug, (current) => current + delta);
 
   function validate(): string | null {
-    if (q.totalKg < MIN_ORDER_KG) return `ご注文は合計${MIN_ORDER_KG}kgから承ります。`;
+    if (q.totalKg < minKg) return `ご注文は合計${minKg}kgから承ります。`;
     if (!contactName.trim()) return 'ご担当者名を入力してください。';
     if (!email.trim()) return 'メールアドレスを入力してください。';
     if (!handDelivery && (!postalCode.trim() || !prefecture || !city.trim() || !streetAddress.trim()))
@@ -230,7 +234,7 @@ export function WholesaleOrder({ account }: { account: WholesaleAccount }) {
           </h2>
           <p className="mt-4 max-w-2xl text-[14px] text-[#8C7B6B] font-light leading-relaxed">
             価格はすべて1kgあたり・税抜です。{MIN_KG_PER_BEAN}kg単位でご指定いただけます
-            （1回のご注文は合計{MIN_ORDER_KG}kgから）。挽き・個包装の追加料金はいただきません。
+            （1回のご注文は合計{minKg}kgから）。挽き・個包装の追加料金はいただきません。
           </p>
 
           <div className="mt-10 space-y-px">
@@ -248,7 +252,7 @@ export function WholesaleOrder({ account }: { account: WholesaleAccount }) {
           </div>
         </section>
 
-        <OrderTerms freeShipping={account.freeShipping} handDelivery={handDelivery} />
+        <OrderTerms minKg={minKg} freeShipping={account.freeShipping} handDelivery={handDelivery} />
 
         <section className="max-w-3xl mx-auto px-6 pt-20 space-y-10">
           <div>
@@ -360,7 +364,7 @@ export function WholesaleOrder({ account }: { account: WholesaleAccount }) {
 
           <button
             type="submit"
-            disabled={submitting || q.totalKg < MIN_ORDER_KG}
+            disabled={submitting || q.totalKg < minKg}
             className="w-full sm:w-auto bg-[#7AAFC4] text-[#2C2416] font-mono text-[13px] tracking-[0.08em] uppercase px-10 py-4 rounded-sm hover:bg-[#6A9DB3] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {submitting ? '送信中...' : paymentMethod === 'card' ? 'お支払いへ進む' : '注文を確定する'}
@@ -715,9 +719,17 @@ function BeanCard({
   );
 }
 
-function OrderTerms({ freeShipping, handDelivery }: { freeShipping: boolean; handDelivery: boolean }) {
+function OrderTerms({
+  minKg,
+  freeShipping,
+  handDelivery,
+}: {
+  minKg: number;
+  freeShipping: boolean;
+  handDelivery: boolean;
+}) {
   const rows: { en: string; value: string }[] = [
-    { en: 'Minimum Order', value: `1回 ${MIN_ORDER_KG}kg 〜・1銘柄につき ${MIN_KG_PER_BEAN}kg 〜（月間最低量はありません）` },
+    { en: 'Minimum Order', value: `1回 ${minKg}kg 〜・1銘柄につき ${MIN_KG_PER_BEAN}kg 〜（月間最低量はありません）` },
     { en: 'Custom Blend', value: `オリジナルブレンドは ${MIN_CUSTOM_BLEND_KG}kg 〜` },
     { en: 'Shipping', value: `ご注文から発送まで約${LEAD_TIME_DAYS}日` },
     {

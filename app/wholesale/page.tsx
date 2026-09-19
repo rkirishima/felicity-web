@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { WHOLESALE_COOKIE, verifySession } from '@/app/lib/wholesale-auth';
-import type { BeanPrices } from '@/app/lib/wholesale';
+import { minOrderKg, type BeanPrices } from '@/app/lib/wholesale';
 import { WholesaleOrder, type WholesaleAccount } from './WholesaleOrder';
 
 // Reads a session cookie and per-account pricing — never cache this page.
@@ -21,7 +21,7 @@ export default async function WholesalePage() {
   const { data } = await supabase
     .from('wholesale_accounts')
     .select(
-      'code, company, contact_name, email, phone, postal_code, prefecture, city, street_address, building, special_prices, free_shipping, delivery_method, must_change_password, active'
+      'code, company, contact_name, email, phone, postal_code, prefecture, city, street_address, building, special_prices, min_order_kg, free_shipping, delivery_method, must_change_password, active'
     )
     .eq('code', session.code)
     .maybeSingle();
@@ -54,6 +54,7 @@ export default async function WholesalePage() {
       }
       return Object.keys(special).length > 0 ? special : null;
     })(),
+    minOrderKg: minOrderKg(data.min_order_kg),
     freeShipping: data.free_shipping,
     deliveryMethod: data.delivery_method === 'hand_delivery' ? 'hand_delivery' : 'shipping',
   };

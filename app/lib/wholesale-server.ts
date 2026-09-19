@@ -17,6 +17,8 @@ export type AccountRecord = {
   phone: string | null;
   /** 銘柄別のお取り決め単価。{ slug: 税抜/kg }。空なら価格表どおり。 */
   special_prices: BeanPrices | null;
+  /** 1回のご注文の最低数量(kg)。 */
+  min_order_kg: number | null;
   free_shipping: boolean;
   delivery_method: DeliveryMethod;
   active: boolean;
@@ -43,7 +45,7 @@ export async function currentAccount(
   const { data } = await supabase
     .from('wholesale_accounts')
     .select(
-      'code, company, contact_name, email, phone, special_prices, free_shipping, delivery_method, active'
+      'code, company, contact_name, email, phone, special_prices, min_order_kg, free_shipping, delivery_method, active'
     )
     .eq('code', session.code)
     .maybeSingle();
