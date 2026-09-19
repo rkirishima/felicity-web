@@ -9,6 +9,7 @@
 // --prices はお取り決め価格（税抜/kg）。銘柄の slug は app/lib/wholesale.ts の
 // WHOLESALE_BEANS に合わせる。省略すれば価格表どおりの銘柄別卸価格になる。
 // --min-kg は1回のご注文の最低数量。省略すれば3kg。
+// --extra-beans は価格表外の銘柄を、この取引先にだけ出すための slug（カンマ区切り）。
 //
 // --email is what the customer types at the login screen; --code stays the
 // internal key used by orders and invoices.
@@ -104,6 +105,9 @@ const row = {
   special_prices: parsePrices(args.prices),
   // 最低ロットは既定3kg。ご要望のあった取引先だけ --min-kg で下げる。
   min_order_kg: parseMinKg(args['min-kg']),
+  extra_beans: args['extra-beans']
+    ? args['extra-beans'].split(',').map((s) => s.trim()).filter(Boolean)
+    : [],
   free_shipping: args['free-shipping'] === 'true',
   delivery_method: args['delivery'] === 'hand' ? 'hand_delivery' : 'shipping',
   // 発行・再発行したパスワードは常に一時的なもの。取引先が自分で決め直すまで注文画面には入れない。
@@ -130,6 +134,9 @@ if (pinned.length > 0) {
   console.log('   価格表どおりの銘柄別卸価格を適用');
 }
 console.log(`   最低ロット: ${row.min_order_kg}kg/回`);
+if (row.extra_beans.length > 0) {
+  console.log(`   限定銘柄: ${row.extra_beans.join('・')}`);
+}
 console.log(
   row.delivery_method === 'hand_delivery'
     ? '   直接お届け（送料なし）'

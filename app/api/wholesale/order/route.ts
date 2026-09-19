@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { beanBySlug, isHandDelivery, isOrderable, minOrderKg, quote } from '@/app/lib/wholesale';
+import { beanBySlug, canOrderBean, isHandDelivery, isOrderable, minOrderKg, quote } from '@/app/lib/wholesale';
 import { notifyWholesaleOrderToTelegram } from '@/lib/telegram';
 import {
   createSquareWholesaleOrder,
   currentAccount,
+  extraBeansOf,
   serviceClient,
   specialPricingOf,
   termsOf,
@@ -51,6 +52,16 @@ export async function POST(request: NextRequest) {
   }
 
   const special = specialPricingOf(account);
+  const extraBeans = extraBeansOf(account);
+
+  // 取引先限定の銘柄は、許可されていない先から slug を直接投げられても通さない。
+  const notAllowed = items.find((it: { slug?: string; kg?: number }) => {
+    const bean = it?.slug ? beanBySlug(it.slug) : undefined;
+    return bean && Number(it.kg) > 0 && !canOrderBean(bean, extraBeans);
+  });
+  if (notAllowed) {
+    return NextResponse.json({ error: 'お取り扱いのない銘柄が含まれています。' }, { status: 400 });
+  }
 
   // quote() drops quote-on-request beans silently so the live form stays
   // editable; ordering one is still a mistake worth naming.

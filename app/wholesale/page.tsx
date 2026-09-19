@@ -21,7 +21,7 @@ export default async function WholesalePage() {
   const { data } = await supabase
     .from('wholesale_accounts')
     .select(
-      'code, company, contact_name, email, phone, postal_code, prefecture, city, street_address, building, special_prices, min_order_kg, free_shipping, delivery_method, must_change_password, active'
+      'code, company, contact_name, email, phone, postal_code, prefecture, city, street_address, building, special_prices, min_order_kg, extra_beans, free_shipping, delivery_method, must_change_password, active'
     )
     .eq('code', session.code)
     .maybeSingle();
@@ -55,6 +55,9 @@ export default async function WholesalePage() {
       return Object.keys(special).length > 0 ? special : null;
     })(),
     minOrderKg: minOrderKg(data.min_order_kg),
+    extraBeans: Array.isArray(data.extra_beans)
+      ? data.extra_beans.filter((slug): slug is string => typeof slug === 'string')
+      : [],
     freeShipping: data.free_shipping,
     deliveryMethod: data.delivery_method === 'hand_delivery' ? 'hand_delivery' : 'shipping',
   };

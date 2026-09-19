@@ -19,6 +19,8 @@ export type AccountRecord = {
   special_prices: BeanPrices | null;
   /** 1回のご注文の最低数量(kg)。 */
   min_order_kg: number | null;
+  /** 価格表外で、この取引先にだけ出している銘柄の slug。 */
+  extra_beans: string[] | null;
   free_shipping: boolean;
   delivery_method: DeliveryMethod;
   active: boolean;
@@ -45,7 +47,7 @@ export async function currentAccount(
   const { data } = await supabase
     .from('wholesale_accounts')
     .select(
-      'code, company, contact_name, email, phone, special_prices, min_order_kg, free_shipping, delivery_method, active'
+      'code, company, contact_name, email, phone, special_prices, min_order_kg, extra_beans, free_shipping, delivery_method, active'
     )
     .eq('code', session.code)
     .maybeSingle();
@@ -65,6 +67,13 @@ export function specialPricingOf(account: AccountRecord): BeanPrices | null {
     if (typeof price === 'number' && Number.isFinite(price) && price > 0) special[slug] = price;
   }
   return Object.keys(special).length > 0 ? special : null;
+}
+
+// text[] は取り違えると全銘柄を素通しさせかねないので、文字列だけを通す。
+export function extraBeansOf(account: AccountRecord): string[] {
+  return Array.isArray(account.extra_beans)
+    ? account.extra_beans.filter((slug): slug is string => typeof slug === 'string')
+    : [];
 }
 
 export function termsOf(account: AccountRecord): QuoteTerms {

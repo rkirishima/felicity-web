@@ -16,6 +16,8 @@
 /** 標準焙煎。指定がなければこのプロファイルで焙煎する。 */
 export type RoastLabel = 'シティ' | 'フルシティ';
 
+// 価格表に載っている銘柄は紹介文まで揃っているが、取引先限定で回している豆は
+// 名前と価格しかないこともある。載っていない項目は表示ごと省く。
 export type WholesaleBean = {
   slug: string;
   /** 産地（COUNTRY）— 価格表の見出し */
@@ -24,23 +26,25 @@ export type WholesaleBean = {
   name: string;
   /** 和名 */
   nameJa: string;
-  roast: RoastLabel;
+  roast?: RoastLabel;
   /** 税抜/kg。null は「都度お見積り」— フォームからは注文させない。 */
   pricePerKg: number | null;
   /** カップの印象。価格表の見出しと同じ順で並べる。 */
-  notes: string[];
+  notes?: string[];
   /** 産地とつくり手の話。価格表の本文そのまま。 */
-  story: string;
-  region: string;
-  producer: string | null;
-  elevation: string;
-  variety: string;
-  process: string;
+  story?: string;
+  region?: string;
+  producer?: string | null;
+  elevation?: string;
+  variety?: string;
+  process?: string;
   // Green weight needed per 1kg roasted, i.e. 1 / roast yield. Used by the
   // green-bean requirement calculation, not by pricing.
   greenPerKg: number;
   /** フレーバーマップ上の位置。x: 軽やか(-1) ↔ 重厚(+1)、y: 深み(-1) ↔ 華やか(+1)。 */
-  map: { x: number; y: number };
+  map?: { x: number; y: number };
+  /** 価格表に載せない、取引先限定の銘柄。許可された取引先にだけ見える。 */
+  restricted?: boolean;
 };
 
 // The list quoted to trade customers, in price-sheet order.
@@ -244,10 +248,35 @@ export const WHOLESALE_BEANS: WholesaleBean[] = [
     greenPerKg: 1.19,
     map: { x: 0.28, y: 0.85 },
   },
+  // 価格表には載せていない、取引先限定の銘柄。
+  // 要確認: 卸単価と紹介文（標準焙煎・カップの印象・産地情報）は未確定。
+  // 単価は当面 CARBS の special_prices で持つ。
+  {
+    slug: 'brazil-santos',
+    origin: 'BRAZIL',
+    name: 'Santos No.2',
+    nameJa: 'ブラジル サントス No.2',
+    pricePerKg: null,
+    greenPerKg: 1.19,
+    restricted: true,
+  },
 ];
 
 export function beanBySlug(slug: string): WholesaleBean | undefined {
   return WHOLESALE_BEANS.find((b) => b.slug === slug);
+}
+
+/**
+ * その取引先に見せる銘柄。価格表の銘柄に、その先だけに出している豆
+ * （wholesale_accounts.extra_beans）を足したもの。
+ */
+export function beansFor(extraBeans?: readonly string[] | null): WholesaleBean[] {
+  const extra = new Set(extraBeans ?? []);
+  return WHOLESALE_BEANS.filter((bean) => !bean.restricted || extra.has(bean.slug));
+}
+
+export function canOrderBean(bean: WholesaleBean, extraBeans?: readonly string[] | null): boolean {
+  return !bean.restricted || (extraBeans ?? []).includes(bean.slug);
 }
 
 // --- Pricing ------------------------------------------------------------
@@ -380,7 +409,7 @@ export type QuoteLine = {
   slug: string;
   name: string;
   nameJa: string;
-  roast: RoastLabel;
+  roast?: RoastLabel;
   kg: number;
   unitPrice: number;
   amount: number;

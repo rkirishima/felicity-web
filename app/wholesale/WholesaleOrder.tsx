@@ -13,7 +13,7 @@ import {
   MIN_KG_PER_BEAN,
   minOrderKg,
   SHIPPING_BOXES,
-  WHOLESALE_BEANS,
+  beansFor,
   freeShippingHint,
   quote,
   unitPrice,
@@ -40,6 +40,8 @@ export type WholesaleAccount = {
   specialPricing: BeanPrices | null;
   /** 1回のご注文の最低数量(kg)。取引先ごとに異なる。 */
   minOrderKg: number;
+  /** 価格表外で、この取引先にだけ出している銘柄の slug。 */
+  extraBeans: string[];
   freeShipping: boolean;
   deliveryMethod: DeliveryMethod;
 };
@@ -95,6 +97,8 @@ export function WholesaleOrder({ account }: { account: WholesaleAccount }) {
   // サーバー側でも同じ値で弾く。ここは入力を止めるためだけのもの。
   const minKg = minOrderKg(account.minOrderKg);
   const q = useMemo(() => quote(items, account.specialPricing, terms), [items, account.specialPricing, terms]);
+  // 価格表の銘柄＋この取引先にだけ出している豆。
+  const beans = useMemo(() => beansFor(account.extraBeans), [account.extraBeans]);
 
   // 3万円の手前で止まっている注文にだけ、あといくらで送料が消えるかを出す。
   const hint = useMemo(
@@ -224,7 +228,7 @@ export function WholesaleOrder({ account }: { account: WholesaleAccount }) {
       <Hero />
       <WhyFelicity />
       <RoastingQuality />
-      <FlavourMap />
+      <FlavourMap beans={beans} />
 
       <form onSubmit={handleSubmit}>
         <section className="max-w-5xl mx-auto px-6 pt-20">
@@ -238,7 +242,7 @@ export function WholesaleOrder({ account }: { account: WholesaleAccount }) {
           </p>
 
           <div className="mt-10 space-y-px">
-            {WHOLESALE_BEANS.map((bean) => (
+            {beans.map((bean) => (
               <BeanCard
                 key={bean.slug}
                 bean={bean}
@@ -507,7 +511,7 @@ function RoastingQuality() {
 }
 
 // 印刷版ガイドの COFFEE MAP と同じ二軸。x: 軽やか↔重厚、y: 深み↔華やか。
-function FlavourMap() {
+function FlavourMap({ beans }: { beans: WholesaleBean[] }) {
   const W = 620;
   const H = 460;
   const cx = W / 2;
@@ -516,6 +520,11 @@ function FlavourMap() {
   const sy = 178;
 
   // 近い点どうしでラベルが重なるので、混み合う銘柄だけ上に出し、左右にも逃がす。
+  // 座標を持たない銘柄（取引先限定で紹介文のない豆）はマップに出さない。
+  const plotted = beans.filter(
+    (bean): bean is WholesaleBean & { map: { x: number; y: number } } => Boolean(bean.map),
+  );
+
   const LABEL_NUDGE: Record<string, { above?: boolean; dx?: number; dy?: number }> = {
     'yemen-white-camel-matari': { above: true },
     'ethiopia-yirgacheffe-g1': { above: true, dx: -40 },
@@ -542,7 +551,7 @@ function FlavourMap() {
           <text x={6} y={cy - 8} fontSize="12" fill={MUTED}>軽やか</text>
           <text x={W - 6} y={cy - 8} textAnchor="end" fontSize="12" fill={MUTED}>重厚</text>
 
-          {WHOLESALE_BEANS.map((bean) => {
+          {plotted.map((bean) => {
             const x = cx + bean.map.x * sx;
             const y = cy - bean.map.y * sy;
             const nudge = LABEL_NUDGE[bean.slug] ?? {};
@@ -623,9 +632,11 @@ function BeanCard({
           <p className="font-mono text-[12px] tracking-[0.14em] uppercase text-[#2C2416]">{bean.origin}</p>
           <h3 className="mt-1 text-[21px] font-light" style={{ color: GREEN }}>{bean.name}</h3>
           <p className="mt-1 text-[13px] text-[#8C7B6B] font-light">{bean.nameJa}</p>
-          <p className="mt-3 text-[12px] font-light" style={{ color: '#9A7B3F' }}>
-            標準焙煎：{bean.roast}
-          </p>
+          {bean.roast && (
+            <p className="mt-3 text-[12px] font-light" style={{ color: '#9A7B3F' }}>
+              標準焙煎：{bean.roast}
+            </p>
+          )}
           <p className="mt-3 text-[20px] text-[#2C2416] font-mono font-light">
             {price === null ? (
               <>
@@ -646,28 +657,38 @@ function BeanCard({
 
         {/* 味わいと物語 */}
         <div>
-          <p className="text-[14px] font-medium leading-relaxed" style={{ color: GREEN }}>
-            {bean.notes.join(' / ')}
-          </p>
-          <p className="mt-3 text-[14px] text-[#2C2416] font-light leading-[1.9]">{bean.story}</p>
+          {bean.notes && bean.notes.length > 0 && (
+            <p className="text-[14px] font-medium leading-relaxed" style={{ color: GREEN }}>
+              {bean.notes.join(' / ')}
+            </p>
+          )}
+          {bean.story && (
+            <p className="mt-3 text-[14px] text-[#2C2416] font-light leading-[1.9]">{bean.story}</p>
+          )}
         </div>
 
         {/* 生産背景 */}
         <dl className="text-[12px] text-[#8C7B6B] font-light space-y-1.5">
-          <div>{bean.region}</div>
+          {bean.region && <div>{bean.region}</div>}
           {bean.producer && <div>{bean.producer}</div>}
-          <div className="pt-1.5 flex gap-3">
-            <dt className="w-10 flex-shrink-0">標高</dt>
-            <dd className="text-[#2C2416]">{bean.elevation}</dd>
-          </div>
-          <div className="flex gap-3">
-            <dt className="w-10 flex-shrink-0">品種</dt>
-            <dd className="text-[#2C2416]">{bean.variety}</dd>
-          </div>
-          <div className="flex gap-3">
-            <dt className="w-10 flex-shrink-0">精製</dt>
-            <dd className="text-[#2C2416]">{bean.process}</dd>
-          </div>
+          {bean.elevation && (
+            <div className="pt-1.5 flex gap-3">
+              <dt className="w-10 flex-shrink-0">標高</dt>
+              <dd className="text-[#2C2416]">{bean.elevation}</dd>
+            </div>
+          )}
+          {bean.variety && (
+            <div className="flex gap-3">
+              <dt className="w-10 flex-shrink-0">品種</dt>
+              <dd className="text-[#2C2416]">{bean.variety}</dd>
+            </div>
+          )}
+          {bean.process && (
+            <div className="flex gap-3">
+              <dt className="w-10 flex-shrink-0">精製</dt>
+              <dd className="text-[#2C2416]">{bean.process}</dd>
+            </div>
+          )}
         </dl>
       </div>
 
