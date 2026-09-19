@@ -248,15 +248,15 @@ export const WHOLESALE_BEANS: WholesaleBean[] = [
     greenPerKg: 1.19,
     map: { x: 0.28, y: 0.85 },
   },
-  // 価格表には載せていない、取引先限定の銘柄。
-  // 要確認: 卸単価と紹介文（標準焙煎・カップの印象・産地情報）は未確定。
-  // 単価は当面 CARBS の special_prices で持つ。
+  // 価格表には載せていない、取引先限定の銘柄。単価は取引先ごとではなく
+  // 銘柄の卸価格として持つので、他の取引先に開けたときも同じ値段になる。
+  // 要確認: 紹介文（標準焙煎・カップの印象・産地情報）は未作成。
   {
     slug: 'brazil-santos',
     origin: 'BRAZIL',
     name: 'Santos No.2',
     nameJa: 'ブラジル サントス No.2',
-    pricePerKg: null,
+    pricePerKg: 4000,
     greenPerKg: 1.19,
     restricted: true,
   },
