@@ -250,13 +250,20 @@ export const WHOLESALE_BEANS: WholesaleBean[] = [
   },
   // 価格表には載せていない、取引先限定の銘柄。単価は取引先ごとではなく
   // 銘柄の卸価格として持つので、他の取引先に開けたときも同じ値段になる。
-  // 要確認: 紹介文（標準焙煎・カップの印象・産地情報）は未作成。
+  //
+  // 紹介文は felicity-staff の焙煎プロファイル（BRA_SANTOS）の風味記述に基づく。
+  // シティ: Nutty / Mild / Low Acidity / Easy Drinking、深煎り: Dark Chocolate /
+  // Smoke / Heavy Body。農園・標高・品種・精製は記録がないため載せない。
   {
     slug: 'brazil-santos',
     origin: 'BRAZIL',
     name: 'Santos No.2',
     nameJa: 'ブラジル サントス No.2',
+    roast: 'シティ',
     pricePerKg: 4000,
+    notes: ['ナッツ', 'ミルクチョコ', '酸味ひかえめ'],
+    story:
+      'サントス港から積み出される、ブラジルの定番銘柄。クセがなく、ナッツのような香ばしさとやわらかな甘さが素直に出ます。ミルクとの相性がよく、ブレンドのベースにも、毎日の一杯にも。深煎りにすれば、ダークチョコのような苦甘さと厚みのあるボディに変わります。',
     greenPerKg: 1.19,
     restricted: true,
   },
