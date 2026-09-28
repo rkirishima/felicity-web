@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Header } from "@/app/components/Header";
 import { MerchSection } from "@/app/components/MerchSection";
+import { WholesaleSection } from "@/app/components/WholesaleSection";
 import { CoffeeGrid } from "@/app/components/CoffeeGrid";
 import HeroCarousel from "@/app/components/HeroCarousel";
 import { getMessages } from "@/app/lib/translations";
@@ -117,6 +118,8 @@ export default function Home() {
       <MerchSection language="ja" apparel={homepage.merch.apparel} />
       {/* ── Experiences ─────────────────────────────────────────────────── */}
       <ExperiencesSection locale="ja" />
+      {/* ── Wholesale ───────────────────────────────────────────────── */}
+      <WholesaleSection locale="ja" />
       {/* ── News ─────────────────────────────────────────────────────── */}
       <section id="news" className="bg-[#EDE5D8] pt-20 pb-24">
         <div className="max-w-5xl mx-auto px-8">

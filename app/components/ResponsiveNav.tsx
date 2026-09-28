@@ -21,6 +21,7 @@ export function ResponsiveNav({ locale, pathname }: ResponsiveNavProps) {
     { label: 'COFFEE', href: '#coffee' },
     { label: 'GOODS', href: '#merch' },
     { label: 'EXPERIENCES', href: '#experiences' },
+    { label: 'WHOLESALE', href: '#wholesale' },
     { label: 'NEWS', href: newsLink },
     { label: 'VISIT', href: '#visit' },
   ];
@@ -31,8 +32,8 @@ export function ResponsiveNav({ locale, pathname }: ResponsiveNavProps) {
 
   return (
     <>
-      {/* Desktop Nav: Hidden on mobile, flex on sm+ */}
-      <nav className="hidden sm:flex items-center gap-8">
+      {/* Desktop Nav: 項目が7つあるので、収まる幅(lg)からしか出さない */}
+      <nav className="hidden lg:flex items-center gap-5 xl:gap-8">
         {navItems.map((item) => (
           <Link
             key={item.label}
@@ -44,8 +45,8 @@ export function ResponsiveNav({ locale, pathname }: ResponsiveNavProps) {
         ))}
       </nav>
 
-      {/* Mobile Hamburger Menu: Visible on mobile only */}
-      <div className="sm:hidden relative">
+      {/* Mobile Hamburger Menu: デスクトップナビが出ない幅ではこちら */}
+      <div className="lg:hidden relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle navigation menu"
