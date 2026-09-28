@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { WHOLESALE_COOKIE, verifySession } from '@/app/lib/wholesale-auth';
 
+// 価格の出ない公開ページ。完全一致でしか通さない。ここを前方一致にすると
+// /wholesale/order まで素通りして卸価格が漏れる。
+const WHOLESALE_PUBLIC_EXACT = ['/wholesale'];
+
 // Paths inside the wholesale area that must stay reachable without a session,
 // otherwise signing in would require already being signed in.
 const WHOLESALE_PUBLIC = ['/wholesale/login', '/api/wholesale/login'];
@@ -10,7 +14,10 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith('/wholesale') || pathname.startsWith('/api/wholesale')) {
-    if (WHOLESALE_PUBLIC.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+    if (
+      WHOLESALE_PUBLIC_EXACT.includes(pathname) ||
+      WHOLESALE_PUBLIC.some((p) => pathname === p || pathname.startsWith(`${p}/`))
+    ) {
       return NextResponse.next();
     }
 

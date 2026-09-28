@@ -131,6 +131,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
       },
     },
+    // 業販の公開ページ（/wholesale/ 配下は robots.txt で Disallow のまま）
+    {
+      url: `${BASE_URL}/wholesale`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    },
     // Contact pages
     {
       url: `${BASE_URL}/contact`,

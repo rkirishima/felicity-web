@@ -24,10 +24,9 @@ export function Footer({ locale }: FooterProps) {
             >
               {locale === 'ja' ? 'メール' : 'Email'}
             </a>
-            {/* The trade section itself stays unlinked; this points at the
-                enquiry block on the contact page. */}
+            {/* 価格の出ない公開ページへ。注文画面は引き続きノーリンク。 */}
             <a
-              href={locale === 'ja' ? '/contact#wholesale' : '/en/contact#wholesale'}
+              href="/wholesale"
               className="text-[#8C7B6B] hover:text-[#2C2416] transition-colors"
             >
               {locale === 'ja' ? '業販・卸売' : 'Wholesale'}

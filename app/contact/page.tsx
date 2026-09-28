@@ -205,8 +205,15 @@ export default function ContactPage() {
                 宛に、会社名・ご担当者名・ご連絡先・ご希望の豆と月あたりのご使用量を
                 お送りください。
               </p>
-              <p className="text-[13px] text-[#8C7B6B] font-light">
-                すでにお取引のあるお客さまは{' '}
+              <p className="text-[13px] text-[#8C7B6B] font-light leading-relaxed">
+                取扱銘柄やお届けの条件は{' '}
+                <a
+                  href="/wholesale"
+                  className="text-[#2C2416] underline underline-offset-2 hover:text-[#7AAFC4] transition-colors"
+                >
+                  業販のご案内
+                </a>
+                {' '}をご覧ください。すでにお取引のあるお客さまは{' '}
                 <a
                   href="/wholesale/login"
                   className="text-[#2C2416] underline underline-offset-2 hover:text-[#7AAFC4] transition-colors"

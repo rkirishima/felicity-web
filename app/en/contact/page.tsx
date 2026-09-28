@@ -207,8 +207,15 @@ export default function ContactPageEN() {
                 with your company, contact name, phone, and the coffees and
                 monthly volume you have in mind.
               </p>
-              <p className="text-[13px] text-[#8C7B6B] font-light">
-                Existing trade customers:{' '}
+              <p className="text-[13px] text-[#8C7B6B] font-light leading-relaxed">
+                Our coffees and delivery terms are on the{' '}
+                <a
+                  href="/wholesale"
+                  className="text-[#2C2416] underline underline-offset-2 hover:text-[#7AAFC4] transition-colors"
+                >
+                  wholesale page
+                </a>
+                . Existing trade customers{' '}
                 <a
                   href="/wholesale/login"
                   className="text-[#2C2416] underline underline-offset-2 hover:text-[#7AAFC4] transition-colors"
