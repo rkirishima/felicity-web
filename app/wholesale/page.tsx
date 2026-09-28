@@ -150,8 +150,8 @@ export default function WholesalePublicPage() {
         <div className={`${panel} mt-10 p-8 sm:p-10 grid md:grid-cols-2 gap-10`}>
           <div className="space-y-4">
             <p className="text-[15px] text-[#2C2416] font-light leading-[1.9]">
-              全銘柄から5種類まで、各15gの無料サンプルをお送りしています（送料無料）。
-              店舗名・所在地・提供方法・気になる豆をお知らせいただければ、豆選びからご相談いただけます。
+              気になる銘柄を3種類まで、各15gの無料サンプルをお送りしています（送料無料）。
+              店舗名・所在地・ご提供方法をお知らせのうえ、お問い合わせください。豆選びからご相談いただけます。
             </p>
             <p className="text-[14px] text-[#8C7B6B] font-light leading-relaxed">
               お見積り、焙煎度合いのご相談、抽出レシピの作成、スタッフの方への淹れ方のご説明、
