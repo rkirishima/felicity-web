@@ -65,7 +65,7 @@ const mailto =
 
 const TERMS: { en: string; value: string }[] = [
   { en: 'Minimum Order', value: '1回3kgから・1銘柄につき1kgから。月間の最低量はありません' },
-  { en: 'Custom Blend', value: 'オリジナルブレンドの開発は3kgから。初回のヒアリングと試作2回までは無料です' },
+  { en: 'Custom Blend', value: 'オリジナルブレンドの開発は3kgから。ヒアリングと試作を重ねて、そのお店の一杯を決めていきます' },
   { en: 'Lead Time', value: 'ご注文から発送まで約3日' },
   { en: 'Delivery', value: '宅配便でお届けします。ご注文金額に応じて送料無料になります' },
   { en: 'Payment', value: '銀行振込またはクレジットカード。継続のお取引では月末締めもご相談いただけます' },
@@ -150,7 +150,7 @@ export default function WholesalePublicPage() {
         <div className={`${panel} mt-10 p-8 sm:p-10 grid md:grid-cols-2 gap-10`}>
           <div className="space-y-4">
             <p className="text-[15px] text-[#2C2416] font-light leading-[1.9]">
-              気になる銘柄を3種類まで、各15gの無料サンプルをお送りしています（送料無料）。
+              気になる銘柄を3種類まで、サンプルのご用意が可能です。
               店舗名・所在地・ご提供方法をお知らせのうえ、お問い合わせください。豆選びからご相談いただけます。
             </p>
             <p className="text-[14px] text-[#8C7B6B] font-light leading-relaxed">

@@ -9,7 +9,7 @@ const COPY = {
     heading: '葉山から、そのお店らしい一杯を。',
     body: 'カフェ・レストラン・ホテル・オフィスさま向けに、自社焙煎のシングルオリジンを1kg単位でお届けしています。',
     detail:
-      '焙煎度合いのご相談、そのお店だけのオリジナルブレンドの開発、抽出レシピのご提案まで。まずは無料サンプルからお試しいただけます。',
+      '焙煎度合いのご相談、そのお店だけのオリジナルブレンドの開発、抽出レシピのご提案まで。まずはサンプルのご相談からどうぞ。',
     cta: '業販のご案内',
     login: '取引先ログイン',
     alt: '焙煎中の豆をトライヤーで確認しているところ',
@@ -19,7 +19,7 @@ const COPY = {
     heading: 'Coffee made for your place.',
     body: 'We supply cafés, restaurants, hotels and offices with our own roasted single origins, by the kilogram.',
     detail:
-      'Roast levels tuned to how you brew, original blends developed for your menu, and brewing recipes on request. Start with free samples.',
+      'Roast levels tuned to how you brew, original blends developed for your menu, and brewing recipes on request. Samples available on request.',
     cta: 'Wholesale',
     login: 'Trade sign in',
     alt: 'Checking the roast with a trier at the Probat',
