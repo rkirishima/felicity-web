@@ -21,6 +21,7 @@ import {
   type BeanPrices,
   type DeliveryMethod,
   type FreeShippingHint,
+  type RoastLabel,
   type WholesaleBean,
 } from '@/app/lib/wholesale';
 
@@ -54,6 +55,13 @@ type Confirmation = {
   amount: number;
 };
 
+// 味わいマップの点の色。焙煎が深くなるほど濃くする。
+const ROAST_DOT: Record<RoastLabel, string> = {
+  シティ: '#B08D57',
+  フルシティ: '#6B4A2F',
+  ダークロースト: '#3F2A1A',
+};
+
 // 印刷版ガイドと揃えた配色。紙の地色に、焙煎の深さを思わせる緑を一色だけ差す。
 const INK = '#2C2416';
 const MUTED = '#8C7B6B';
@@ -65,7 +73,7 @@ const input =
   'w-full bg-[#F4EFE4] border border-[#DDD5C5] px-4 py-3 text-[15px] text-[#2C2416] rounded-sm focus:outline-none focus:border-[#8C7B6B]';
 const eyebrow = 'font-mono text-[11px] tracking-[0.24em] uppercase text-[#8C7B6B]';
 
-export function WholesaleOrder({ account }: { account: WholesaleAccount }) {
+export function WholesaleOrder({ account, preview = false }: { account: WholesaleAccount; preview?: boolean }) {
   const router = useRouter();
 
   const [kgBySlug, setKgBySlug] = useState<Record<string, number>>({});
@@ -132,6 +140,7 @@ export function WholesaleOrder({ account }: { account: WholesaleAccount }) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (preview) return;
     const problem = validate();
     if (problem) {
       setError(problem);
@@ -368,10 +377,10 @@ export function WholesaleOrder({ account }: { account: WholesaleAccount }) {
 
           <button
             type="submit"
-            disabled={submitting || q.totalKg < minKg}
+            disabled={preview || submitting || q.totalKg < minKg}
             className="w-full sm:w-auto bg-[#7AAFC4] text-[#2C2416] font-mono text-[13px] tracking-[0.08em] uppercase px-10 py-4 rounded-sm hover:bg-[#6A9DB3] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {submitting ? '送信中...' : paymentMethod === 'card' ? 'お支払いへ進む' : '注文を確定する'}
+            {preview ? '下見用（注文は送信されません）' : submitting ? '送信中...' : paymentMethod === 'card' ? 'お支払いへ進む' : '注文を確定する'}
           </button>
         </section>
       </form>
@@ -558,7 +567,7 @@ function FlavourMap({ beans }: { beans: WholesaleBean[] }) {
             const above = nudge.above ?? false;
             const lx = x + (nudge.dx ?? 0);
             const ly = y + (nudge.dy ?? 0);
-            const fill = bean.roast === 'シティ' ? '#B08D57' : '#6B4A2F';
+            const fill = ROAST_DOT[bean.roast ?? 'フルシティ'];
             return (
               <g key={bean.slug}>
                 <circle cx={x} cy={y} r="13" fill="none" stroke="#DDD5C5" strokeWidth="1" />
@@ -588,14 +597,15 @@ function FlavourMap({ beans }: { beans: WholesaleBean[] }) {
         </svg>
 
         <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-[11px] text-[#8C7B6B] font-light">
-          <span className="flex items-center gap-2">
-            <span className="inline-block w-3 h-3 rounded-full" style={{ background: '#B08D57' }} />
-            標準焙煎 シティ
-          </span>
-          <span className="flex items-center gap-2">
-            <span className="inline-block w-3 h-3 rounded-full" style={{ background: '#6B4A2F' }} />
-            標準焙煎 フルシティ
-          </span>
+          {/* 凡例に出すのは、いま並んでいる銘柄で実際に使っている焙煎度だけ。 */}
+          {(Object.keys(ROAST_DOT) as RoastLabel[])
+            .filter((roast) => plotted.some((bean) => (bean.roast ?? 'フルシティ') === roast))
+            .map((roast) => (
+              <span key={roast} className="flex items-center gap-2">
+                <span className="inline-block w-3 h-3 rounded-full" style={{ background: ROAST_DOT[roast] }} />
+                標準焙煎 {roast}
+              </span>
+            ))}
           <span>焙煎度合いはご相談に応じて調整できます。</span>
         </div>
       </div>

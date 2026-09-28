@@ -14,7 +14,7 @@
 // account record — the browser's numbers are display only.
 
 /** 標準焙煎。指定がなければこのプロファイルで焙煎する。 */
-export type RoastLabel = 'シティ' | 'フルシティ';
+export type RoastLabel = 'シティ' | 'フルシティ' | 'ダークロースト';
 
 // 価格表に載っている銘柄は紹介文まで揃っているが、取引先限定で回している豆は
 // 名前と価格しかないこともある。載っていない項目は表示ごと省く。
@@ -252,19 +252,21 @@ export const WHOLESALE_BEANS: WholesaleBean[] = [
   // 銘柄の卸価格として持つので、他の取引先に開けたときも同じ値段になる。
   //
   // 紹介文は felicity-staff の焙煎プロファイル（BRA_SANTOS）の風味記述に基づく。
-  // シティ: Nutty / Mild / Low Acidity / Easy Drinking、深煎り: Dark Chocolate /
-  // Smoke / Heavy Body。農園・標高・品種・精製は記録がないため載せない。
+  // 標準はダークロースト: Dark Chocolate / Smoke / Heavy Body。浅めに振ると
+  // Nutty / Mild / Low Acidity。農園・標高・品種・精製は記録がないため載せない。
+  // 要確認: マップ上の位置は深煎りの味わいからの推定値。
   {
     slug: 'brazil-santos',
     origin: 'BRAZIL',
     name: 'Santos No.2',
     nameJa: 'ブラジル サントス No.2',
-    roast: 'シティ',
+    roast: 'ダークロースト',
     pricePerKg: 4000,
-    notes: ['ナッツ', 'ミルクチョコ', '酸味ひかえめ'],
+    notes: ['ダークチョコ', '香ばしいナッツ', '重厚なボディ'],
     story:
-      'サントス港から積み出される、ブラジルの定番銘柄。クセがなく、ナッツのような香ばしさとやわらかな甘さが素直に出ます。ミルクとの相性がよく、ブレンドのベースにも、毎日の一杯にも。深煎りにすれば、ダークチョコのような苦甘さと厚みのあるボディに変わります。',
+      'サントス港から積み出される、ブラジルの定番銘柄。深めに焼き込むことで、ダークチョコのような苦甘さと厚みのあるボディが出ます。ミルクに負けない味の芯があり、エスプレッソやカフェラテのベースに向く一本です。浅めに振れば、ナッツの香ばしさとやわらかな甘さの穏やかな表情にもなります。',
     greenPerKg: 1.19,
+    map: { x: 0.1, y: -0.78 },
     restricted: true,
   },
 ];
