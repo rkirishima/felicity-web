@@ -208,16 +208,17 @@ export async function POST(request: NextRequest) {
   // --- Auto-print product labels (same GTIN design as in-store POS) ---
   // Fires fire-and-forget — if the cafe is closed or the Pi is offline, the
   // order still completes and staff can re-print from /admin/label.
-  const labelPrintUrl = process.env.LABEL_PRINT_URL;
+  // Vercel の環境変数に末尾の改行が混ざっていたことがある。ヘッダー値に改行が
+  // あると fetch が送信前に例外を投げ、ラベルが一枚も印刷されなかった。
+  const labelPrintUrl = process.env.LABEL_PRINT_URL?.trim();
+  const labelPrintSecret = process.env.LABEL_PRINT_SECRET?.trim();
   if (labelPrintUrl && orderItems.length > 0) {
     try {
       const printRes = await fetch(labelPrintUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(process.env.LABEL_PRINT_SECRET
-            ? { 'x-label-print-secret': process.env.LABEL_PRINT_SECRET }
-            : {}),
+          ...(labelPrintSecret ? { 'x-label-print-secret': labelPrintSecret } : {}),
         },
         body: JSON.stringify({ items: orderItems }),
       });
