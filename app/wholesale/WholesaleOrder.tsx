@@ -205,6 +205,12 @@ export function WholesaleOrder({ account, preview = false }: { account: Wholesal
           </div>
           <div className="flex items-center gap-4 flex-shrink-0">
             <a
+              href="/wholesale/orders"
+              className="text-[11px] text-[#8C7B6B] font-mono tracking-[0.08em] uppercase hover:text-[#2C2416] transition-colors"
+            >
+              注文履歴
+            </a>
+            <a
               href="/wholesale/password"
               className="text-[11px] text-[#8C7B6B] font-mono tracking-[0.08em] uppercase hover:text-[#2C2416] transition-colors"
             >
@@ -762,13 +768,21 @@ function OrderConfirmation({ confirmation, onReset }: { confirmation: Confirmati
         )}
       </div>
 
-      <button
-        type="button"
-        onClick={onReset}
-        className="mt-8 text-[12px] text-[#8C7B6B] font-mono tracking-[0.08em] uppercase hover:text-[#2C2416] transition-colors"
-      >
-        続けて注文する
-      </button>
+      <div className="mt-8 flex justify-center gap-8">
+        <a
+          href="/wholesale/orders"
+          className="text-[12px] text-[#8C7B6B] font-mono tracking-[0.08em] uppercase hover:text-[#2C2416] transition-colors"
+        >
+          注文履歴・納品書
+        </a>
+        <button
+          type="button"
+          onClick={onReset}
+          className="text-[12px] text-[#8C7B6B] font-mono tracking-[0.08em] uppercase hover:text-[#2C2416] transition-colors"
+        >
+          続けて注文する
+        </button>
+      </div>
     </main>
   );
 }
