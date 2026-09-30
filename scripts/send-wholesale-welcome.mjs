@@ -79,8 +79,10 @@ const deliveryLines = handDelivery
     : ['ご注文金額（税抜）30,000円以上で送料無料。未満の場合は箱のサイズに応じて加算されます'];
 
 const hasSantos = (account.extra_beans ?? []).includes('brazil-santos');
+// サントスを取引先限定(extra_beans)で出している先は、ずっとサントスを使っている
+// お店なので「いつもの豆」として案内する。
 const beansLine = hasSantos
-  ? 'ブラジル サントス No.2（¥4,000/kg）ほか、シングルオリジン10銘柄をご用意しています。'
+  ? 'いつものブラジル サントス No.2（ダークロースト・¥4,000/kg）も、こちらからご注文いただけます。そのほか、シングルオリジン10銘柄をご用意しています。'
   : 'シングルオリジン10銘柄をご用意しています。';
 
 const orderPoints = [
