@@ -6,6 +6,7 @@ import sqlite3
 import json
 import os
 import queue
+import re
 import requests
 import threading
 import time
@@ -59,9 +60,27 @@ from barcode.writer import ImageWriter
 # ---------------------------------------------------------------------------
 
 PRINTER_MODEL    = "QL-820NWB"
-PRINTER_IP       = "192.168.11.33"
+PRINTER_MDNS     = "BRWF44EB4FE3E77.local"  # stable name from printer MAC — survives DHCP changes
+PRINTER_IP       = "192.168.11.33"          # refreshed via _refresh_printer_ip(); fallback if mDNS fails
 # brother_ql network backend accepts a bare IP (port defaults to 9100) — confirmed in source.
 # tcp://IP:PORT format is also accepted but not required.
+
+
+def _refresh_printer_ip() -> str:
+    """Re-resolve the printer's mDNS name so a DHCP address change never
+    strands us on a stale IP. Keeps the last known address on failure."""
+    global PRINTER_IP
+    try:
+        ip = socket.gethostbyname(PRINTER_MDNS)
+        if ip != PRINTER_IP:
+            print(f"[printer] {PRINTER_MDNS} resolved to {ip} (was {PRINTER_IP})", flush=True)
+        PRINTER_IP = ip
+    except OSError as e:
+        print(f"[printer] mDNS lookup failed ({e}) — keeping {PRINTER_IP}", flush=True)
+    return PRINTER_IP
+
+
+_refresh_printer_ip()
 
 # OPERATOR: verify LABEL_IDENTIFIER for your actual tape stock.
 #   "62" = 62mm continuous tape  → TAPE_WIDTH_PX 696 (matches this setting — likely correct).
@@ -168,7 +187,29 @@ def generate_barcode_image(code: str) -> Image.Image:
     return img.copy()
 
 
-def build_label(origin: str, weight: str, form: str, barcode_number: str) -> Image.Image:
+def weight_to_grams(weight: str) -> float:
+    """Parse "10g" / "200g" / "1kg" / "1Kg" into grams. 0 when unparseable."""
+    m = re.match(r"\s*(\d+(?:\.\d+)?)\s*(kg|g)\s*$", weight or "", re.IGNORECASE)
+    if not m:
+        return 0.0
+    n = float(m.group(1))
+    return n * 1000 if m.group(2).lower() == "kg" else n
+
+
+def expiry_months(form: str, weight: str, category: str | None = None) -> int:
+    """
+    賞味期限の月数。
+      ドリップパック (10g / category='drip') → 3ヶ月（個包装のため粉より長い）
+      粉 → 2ヶ月 ／ 豆 → 4ヶ月
+    """
+    grams = weight_to_grams(weight)
+    if category == "drip" or (0 < grams <= 10):
+        return 3
+    return 2 if form == "粉" else 4
+
+
+def build_label(origin: str, weight: str, form: str, barcode_number: str,
+                category: str | None = None) -> Image.Image:
     width_px  = PRINT_LENGTH_PX
     height_px = TAPE_WIDTH_PX
     margin    = 8
@@ -178,7 +219,7 @@ def build_label(origin: str, weight: str, form: str, barcode_number: str) -> Ima
     COL_W     = 130
 
     today       = datetime.now()
-    expiry_date = today + relativedelta(months=2 if form == "粉" else 4)
+    expiry_date = today + relativedelta(months=expiry_months(form, weight, category))
     expiry_str  = expiry_date.strftime("%Y年%m月")
 
     font_path      = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
@@ -272,6 +313,7 @@ def wake_printer(poll_timeout: float = 20.0) -> bool:
 
     Returns True when port 9100 is confirmed open, False on timeout.
     """
+    _refresh_printer_ip()  # pick up a new DHCP address before every wake cycle
     print(f"[wake_printer] Poking port 80 on {PRINTER_IP}…", flush=True)
     _tcp_connect(PRINTER_IP, 80, timeout=2.0)   # fire-and-forget wake poke
 
@@ -938,6 +980,7 @@ def label_print():
     item_type    = data.get("type", "ground")   # 'bean' | 'ground'
     gtin         = data.get("gtin")
     quantity     = max(1, min(99, int(data.get("quantity", 1))))
+    category     = data.get("category")         # 'drip' | 'retail' | 'wholesale'
 
     if not product_name or not size or not gtin:
         return jsonify({"error": "Missing required fields (product_name, size, gtin)"}), 400
@@ -945,7 +988,7 @@ def label_print():
     form   = "豆" if item_type == "bean" else "粉"
     queued = 0
     for i in range(quantity):
-        img = build_label(product_name, size, form, gtin)
+        img = build_label(product_name, size, form, gtin, category)
         enqueue_print(
             img,
             label        = f"Staff: {product_name} {size} ({form}) #{i+1}/{quantity}",
