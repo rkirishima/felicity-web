@@ -95,7 +95,7 @@ export function WholesaleOrder({ account, preview = false }: { account: Wholesal
   // 価格表の銘柄＋この取引先にだけ出している豆。
   const beans = useMemo(() => beansFor(account.extraBeans), [account.extraBeans]);
 
-  // 3万円の手前で止まっている注文にだけ、あといくらで送料が消えるかを出す。
+  // 送料無料ラインの手前で止まっている注文にだけ、あといくらで送料が消えるかを出す。
   const hint = useMemo(
     () => freeShippingHint(items, account.specialPricing, terms),
     [items, account.specialPricing, terms],

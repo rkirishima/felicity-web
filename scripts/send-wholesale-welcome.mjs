@@ -76,7 +76,7 @@ const deliveryLines = handDelivery
   ? [`${account.company}様は直接お届けのため、送料・配送先のご入力は不要です`]
   : account.free_shipping
     ? ['送料は当社が負担いたします']
-    : ['ご注文金額（税抜）30,000円以上で送料無料。未満の場合は箱のサイズに応じて加算されます'];
+    : ['ご注文金額（税抜）5,000円以上で送料無料'];
 
 const hasSantos = (account.extra_beans ?? []).includes('brazil-santos');
 // サントスを取引先限定(extra_beans)で出している先は、ずっとサントスを使っている

@@ -325,8 +325,11 @@ export const MIN_KG_PER_BEAN = 1;
 export const MIN_CUSTOM_BLEND_KG = 3;
 /** ご注文からお届けまでの目安。 */
 export const LEAD_TIME_DAYS = 3;
-/** この金額（税抜小計）以上で送料無料。 */
-export const FREE_SHIPPING_THRESHOLD = 30000;
+/**
+ * この金額（税抜小計）以上で送料無料。小売EC（CartContext）と同じ5,000円に揃えた。
+ * 価格表PDFは「3万円以上」のままなので、刷り直すときに合わせること。
+ */
+export const FREE_SHIPPING_THRESHOLD = 5000;
 
 // --- Shipping -----------------------------------------------------------
 //
@@ -334,7 +337,7 @@ export const FREE_SHIPPING_THRESHOLD = 30000;
 // 2.7L あるため、下表は容積から逆算した目安の積載量。
 //
 // 要確認: 金額はヤマト宅急便の関東→関東を想定した暫定値。価格表でも
-// 「3万円未満の送料：要確認」としているため、ここは目安として表示する。
+// 送料無料ライン未満の注文（最低ロットを下げた取引先の少量発送）でだけ使う目安。
 export type ShippingBox = {
   maxKg: number;
   label: string;
@@ -474,7 +477,7 @@ export function quote(
   const plan = shippingPlan(totalKg);
 
   // 手渡しなら運送便を使わないので送料そのものが発生しない。次に取引先ごとの
-  // 当社負担、最後に価格表の3万円以上送料無料。
+  // 当社負担、最後に送料無料ライン（FREE_SHIPPING_THRESHOLD）。
   const shippingBasis: ShippingBasis =
     totalKg === 0
       ? 'none'
@@ -525,7 +528,7 @@ export type FreeShippingHint = {
   saving: number;
 };
 
-// 3万円の手前で止まっている注文に、あといくらで送料が消えるかを出す。
+// 送料無料ラインの手前で止まっている注文に、あといくらで送料が消えるかを出す。
 // 送料を払わない取引先には出さない。
 export function freeShippingHint(
   items: OrderLineInput[],
