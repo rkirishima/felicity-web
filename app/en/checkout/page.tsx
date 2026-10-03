@@ -6,6 +6,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { Header } from '@/app/components/Header';
 import { CheckoutForm } from '@/app/components/CheckoutForm';
 import { useCart } from '@/app/hooks/useCart';
+import { FELICITY_BANK } from '@/app/lib/bank';
 
 const translations = {
   ja: {
@@ -117,11 +118,11 @@ function CheckoutPageContent({ language = 'ja' }: { language: 'ja' | 'en' }) {
                   <div className="text-left space-y-4">
                     <p className="text-[14px] text-[#2C2416] font-light">{t.bankTransferNote}</p>
                     <div className="space-y-2 text-[14px] text-[#8C7B6B]">
-                      <div className="flex justify-between"><span>{t.bankName}:</span><span>住信SBIネット銀行</span></div>
-                      <div className="flex justify-between"><span>{t.branchName}:</span><span>法人第一支店</span></div>
-                      <div className="flex justify-between"><span>{t.accountType}:</span><span>普通</span></div>
-                      <div className="flex justify-between"><span>{t.accountNumber}:</span><span>2373525</span></div>
-                      <div className="flex justify-between"><span>{t.accountHolder}:</span><span>フェリシティ</span></div>
+                      <div className="flex justify-between"><span>{t.bankName}:</span><span>{FELICITY_BANK.bankName}</span></div>
+                      <div className="flex justify-between"><span>{t.branchName}:</span><span>{FELICITY_BANK.branchName}</span></div>
+                      <div className="flex justify-between"><span>{t.accountType}:</span><span>{FELICITY_BANK.accountType}</span></div>
+                      <div className="flex justify-between"><span>{t.accountNumber}:</span><span>{FELICITY_BANK.accountNumber}</span></div>
+                      <div className="flex justify-between"><span>{t.accountHolder}:</span><span>{FELICITY_BANK.accountHolder}</span></div>
                       {orderAmount && (
                         <div className="flex justify-between font-light text-[#2C2416]">
                           <span>{t.transferAmount}:</span>

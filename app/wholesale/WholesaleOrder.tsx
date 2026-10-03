@@ -25,6 +25,7 @@ import {
   type RoastLabel,
   type WholesaleBean,
 } from '@/app/lib/wholesale';
+import { FELICITY_BANK } from '@/app/lib/bank';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -740,11 +741,11 @@ function OrderConfirmation({ confirmation, onReset }: { confirmation: Confirmati
           <div className="space-y-3">
             <p className="text-[14px] text-[#2C2416] font-light">下記の口座にお振込みをお願いいたします。</p>
             <div className="space-y-2 text-[14px] text-[#8C7B6B]">
-              <div className="flex justify-between"><span>銀行名:</span><span>住信SBIネット銀行</span></div>
-              <div className="flex justify-between"><span>支店名:</span><span>法人第一支店</span></div>
-              <div className="flex justify-between"><span>口座種別:</span><span>普通</span></div>
-              <div className="flex justify-between"><span>口座番号:</span><span>2373525</span></div>
-              <div className="flex justify-between"><span>口座名義:</span><span>フェリシティ</span></div>
+              <div className="flex justify-between"><span>銀行名:</span><span>{FELICITY_BANK.bankName}</span></div>
+              <div className="flex justify-between"><span>支店名:</span><span>{FELICITY_BANK.branchName}</span></div>
+              <div className="flex justify-between"><span>口座種別:</span><span>{FELICITY_BANK.accountType}</span></div>
+              <div className="flex justify-between"><span>口座番号:</span><span>{FELICITY_BANK.accountNumber}</span></div>
+              <div className="flex justify-between"><span>口座名義:</span><span>{FELICITY_BANK.accountHolder}</span></div>
               <div className="flex justify-between text-[#2C2416]">
                 <span>お振込み金額:</span>
                 <span className="font-mono">{yen(confirmation.amount)}</span>

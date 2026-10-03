@@ -6,6 +6,7 @@ import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-
 import { useCart } from '@/app/hooks/useCart';
 import { PREFECTURES } from '@/lib/prefectures';
 import { GrindOption, grindLabel } from '@/app/lib/grind';
+import { FELICITY_BANK } from '@/app/lib/bank';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -382,11 +383,11 @@ export function CheckoutForm({ language = 'ja', onSuccess, onError }: CheckoutFo
             <div className="mt-4 p-4 bg-[#F4EFE4] rounded-sm text-[14px]">
               <div className="font-light text-[#2C2416] mb-4">{t.bankDetails}</div>
               <div className="space-y-2 text-[#8C7B6B]">
-                <div className="flex justify-between"><span>{t.bankName}:</span><span>住信SBIネット銀行</span></div>
-                <div className="flex justify-between"><span>{t.branchName}:</span><span>法人第一支店</span></div>
-                <div className="flex justify-between"><span>{t.accountType}:</span><span>普通</span></div>
-                <div className="flex justify-between"><span>{t.accountNumber}:</span><span>2373525</span></div>
-                <div className="flex justify-between"><span>{t.accountHolder}:</span><span>フェリシティ</span></div>
+                <div className="flex justify-between"><span>{t.bankName}:</span><span>{FELICITY_BANK.bankName}</span></div>
+                <div className="flex justify-between"><span>{t.branchName}:</span><span>{FELICITY_BANK.branchName}</span></div>
+                <div className="flex justify-between"><span>{t.accountType}:</span><span>{FELICITY_BANK.accountType}</span></div>
+                <div className="flex justify-between"><span>{t.accountNumber}:</span><span>{FELICITY_BANK.accountNumber}</span></div>
+                <div className="flex justify-between"><span>{t.accountHolder}:</span><span>{FELICITY_BANK.accountHolder}</span></div>
                 <div className="text-[12px] mt-4 pt-4 border-t border-[#DDD5C5]">{t.transferDeadline}</div>
               </div>
             </div>
