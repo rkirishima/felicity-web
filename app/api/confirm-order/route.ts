@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     id: i.id,
     name: i.name,
     qty: i.qty || 1,
-    grind: i.grind ?? 'whole',
+    grind: i.grind,
   })) || [];
 
   // --- Square Order with fulfillment ---
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
         name: withGrindNote(item.name, item.grind),
         quantity: String(item.qty),
         base_price_money: { amount: 0, currency: 'JPY' },
-        note: `ECサイト注文｜挽き方: ${grindNote(item.grind)}`,
+        note: item.grind ? `ECサイト注文｜挽き方: ${grindNote(item.grind)}` : 'ECサイト注文',
       }))
     : [{
         name: `EC注文 ¥${amount}`,

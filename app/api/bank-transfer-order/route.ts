@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     name: withGrindNote(item.name, item.grind),
     quantity: String(item.quantity || 1),
     base_price_money: { amount: 0, currency: 'JPY' },
-    note: `銀行振込注文｜挽き方: ${grindNote(item.grind)}`,
+    note: item.grind ? `銀行振込注文｜挽き方: ${grindNote(item.grind)}` : '銀行振込注文',
   }));
 
   const orderPayload = {
