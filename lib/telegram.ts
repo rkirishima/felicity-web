@@ -134,3 +134,30 @@ export async function notifyWholesaleOrderToTelegram(order: WholesaleNotificatio
     console.error('[telegram] wholesale notification error:', err);
   }
 }
+
+// お客様がメールのリンクから銀行振込注文をキャンセルしたときの通知。
+// Never throws.
+export async function notifyOrderCancelToTelegram(order: { orderId: string; customerName: string; amount: number }): Promise<void> {
+  const token = process.env.TELEGRAM_ORDERS_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_ORDERS_CHAT_ID;
+  if (!token || !chatId) return;
+
+  const text = [
+    '❌ 注文キャンセル（お客様操作）',
+    '',
+    `注文番号: ${order.orderId}`,
+    `名前: ${order.customerName}`,
+    `金額: ¥${order.amount.toLocaleString('ja-JP')}`,
+  ].join('\n');
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text }),
+    });
+    if (!res.ok) console.error('[telegram] cancel notify failed:', res.status, await res.text().catch(() => ''));
+  } catch (err) {
+    console.error('[telegram] cancel notify error:', err);
+  }
+}
