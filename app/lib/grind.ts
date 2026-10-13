@@ -73,7 +73,9 @@ export function grindNote(grind: GrindOption | undefined, locale: Locale = 'ja')
 // Used in human-facing order records (Square note, email, Telegram). The clean
 // `name` field is kept separate so the label printer's size-suffix parser still
 // works; grind is also passed to the printer as its own field.
+// 豆以外（grind なし）は名前そのまま。
 export function withGrindNote(name: string, grind: GrindOption | undefined, locale: Locale = 'ja'): string {
+  if (!grind) return name;
   const note = grindNote(grind, locale);
   return locale === 'en' ? `${name} (${note})` : `${name}（${note}）`;
 }

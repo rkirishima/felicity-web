@@ -39,7 +39,7 @@ export async function notifyOrderToTelegram(order: OrderNotification): Promise<v
 
   const itemLines =
     (order.items || [])
-      .map((it) => `・${it.name}（${grindNote(it.grind)}）×${it.quantity ?? it.qty ?? 1}`)
+      .map((it) => `・${it.grind ? `${it.name}（${grindNote(it.grind)}）` : it.name}×${it.quantity ?? it.qty ?? 1}`)
       .join('\n') || '（明細なし）';
 
   const lines: string[] = [
