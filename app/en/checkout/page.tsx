@@ -56,6 +56,7 @@ function CheckoutPageContent({ language = 'ja' }: { language: 'ja' | 'en' }) {
   const searchParams = useSearchParams();
   const items = useCart((state) => state.items);
   const clearCart = useCart((state) => state.clearCart);
+  const getShippingCost = useCart((state) => state.getShippingCost);
   const _hasHydrated = useCart((state) => state._hasHydrated);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -170,7 +171,8 @@ function CheckoutPageContent({ language = 'ja' }: { language: 'ja' | 'en' }) {
                   <CheckoutForm
                     language={language}
                     onSuccess={(id, method) => {
-                      const totalAmount = items.reduce((sum, item) => sum + item.price * (item.quantity ?? 1), 0);
+                      // 送料込み（注文メール・決済額と同じ金額）
+                      const totalAmount = items.reduce((sum, item) => sum + item.price * (item.quantity ?? 1), 0) + getShippingCost();
                       router.push(`${checkoutUrl}?confirmed=true&orderId=${id}&method=${method}&amount=${totalAmount}`);
                     }}
                     onError={(error) => {
