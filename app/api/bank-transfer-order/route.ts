@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { notifyOrderToTelegram } from '@/lib/telegram';
+import { sendBankTransferOrderEmail } from '@/lib/bank-transfer-email';
 import { GrindOption, grindNote, withGrindNote } from '@/app/lib/grind';
 
 export async function POST(request: NextRequest) {
@@ -86,6 +87,8 @@ export async function POST(request: NextRequest) {
     console.error('Supabase insert error (bank transfer):', dbError);
     return NextResponse.json({ error: 'Database insert failed' }, { status: 500 });
   }
+
+  await sendBankTransferOrderEmail({ orderId, email, fullName, shippingAddress, items, amount });
 
   await notifyOrderToTelegram({
     orderId,
