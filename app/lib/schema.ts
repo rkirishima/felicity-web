@@ -30,27 +30,30 @@ const BUSINESS_INFO = {
   phone: "+81-80-8758-4368",
   email: "info@felicity.cafe",
   priceRange: "¥¥",
+  // 出典は Googleビジネスプロフィール（2026-10-14 時点）。
+  // 金曜は定休のため、意図的に dayOfWeek から外してある。
+  // ここを直すときは messages/{ja,en}.json と contact ページも必ず一緒に直すこと。
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",
-      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday"],
       opens: "11:00",
       closes: "17:00",
     },
     {
       "@type": "OpeningHoursSpecification",
       dayOfWeek: ["Saturday", "Sunday"],
-      opens: "09:00",
+      opens: "10:00",
       closes: "17:00",
     },
     {
       "@type": "OpeningHoursSpecification",
       dayOfWeek: "https://schema.org/PublicHolidays",
-      opens: "09:00",
+      opens: "10:00",
       closes: "17:00",
     },
   ],
-  closedDays: [],
+  closedDays: ["Friday"],
 };
 
 /**

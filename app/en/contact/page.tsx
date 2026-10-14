@@ -84,9 +84,9 @@ export default function ContactPageEN() {
                 Hours
               </h2>
               <div className="space-y-1 text-[15px] text-[#2C2416]">
-                <p>Mon – Fri — 11:00 – 17:00</p>
-                <p>Sat, Sun &amp; public holidays — 9:00 – 18:00</p>
-                <p className="text-[13px] text-[#8C7B6B] mt-2">Open daily through the summer</p>
+                <p>Mon – Thu — 11:00 – 17:00</p>
+                <p>Sat &amp; Sun — 10:00 – 17:00</p>
+                <p className="text-[13px] text-[#8C7B6B] mt-2">Closed on Fridays</p>
               </div>
             </div>
 

@@ -83,9 +83,9 @@ export default function ContactPage() {
                 営業時間
               </h2>
               <div className="space-y-1 text-[15px] text-[#2C2416]">
-                <p>月〜金 — 11:00 – 17:00</p>
-                <p>土・日・祝 — 9:00 – 18:00</p>
-                <p className="text-[13px] text-[#8C7B6B] mt-2">夏季は無休（毎日営業）</p>
+                <p>月〜木 — 11:00 – 17:00</p>
+                <p>土・日 — 10:00 – 17:00</p>
+                <p className="text-[13px] text-[#8C7B6B] mt-2">定休日：金曜</p>
               </div>
             </div>
 
