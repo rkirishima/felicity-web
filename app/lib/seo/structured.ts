@@ -68,6 +68,17 @@ export function buildCafeSchema(maps?: MapsHours | null) {
   };
 }
 
+/**
+ * "¥2,800" → 2800。
+ * Product 型は priceYen を持つ版と持たない版があるため、どちらでも動くよう
+ * 表示用の price 文字列から数値を起こす。桁区切りのカンマを数字として拾うと
+ * ¥2,800 が 2 になるので、数字以外をまとめて落としてから一度に変換する。
+ */
+function priceToYen(price: string): number {
+  const digits = price.replace(/[^\d]/g, '');
+  return digits ? Number(digits) : 0;
+}
+
 export function buildProductSchema(p: (typeof products)[number]) {
   return {
     '@context': 'https://schema.org',
@@ -87,7 +98,7 @@ export function buildProductSchema(p: (typeof products)[number]) {
       '@type': 'Offer',
       url: `https://felicity.cafe/products/${p.slug}`,
       priceCurrency: 'JPY',
-      price: p.priceYen,
+      price: priceToYen(p.price),
       availability: 'https://schema.org/InStock',
       seller: { '@type': 'Organization', name: BUSINESS.name },
     },
