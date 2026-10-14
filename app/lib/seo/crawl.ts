@@ -5,12 +5,37 @@ import * as cheerio from 'cheerio';
 import type { PageSnapshot } from './types';
 
 const UA = 'FelicitySEOCoach/1.0 (+https://felicity.cafe)';
-/** 1リクエストごとの待ち時間(ms)。サイトに負荷をかけない。 */
-const DELAY_MS = 250;
+/**
+ * 1リクエストごとの待ち時間(ms)。
+ * 250ms で 24ページ + リンク確認を連続で叩いたところ、Vercel のボット対策
+ * （x-vercel-mitigated: challenge）に当たって全ページ 403 になった。
+ * 自分のサイトを自分で締め出しては意味がないので、間隔を広げている。
+ */
+const DELAY_MS = 500;
+const LINK_DELAY_MS = 250;
 /** 1回のスキャンで見る最大ページ数。Vercel の実行時間内に収める。 */
 export const MAX_PAGES = 24;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * ボット対策のチャレンジに当たったか。
+ *
+ * これを「リンク切れ」や「ページ取得失敗」として扱うと、実際には健全な
+ * サイトに赤い指摘が並んでしまう。誤った結果を出すくらいなら、
+ * 止まったことをそのまま伝えるほうがよい。
+ */
+export function isChallenge(res: Response, body?: string): boolean {
+  if (res.headers.get('x-vercel-mitigated') === 'challenge') return true;
+  if (res.headers.get('cf-mitigated') === 'challenge') return true;
+  if (res.status === 429) return true;
+  if (res.status === 403 && body) {
+    return /Vercel Security Checkpoint|Just a moment|cf-browser-verification|Attention Required/i.test(
+      body
+    );
+  }
+  return false;
+}
 
 async function get(url: string, timeoutMs = 10_000): Promise<Response> {
   const ac = new AbortController();
@@ -203,6 +228,10 @@ export function parsePage(url: string, status: number, html: string): PageSnapsh
 export interface CrawlResult {
   pages: PageSnapshot[];
   errors: string[];
+  /** ボット対策に当たって途中で打ち切ったか */
+  blocked: boolean;
+  /** 何秒後に再試行すればよいか（Retry-After があれば） */
+  retryAfterSec: number | null;
 }
 
 export async function crawlSite(baseUrl: string, limit = MAX_PAGES): Promise<CrawlResult> {
@@ -216,8 +245,10 @@ export async function crawlSite(baseUrl: string, limit = MAX_PAGES): Promise<Cra
 
   const pages: PageSnapshot[] = [];
   const visited = new Set<string>();
+  let blocked = false;
+  let retryAfterSec: number | null = null;
 
-  while (queue.length && pages.length < limit) {
+  while (queue.length && pages.length < limit && !blocked) {
     const url = queue.shift()!;
     const normalized = url.replace(/\/$/, '') || origin;
     if (visited.has(normalized)) continue;
@@ -232,6 +263,16 @@ export async function crawlSite(baseUrl: string, limit = MAX_PAGES): Promise<Cra
       const ct = res.headers.get('content-type') || '';
       if (!ct.includes('text/html')) continue;
       const html = await res.text();
+
+      // チャレンジに当たったら即座に打ち切る。待たされている相手に
+      // 残りを投げ続けても通らないし、対策を強めるだけ。
+      if (isChallenge(res, html)) {
+        blocked = true;
+        const ra = res.headers.get('retry-after');
+        retryAfterSec = ra && /^\d+$/.test(ra) ? Number(ra) : null;
+        break;
+      }
+
       const snap = parsePage(url, res.status, html);
       pages.push(snap);
 
@@ -246,35 +287,48 @@ export async function crawlSite(baseUrl: string, limit = MAX_PAGES): Promise<Cra
     }
   }
 
-  return { pages, errors };
+  return { pages, errors, blocked, retryAfterSec };
+}
+
+export interface LinkCheckResult {
+  broken: { url: string; status: number }[];
+  /** ボット対策で確認できなかったリンク。壊れているとは限らないので別枠。 */
+  blockedUrls: string[];
 }
 
 /**
- * リンク切れチェック。ページ本文から集めた外部/内部リンクを HEAD で確認する。
+ * リンク切れチェック。ページ本文から集めたリンクを確認する。
  * 件数が多いと時間がかかるので上限を設ける。
+ *
+ * チャレンジに当たったものは broken に入れない。自分が締め出されただけで
+ * 「リンクが切れています」と赤く出すと、直しようのない指摘になる。
  */
-export async function checkLinks(
-  urls: string[],
-  limit = 40
-): Promise<{ url: string; status: number }[]> {
+export async function checkLinks(urls: string[], limit = 30): Promise<LinkCheckResult> {
   const targets = [...new Set(urls)].slice(0, limit);
   const broken: { url: string; status: number }[] = [];
+  const blockedUrls: string[] = [];
 
   for (const url of targets) {
     try {
-      await sleep(80);
-      let res = await get(url, 7000).catch(() => null);
-      // HEAD を嫌うサーバーがあるので GET で取り直す運用にせず、
-      // 最初から GET で見ている(get() は GET)。失敗のみ記録。
+      await sleep(LINK_DELAY_MS);
+      const res = await get(url, 7000).catch(() => null);
       if (!res) {
         broken.push({ url, status: 0 });
         continue;
       }
-      if (res.status >= 400) broken.push({ url, status: res.status });
-      res = null;
+
+      if (res.status >= 400) {
+        // 403/429 はチャレンジの可能性があるので本文まで見て判定する。
+        const body = res.status === 403 ? await res.text().catch(() => '') : '';
+        if (isChallenge(res, body)) {
+          blockedUrls.push(url);
+          continue;
+        }
+        broken.push({ url, status: res.status });
+      }
     } catch {
       broken.push({ url, status: 0 });
     }
   }
-  return broken;
+  return { broken, blockedUrls };
 }

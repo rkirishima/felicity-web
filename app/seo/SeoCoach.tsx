@@ -41,6 +41,14 @@ const COPY = {
     error: 'チェックに失敗しました',
     speedFailed: '表示速度を計測できませんでした',
     speedRateLimited: 'Googleの計測が1日の上限に達しました。明日になれば計測できます。',
+    challengedTitle: 'サイトの自動アクセス対策に当たり、途中で止まりました',
+    challengedBody:
+      'felicity.cafe には、機械的な連続アクセスを一時的にブロックする仕組みが入っています。このチェックもそれに当たったため、結果が不正確にならないよう採点せずに中断しました。サイト自体は正常で、お客様の表示には影響ありません。',
+    challengedAction: (sec: number | null) =>
+      sec
+        ? `${sec}秒ほどおいてから、もう一度チェックしてください。`
+        : '数分おいてから、もう一度チェックしてください。',
+    noPages: 'サイトのページを取得できませんでした。時間をおいてお試しください。',
     speedKeyHint:
       '表示速度だけはGoogleの無料計測を使っており、鍵なしだと1日の回数制限にすぐ当たります。他の項目の結果には影響しません。',
     retry: '速度だけもう一度',
@@ -68,6 +76,12 @@ const COPY = {
     error: 'The check failed',
     speedFailed: 'Could not measure loading speed',
     speedRateLimited: "Google's daily measurement limit was reached. It will work again tomorrow.",
+    challengedTitle: 'Stopped early — the site’s bot protection kicked in',
+    challengedBody:
+      'felicity.cafe temporarily blocks rapid automated requests. This check hit that protection, so it stopped rather than scoring an incomplete crawl. The site itself is fine and visitors are unaffected.',
+    challengedAction: (sec: number | null) =>
+      sec ? `Wait about ${sec} seconds and run the check again.` : 'Wait a few minutes and run the check again.',
+    noPages: 'Could not fetch any pages. Please try again later.',
     speedKeyHint:
       "Loading speed uses Google's free measurement, which hits a daily limit without a key. Nothing else in this report is affected.",
     retry: 'Retry speed only',
@@ -125,6 +139,7 @@ export function SeoCoach() {
   const [speedLoading, setSpeedLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [challenged, setChallenged] = useState<{ retryAfterSec: number | null } | null>(null);
   const [tab, setTab] = useState<Tab>('top');
 
   const t = COPY[lang];
@@ -132,6 +147,7 @@ export function SeoCoach() {
   const run = async () => {
     setLoading(true);
     setError(null);
+    setChallenged(null);
     setSpeed(null);
     try {
       const res = await fetch('/api/seo/scan', {
@@ -140,7 +156,14 @@ export function SeoCoach() {
         body: JSON.stringify({ target: 'https://felicity.cafe' }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || t.error);
+      if (!res.ok) {
+        // 文面は言語に合わせて画面側で出すので、サーバーからはコードだけ受け取る。
+        if (data.code === 'challenged') {
+          setChallenged({ retryAfterSec: data.retryAfterSec ?? null });
+          return;
+        }
+        throw new Error(data.code === 'no_pages' ? t.noPages : t.error);
+      }
       setReport(data);
       setTab('top');
       measureSpeed();
@@ -216,6 +239,20 @@ export function SeoCoach() {
         )}
         {error && <p className="mt-3 text-[14px] text-[#C96A5B]">{error}</p>}
       </div>
+
+      {/* ボット対策で中断したとき。失敗ではなく「結果を出さなかった」理由を説明する。 */}
+      {challenged && (
+        <div className="mt-5 rounded-lg border border-[#D4A24C] bg-[#EDE5D8] p-5">
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#8C7B6B]">
+            {lang === 'ja' ? '中断しました' : 'Stopped'}
+          </p>
+          <h3 className="mt-1 text-[17px] font-medium leading-snug">{t.challengedTitle}</h3>
+          <p className="mt-3 text-[14px] leading-relaxed text-[#5C5248]">{t.challengedBody}</p>
+          <p className="mt-3 text-[14px] leading-relaxed text-[#2C2416]">
+            {t.challengedAction(challenged.retryAfterSec)}
+          </p>
+        </div>
+      )}
 
       {/* 表示速度 */}
       {(speed || speedLoading || speedError) && (

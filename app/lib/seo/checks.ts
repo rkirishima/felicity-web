@@ -44,7 +44,11 @@ function ok(
   return { id, severity: 'green', weight, category: 'page', ja, en };
 }
 
-export function runPageChecks(pages: PageSnapshot[], brokenLinks: { url: string; status: number }[]): Finding[] {
+export function runPageChecks(
+  pages: PageSnapshot[],
+  brokenLinks: { url: string; status: number }[],
+  uncheckedLinks: string[] = []
+): Finding[] {
   const findings: Finding[] = [];
   const indexable = pages.filter((p) => p.status === 200);
 
@@ -452,17 +456,25 @@ export function runPageChecks(pages: PageSnapshot[], brokenLinks: { url: string;
       },
     });
   } else {
+    const note =
+      uncheckedLinks.length > 0
+        ? `（${uncheckedLinks.length}件はアクセス制限のため確認できませんでした）`
+        : '';
+    const noteEn =
+      uncheckedLinks.length > 0
+        ? ` (${uncheckedLinks.length} could not be checked due to bot protection)`
+        : '';
     findings.push(
       ok(
         'broken-links-ok',
         70,
         {
-          title: 'リンク切れは見つかりませんでした',
+          title: `リンク切れは見つかりませんでした${note}`,
           impact: 'お客様がエラー画面に当たる心配はありません。',
           action: 'このまま維持してください。',
         },
         {
-          title: 'No broken links found',
+          title: `No broken links found${noteEn}`,
           impact: 'Visitors will not hit error pages.',
           action: 'Nothing to do.',
         }

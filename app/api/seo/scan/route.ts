@@ -24,11 +24,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'felicity.cafe 以外はスキャンできません' }, { status: 400 });
     }
 
-    const { pages, errors } = await crawlSite(target, MAX_PAGES);
+    const { pages, errors, blocked, retryAfterSec } = await crawlSite(target, MAX_PAGES);
+
+    // ボット対策に当たったら、途中までの結果で採点しない。
+    // 取れなかったページは「問題なし」でも「問題あり」でもなく、ただ不明。
+    // 中途半端なスコアを出すと、直す必要のないものを直させることになる。
+    if (blocked) {
+      return NextResponse.json(
+        {
+          code: 'challenged',
+          scannedPages: pages.length,
+          retryAfterSec,
+        },
+        { status: 503 }
+      );
+    }
 
     if (pages.length === 0) {
       return NextResponse.json(
-        { error: 'ページを1件も取得できませんでした', details: errors },
+        { code: 'no_pages', details: errors },
         { status: 502 }
       );
     }
@@ -36,10 +50,11 @@ export async function POST(request: NextRequest) {
     // リンク切れチェックは本数が多いと時間を食うので、
     // 内部リンク + 外部リンクを混ぜて上限を切る。
     const allLinks = [...new Set(pages.flatMap((p) => p.links))];
-    const [broken, maps] = await Promise.all([checkLinks(allLinks, 40), fetchMapsHours()]);
+    const [linkResult, maps] = await Promise.all([checkLinks(allLinks), fetchMapsHours()]);
+    const { broken, blockedUrls } = linkResult;
 
     const findings = [
-      ...runPageChecks(pages, broken),
+      ...runPageChecks(pages, broken, blockedUrls),
       ...runLocalChecks(pages, maps),
       ...runSchemaChecks(pages, maps),
     ];
