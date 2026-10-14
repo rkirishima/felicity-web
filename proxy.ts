@@ -30,7 +30,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/wholesale/login', request.url));
   }
 
-  // /doug — single shared secret, hidden rather than redirected.
+  // /doug と /seo — single shared secret, hidden rather than redirected.
+  // SEOコーチは Claude API とクロールを動かすので、公開したままにはしない。
+  // 専用の秘密鍵を増やすとスタッフに配る鍵が2本になるため、Doug と同じ
+  // doug_session（path:'/' で発行済み）をそのまま入館証として使う。
   const cookie = request.cookies.get('doug_session')?.value;
   const secret = process.env.DOUG_ACCESS_SECRET;
 
@@ -45,6 +48,8 @@ export const config = {
   matcher: [
     '/doug/:path*',
     '/api/doug/:path*',
+    '/seo/:path*',
+    '/api/seo/:path*',
     '/wholesale/:path*',
     '/api/wholesale/:path*',
   ],
