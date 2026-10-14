@@ -10,6 +10,7 @@ import {
   buildOrganizationSchema,
   buildProductSchema,
 } from '@/app/lib/seo/structured';
+import type { MapsHours } from '@/app/lib/seo/maps';
 
 type Lang = 'ja' | 'en';
 
@@ -19,7 +20,7 @@ const json = (o: unknown) => JSON.stringify(o, null, 2);
  * チェック結果と関係なく、いつでも貼れる JSON-LD を出す。
  * 全部が緑でも「新しい豆を足したからコードが欲しい」という使い方があるため。
  */
-export function SchemaGenerator({ lang }: { lang: Lang }) {
+export function SchemaGenerator({ lang, maps }: { lang: Lang; maps: MapsHours | null }) {
   const isEn = lang === 'en';
   const [bean, setBean] = useState(products[0].slug);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -31,9 +32,13 @@ export function SchemaGenerator({ lang }: { lang: Lang }) {
       id: 'cafe',
       ja: '店舗情報（トップページ用）',
       en: 'Shop info (for the homepage)',
-      noteJa: '貼ったあとに、実際の営業時間を openingHoursSpecification に足してください。',
-      noteEn: 'After pasting, add your real hours under openingHoursSpecification.',
-      code: json(buildCafeSchema()),
+      noteJa: maps
+        ? 'Googleマップの営業時間がそのまま入っています。マップを更新したらここを取り直してください。'
+        : 'Googleマップと接続していないため、営業時間は入っていません。間違った時間を載せないよう、あえて空にしています。',
+      noteEn: maps
+        ? 'Hours come straight from Google Maps. Re-copy this after you update Maps.'
+        : 'Not connected to Google Maps, so hours are left out on purpose rather than risking wrong ones.',
+      code: json(buildCafeSchema(maps)),
     },
     {
       id: 'product',

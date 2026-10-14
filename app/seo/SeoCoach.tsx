@@ -309,7 +309,7 @@ export function SeoCoach() {
                   <FindingCard key={f.id} finding={f} lang={lang} />
                 ))}
                 <div className="pt-4">
-                  <SchemaGenerator lang={lang} />
+                  <SchemaGenerator lang={lang} maps={report.maps} />
                 </div>
               </>
             )}

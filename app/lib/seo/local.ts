@@ -6,6 +6,7 @@
 // オーナーに決めてもらう。勝手に正解を決めて直させると実態とずれる。
 
 import type { Finding, PageSnapshot } from './types';
+import { hoursAsRanges, type MapsHours } from './maps';
 
 export const BUSINESS = {
   name: 'FELICITY COFFEE ROASTERS',
@@ -46,7 +47,7 @@ function digitsOnly(s: string): string {
   return s.replace(/[^\d]/g, '');
 }
 
-export function runLocalChecks(pages: PageSnapshot[]): Finding[] {
+export function runLocalChecks(pages: PageSnapshot[], maps: MapsHours | null = null): Finding[] {
   const findings: Finding[] = [];
   const live = pages.filter((p) => p.status === 200);
 
@@ -188,8 +189,9 @@ export function runLocalChecks(pages: PageSnapshot[]): Finding[] {
     });
   }
 
-  // ── 営業時間の食い違い ────────────────────────────────────────
-  // 「正解」を持たず、サイト内で割れていないかだけを見る。
+  // ── 営業時間 ──────────────────────────────────────────────────
+  // Googleマップが取れていればそれを正解として突き合わせる。
+  // 取れない場合のみ、サイト内で割れていないかだけを見る。
   const hoursByPage = new Map<string, string[]>();
   for (const p of live) {
     const hrs = [...new Set(extractHours(p.text))];
@@ -197,7 +199,9 @@ export function runLocalChecks(pages: PageSnapshot[]): Finding[] {
   }
   const allHourSets = [...new Set([...hoursByPage.values()].map((h) => h.sort().join(' / ')))];
 
-  if (hoursByPage.size === 0) {
+  if (maps && maps.regular.length > 0) {
+    findings.push(...compareWithMaps(hoursByPage, maps));
+  } else if (hoursByPage.size === 0) {
     findings.push({
       id: 'nap-hours-absent',
       severity: 'red',
@@ -257,6 +261,19 @@ export function runLocalChecks(pages: PageSnapshot[]): Finding[] {
   // ── Googleマップ埋め込み ──────────────────────────────────────
   const mapPages = live.filter((p) => p.mapEmbeds.length > 0);
   const allEmbeds = mapPages.flatMap((p) => p.mapEmbeds);
+
+  // 埋め込みコードを手で組み立てると、座標は合っていても場所IDが出鱈目になり、
+  // 地図は出るのにピンが立たない。Googleの「地図を埋め込む」で出るコードは
+  // 1s に 0x〈16桁hex〉:0x〈16桁hex〉、4v に13桁のタイムスタンプが入る。
+  const forged = allEmbeds.filter((src) => {
+    const decoded = decodeURIComponent(src);
+    const placeRef = decoded.match(/!1s(0x[0-9a-f]+%?3?A?:?0x[0-9a-z]+)/i)?.[1] ?? '';
+    const looksReal = /^0x[0-9a-f]{12,20}:0x[0-9a-f]{12,20}$/i.test(placeRef.replace(/%3A/i, ':'));
+    const stamp = decoded.match(/!4v(\d+)/)?.[1] ?? '';
+    const stampReal = stamp.length >= 13 && !/^1{0,1}2345678900?$/.test(stamp);
+    return !looksReal || !stampReal;
+  });
+
   const pointsHere = allEmbeds.some((src) => {
     const decoded = decodeURIComponent(src);
     if (BUSINESS.addressParts.every((part) => decoded.includes(part))) return true;
@@ -285,6 +302,25 @@ export function runLocalChecks(pages: PageSnapshot[]): Finding[] {
         title: 'No Google Map is embedded',
         impact: 'First-time visitors cannot picture where you are and hesitate to come.',
         action: 'Embed your shop location on the access page.',
+      },
+    });
+  } else if (forged.length === allEmbeds.length) {
+    findings.push({
+      id: 'map-forged-embed',
+      severity: 'red',
+      weight: 75,
+      category: 'local',
+      ja: {
+        title: '地図は出ていますが、お店のピンが立っていません',
+        impact:
+          '周辺の地図だけが表示され、どれがFelicityか分かりません。初めてのお客様が場所を特定できず、来店を逃します。',
+        action: `埋め込みコードが手書きで、Googleが店舗を識別できない状態です。Googleマップで「${BUSINESS.name}」を開き、「共有」→「地図を埋め込む」で出るコードを丸ごと貼り替えてください。該当：${mapPages.map((p) => (p.path === '/' ? 'トップ' : p.path)).join('、')}`,
+      },
+      en: {
+        title: 'The map shows, but your shop has no pin',
+        impact:
+          'Visitors see the surrounding area with nothing marking Felicity, cannot work out where you are, and do not come.',
+        action: `The embed code was hand-written, so Google cannot identify the shop. Open "${BUSINESS.name}" on Google Maps, choose Share → Embed a map, and paste that code as-is. Pages: ${mapPages.map((p) => p.path).join(', ')}`,
       },
     });
   } else if (!pointsHere) {
@@ -324,6 +360,140 @@ export function runLocalChecks(pages: PageSnapshot[]): Finding[] {
   }
 
   return findings;
+}
+
+/**
+ * Googleマップを正として、サイトに書かれた営業時間を突き合わせる。
+ *
+ * 冬/夏の切り替えや祭日はマップ側で更新されるので、サイトにベタ書きしている限り
+ * 必ずいつかずれる。ここでは「いまずれているか」だけでなく、
+ * 「ベタ書きをやめる」という構造的な直し方も必ず1件出す。
+ */
+function compareWithMaps(
+  hoursByPage: Map<string, string[]>,
+  maps: MapsHours
+): Finding[] {
+  const out: Finding[] = [];
+  const truth = hoursAsRanges(maps.regular);
+  const truthList = [...truth].join('・');
+  const mapsSummary = maps.weekdayDescriptions.join(' ／ ');
+
+  // サイトに書かれていて、マップのどの時間帯とも一致しないページ
+  const mismatched = [...hoursByPage.entries()].filter(([, hrs]) =>
+    hrs.some((h) => !truth.has(h))
+  );
+
+  if (hoursByPage.size === 0) {
+    out.push({
+      id: 'maps-hours-absent',
+      severity: 'red',
+      weight: 80,
+      category: 'local',
+      ja: {
+        title: '営業時間がサイトに載っていません',
+        impact: '「今日やっている?」を確かめられず、来店をあきらめるお客様が出ます。',
+        action: `Googleマップには「${mapsSummary}」と登録されています。これをフッターに載せてください。`,
+      },
+      en: {
+        title: 'Opening hours are not shown on the site',
+        impact: 'Visitors cannot check if you are open today and give up on coming.',
+        action: `Google Maps says "${maps.weekdayDescriptions.join(' / ')}". Put this in the footer.`,
+      },
+      copyText: mapsSummary,
+    });
+  } else if (mismatched.length > 0) {
+    out.push({
+      id: 'maps-hours-mismatch',
+      severity: 'red',
+      weight: 90,
+      category: 'local',
+      ja: {
+        title: 'サイトの営業時間がGoogleマップと違います',
+        impact:
+          'マップを見て来たお客様とサイトを見て来たお客様が、別々の時間を信じることになります。閉まっている時間に来店されると悪い口コミに直結します。',
+        action: `Googleマップ（正）：${mapsSummary}。直すページ：${mismatched
+          .map(([path, hrs]) => `${path === '/' ? 'トップ' : path}（${hrs.join('・')}）`)
+          .join('、')}`,
+      },
+      en: {
+        title: 'The hours on your site disagree with Google Maps',
+        impact:
+          'Customers from Maps and customers from your site believe different hours. Arriving to a closed shop turns straight into a bad review.',
+        action: `Google Maps (source of truth): ${maps.weekdayDescriptions.join(' / ')}. Pages to fix: ${mismatched
+          .map(([path, hrs]) => `${path} (${hrs.join(', ')})`)
+          .join(', ')}`,
+      },
+      copyText: mapsSummary,
+    });
+  } else {
+    out.push({
+      id: 'maps-hours-match',
+      severity: 'green',
+      weight: 90,
+      category: 'local',
+      ja: {
+        title: 'サイトの営業時間はGoogleマップと一致しています',
+        impact: 'どちらを見たお客様も同じ時間を信じられる状態です。',
+        action: `現在の登録：${mapsSummary}`,
+      },
+      en: {
+        title: 'Site hours match Google Maps',
+        impact: 'Everyone sees the same hours wherever they look.',
+        action: `Currently: ${maps.weekdayDescriptions.join(' / ')}`,
+      },
+    });
+  }
+
+  // 今週、祭日などで通常と違う時間になっている
+  if (maps.hasSpecialHours) {
+    out.push({
+      id: 'maps-special-hours',
+      severity: 'yellow',
+      weight: 70,
+      category: 'local',
+      ja: {
+        title: '今週は、通常と違う営業時間になっています',
+        impact:
+          'Googleマップには反映されていますが、サイトには通常の時間が出たままです。祭日にサイトを見て来たお客様が外します。',
+        action: `今週の実際の時間：${maps.currentWeekdayDescriptions.join(' ／ ')}${
+          maps.specialDays.length ? `（特別営業日：${maps.specialDays.map((d) => d.date).join('、')}）` : ''
+        }`,
+      },
+      en: {
+        title: 'This week has non-standard opening hours',
+        impact:
+          'Google Maps reflects it, but your site still shows the usual hours, so holiday visitors get it wrong.',
+        action: `Actual hours this week: ${maps.currentWeekdayDescriptions.join(' / ')}${
+          maps.specialDays.length ? ` (special days: ${maps.specialDays.map((d) => d.date).join(', ')})` : ''
+        }`,
+      },
+      copyText: maps.currentWeekdayDescriptions.join('\n'),
+    });
+  }
+
+  // 構造的な直し方。冬夏・祭日で変わる以上、ベタ書きのままだと必ずまたずれる。
+  out.push({
+    id: 'maps-hours-hardcoded',
+    severity: hoursByPage.size > 0 ? 'yellow' : 'green',
+    weight: 60,
+    category: 'local',
+    ja: {
+      title: '営業時間がページに直接書き込まれています',
+      impact:
+        '冬と夏の切り替えや祭日のたびに手で直す必要があり、1回でも忘れると「営業中」と出たまま閉まっている状態になります。',
+      action:
+        'Googleマップから営業時間を自動で読み込んで表示する作りに変えると、マップを更新するだけでサイト・検索結果・この画面がすべて揃います。',
+    },
+    en: {
+      title: 'Opening hours are written directly into the pages',
+      impact:
+        'Every seasonal switch and public holiday needs a manual edit, and one missed edit leaves you showing "open" while closed.',
+      action:
+        'Have the site read hours from Google Maps automatically — then updating Maps updates the site, the search results and this report together.',
+    },
+  });
+
+  return out;
 }
 
 /** Googleビジネスプロフィールでやること。サイトからは判定できないので手動チェック用。 */

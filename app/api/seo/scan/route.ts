@@ -4,6 +4,7 @@ import { runPageChecks } from '@/app/lib/seo/checks';
 import { runLocalChecks } from '@/app/lib/seo/local';
 import { runSchemaChecks } from '@/app/lib/seo/structured';
 import { calculateScore, topThree } from '@/app/lib/seo/score';
+import { fetchMapsHours } from '@/app/lib/seo/maps';
 import type { ScanReport } from '@/app/lib/seo/types';
 
 // クロール + 判定。PageSpeed は時間がかかるので別エンドポイントに分けている。
@@ -35,18 +36,19 @@ export async function POST(request: NextRequest) {
     // リンク切れチェックは本数が多いと時間を食うので、
     // 内部リンク + 外部リンクを混ぜて上限を切る。
     const allLinks = [...new Set(pages.flatMap((p) => p.links))];
-    const broken = await checkLinks(allLinks, 40);
+    const [broken, maps] = await Promise.all([checkLinks(allLinks, 40), fetchMapsHours()]);
 
     const findings = [
       ...runPageChecks(pages, broken),
-      ...runLocalChecks(pages),
-      ...runSchemaChecks(pages),
+      ...runLocalChecks(pages, maps),
+      ...runSchemaChecks(pages, maps),
     ];
 
     const report: ScanReport = {
       scannedAt: new Date().toISOString(),
       baseUrl: target,
       score: calculateScore(findings),
+      maps,
       pages,
       findings,
       top3: topThree(findings),

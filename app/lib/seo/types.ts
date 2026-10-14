@@ -58,6 +58,8 @@ export interface ScanReport {
   scannedAt: string;
   baseUrl: string;
   score: number;
+  /** Googleマップから取れた営業時間。鍵が無ければ null */
+  maps: import('./maps').MapsHours | null;
   pages: PageSnapshot[];
   findings: Finding[];
   /** 売上インパクト順の上位3件 */

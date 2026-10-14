@@ -5,6 +5,7 @@
 
 import type { Finding, PageSnapshot } from './types';
 import { BUSINESS } from './local';
+import { toOpeningHoursSpecification, type MapsHours } from './maps';
 import { products } from '../products';
 
 type Node = Record<string, unknown>;
@@ -34,7 +35,13 @@ const json = (o: unknown) => JSON.stringify(o, null, 2);
 
 // ── 生成テンプレート ──────────────────────────────────────────────
 
-export function buildCafeSchema() {
+/**
+ * 店舗情報の JSON-LD。営業時間は Googleマップから取れたときだけ入れる。
+ * 冬夏・祭日で変わるものを人の手で書き込ませると、ここが真っ先に腐るため、
+ * 正解が取れないときは項目ごと出さない（間違った時間を載せるより良い）。
+ */
+export function buildCafeSchema(maps?: MapsHours | null) {
+  const hours = maps?.regular.length ? toOpeningHoursSpecification(maps.regular) : null;
   return {
     '@context': 'https://schema.org',
     '@type': 'CafeOrCoffeeShop',
@@ -57,10 +64,7 @@ export function buildCafeSchema() {
     geo: { '@type': 'GeoCoordinates', latitude: BUSINESS.lat, longitude: BUSINESS.lng },
     hasMap: `https://www.google.com/maps/search/?api=1&query=${BUSINESS.lat},${BUSINESS.lng}`,
     sameAs: [`https://www.instagram.com/${BUSINESS.instagram}/`],
-    // 営業時間はサイト側の表記に合わせて書き換えてもらう前提で、
-    // あえて空にせずコメント代わりのプレースホルダを置かない——
-    // 間違った時間を構造化データに入れるほうが実害が大きいため、
-    // openingHoursSpecification は画面側の指示で手入力してもらう。
+    ...(hours ? { openingHoursSpecification: hours } : {}),
   };
 }
 
@@ -177,7 +181,7 @@ export function buildBreadcrumbSchema() {
 
 // ── 判定 ──────────────────────────────────────────────────────────
 
-export function runSchemaChecks(pages: PageSnapshot[]): Finding[] {
+export function runSchemaChecks(pages: PageSnapshot[], maps: MapsHours | null = null): Finding[] {
   const findings: Finding[] = [];
   const live = pages.filter((p) => p.status === 200);
 
@@ -201,7 +205,7 @@ export function runSchemaChecks(pages: PageSnapshot[]): Finding[] {
         impact: 'Google ignores broken data entirely, so you get no rich result.',
         action: `Pages: ${broken.map((p) => p.path).join(', ')}. Replace it with the code below.`,
       },
-      copyText: json(buildCafeSchema()),
+      copyText: json(buildCafeSchema(maps)),
       copyKind: 'json',
     });
   }
@@ -224,7 +228,7 @@ export function runSchemaChecks(pages: PageSnapshot[]): Finding[] {
         impact: 'You are missing from map results and "cafes near me", losing walk-in traffic.',
         action: 'Paste the code below into the homepage, then fill in your real opening hours.',
       },
-      copyText: json(buildCafeSchema()),
+      copyText: json(buildCafeSchema(maps)),
       copyKind: 'json',
     });
   } else {
@@ -252,7 +256,7 @@ export function runSchemaChecks(pages: PageSnapshot[]): Finding[] {
           impact: 'More complete data ranks higher on maps and looks better in search.',
           action: 'Replace it with the code below, then fill in your real opening hours.',
         },
-        copyText: json(buildCafeSchema()),
+        copyText: json(buildCafeSchema(maps)),
         copyKind: 'json',
       });
     } else {
