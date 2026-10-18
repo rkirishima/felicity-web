@@ -25,7 +25,7 @@ export default function WholesaleLoginPage() {
         setError(data.error || 'ログインできませんでした。');
         return;
       }
-      router.push('/wholesale');
+      router.push('/wholesale/order');
       router.refresh();
     } catch {
       setError('通信エラーが発生しました。時間をおいてお試しください。');
