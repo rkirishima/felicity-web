@@ -135,6 +135,51 @@ export async function notifyWholesaleOrderToTelegram(order: WholesaleNotificatio
   }
 }
 
+// HP の業販ページから新しい申し込みが来たときの通知。承認リンク付き。
+// リンクは承認画面を開くだけで、承認はその画面のボタンで行う（Telegram の
+// リンクプレビューが GET しても何も起きないように）。Never throws.
+export async function notifyWholesaleApplicationToTelegram(app: {
+  company: string;
+  storeName: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  address: string;
+  note: string | null;
+  approveUrl: string;
+}): Promise<void> {
+  const token = process.env.TELEGRAM_ORDERS_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_ORDERS_CHAT_ID;
+  if (!token || !chatId) {
+    console.warn('[telegram] orders bot not configured — skipping wholesale application notification');
+    return;
+  }
+
+  const lines = [
+    '🤝 業販のお申し込み（承認待ち）',
+    '',
+    `店舗名: ${app.storeName}`,
+    `会社名: ${app.company}`,
+    `担当: ${app.contactName}`,
+    `メール: ${app.email}`,
+    `電話: ${app.phone}`,
+    `住所: ${app.address}`,
+  ];
+  if (app.note) lines.push('', `ご要望: ${app.note}`);
+  lines.push('', `承認する → ${app.approveUrl}`);
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text: lines.join('\n'), disable_web_page_preview: true }),
+    });
+    if (!res.ok) console.error('[telegram] wholesale application notification failed:', await res.text());
+  } catch (err) {
+    console.error('[telegram] wholesale application notification error:', err);
+  }
+}
+
 // お客様がメールのリンクから銀行振込注文をキャンセルしたときの通知。
 // Never throws.
 export async function notifyOrderCancelToTelegram(order: { orderId: string; customerName: string; amount: number }): Promise<void> {

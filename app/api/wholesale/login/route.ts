@@ -29,11 +29,19 @@ export async function POST(request: NextRequest) {
   // be tricked by `_` or `%` inside an address.
   const { data: account } = await supabase
     .from('wholesale_accounts')
-    .select('code, company, password_hash, active')
+    .select('code, company, password_hash, active, approved_at')
     .eq('email', email.trim().toLowerCase())
     .maybeSingle();
 
   const ok = await verifyPassword(password, account?.password_hash ?? DUMMY_HASH);
+
+  // HP から申し込んで承認待ちの取引先。パスワードが合っている本人にだけ伝える。
+  if (account && ok && !account.active && !account.approved_at) {
+    return NextResponse.json(
+      { error: 'お申し込みを確認中です。ご利用いただけるようになりましたら、メールでお知らせいたします。' },
+      { status: 403 },
+    );
+  }
 
   if (!account || !account.active || !ok) {
     return NextResponse.json({ error: 'メールアドレスまたはパスワードが正しくありません。' }, { status: 401 });

@@ -118,3 +118,7 @@ export async function verifySession(token: string | undefined | null): Promise<W
 }
 
 export const SESSION_MAX_AGE = SESSION_TTL_SECONDS;
+
+
+// 新規申し込みとパスワード変更で共通の下限。
+export const MIN_PASSWORD_LENGTH = 10;

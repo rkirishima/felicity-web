@@ -8,7 +8,16 @@ const WHOLESALE_PUBLIC_EXACT = ['/wholesale'];
 
 // Paths inside the wholesale area that must stay reachable without a session,
 // otherwise signing in would require already being signed in.
-const WHOLESALE_PUBLIC = ['/wholesale/login', '/api/wholesale/login'];
+//
+// signup は新規の申し込み。approve は Telegram の承認リンクから開く画面で、
+// セッションではなく URL の署名（lib/wholesale-application.ts）で守っている。
+const WHOLESALE_PUBLIC = [
+  '/wholesale/login',
+  '/api/wholesale/login',
+  '/wholesale/signup',
+  '/api/wholesale/signup',
+  '/wholesale/approve',
+];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

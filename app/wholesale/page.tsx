@@ -1,7 +1,8 @@
 // 業販の公開ページ。
 //
 // ログイン後の注文画面(/wholesale/order)と同じ読み物を出すが、単価は一切
-// 載せない。価格の確認と発注はメールでのお問い合わせから始めてもらう。
+// 載せない。新規の取引先は /wholesale/signup から申し込み、承認後に
+// 卸価格を見て発注できる。メールでのお問い合わせも残してある。
 // 検索から新規の取引先に見つけてもらうためのページなので、ここだけは
 // インデックスを許可する(/wholesale/ 配下は robots.txt で Disallow のまま)。
 
@@ -21,7 +22,7 @@ import {
 } from './sections';
 
 export const metadata: Metadata = {
-  title: '業販・卸売 | FELICITY COFFEE ROASTERS',
+  title: '業販・卸売',
   description:
     'カフェ・レストラン・ホテル・オフィスさま向けに、葉山の自社焙煎所からシングルオリジンのコーヒー豆を1kg単位でお届けします。焙煎度合いのご相談、オリジナルブレンドの開発、抽出レシピのご提案まで。',
   alternates: { canonical: 'https://felicity.cafe/wholesale' },
@@ -88,12 +89,20 @@ export default function WholesalePublicPage() {
           >
             Felicity
           </Link>
-          <Link
-            href="/wholesale/login"
-            className="text-[11px] text-[#8C7B6B] font-mono tracking-[0.08em] uppercase hover:text-[#2C2416] transition-colors"
-          >
-            取引先ログイン
-          </Link>
+          <div className="flex items-center gap-5">
+            <Link
+              href="/wholesale/signup"
+              className="text-[11px] text-[#2C2416] font-mono tracking-[0.08em] uppercase hover:text-[#8C7B6B] transition-colors"
+            >
+              お申し込み
+            </Link>
+            <Link
+              href="/wholesale/login"
+              className="text-[11px] text-[#8C7B6B] font-mono tracking-[0.08em] uppercase hover:text-[#2C2416] transition-colors"
+            >
+              取引先ログイン
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -109,7 +118,7 @@ export default function WholesalePublicPage() {
         </h2>
         <p className="mt-4 max-w-2xl text-[14px] text-[#8C7B6B] font-light leading-relaxed">
           1kg単位でお届けしています。入荷状況により銘柄は入れ替わります。
-          卸価格はお問い合わせいただいた際にお見積りとしてお送りします。
+          卸価格は、お申し込みいただいたあと取引先ページでご確認いただけます。
         </p>
 
         <div className="mt-10 space-y-px">
@@ -160,22 +169,25 @@ export default function WholesalePublicPage() {
           </div>
 
           <div className="space-y-5">
-            <a
-              href={mailto}
+            <Link
+              href="/wholesale/signup"
               className="inline-block bg-[#7AAFC4] text-[#2C2416] font-mono text-[13px] tracking-[0.08em] uppercase px-8 py-4 rounded-sm hover:bg-[#6A9DB3] transition-colors"
             >
-              業販について問い合わせる
-            </a>
+              業販を申し込む
+            </Link>
             <p className="text-[13px] text-[#8C7B6B] font-light leading-relaxed">
-              メールソフトが開かない場合は{' '}
+              店舗名・ご住所・ご連絡先をご入力いただくと、確認のうえ1〜2営業日でご利用開始のメールをお送りします。
+              ご利用開始後は、卸価格を見ながらそのままご注文いただけます。
+            </p>
+            <p className="text-[13px] text-[#8C7B6B] font-light leading-relaxed">
+              先にご相談やサンプルのご希望がある場合は、
               <a
-                href="mailto:info@felicity.cafe"
+                href={mailto}
                 className="text-[#2C2416] underline underline-offset-2 hover:text-[#7AAFC4] transition-colors"
               >
-                info@felicity.cafe
-              </a>{' '}
-              宛に、会社名・ご担当者名・ご連絡先・ご希望の豆と月あたりのご使用量をお送りください。
-              お見積りと、ご注文用アカウントをお送りします。
+                メールでのお問い合わせ
+              </a>
+              （info@felicity.cafe）も承ります。
             </p>
             <p className="text-[13px] text-[#8C7B6B] font-light">
               すでにお取引のあるお客さまは{' '}

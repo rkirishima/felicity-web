@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { hashPassword, verifyPassword } from '@/app/lib/wholesale-auth';
+import { MIN_PASSWORD_LENGTH, hashPassword, verifyPassword } from '@/app/lib/wholesale-auth';
 import { currentAccount, serviceClient } from '@/app/lib/wholesale-server';
-
-export const MIN_PASSWORD_LENGTH = 10;
 
 export async function POST(request: NextRequest) {
   const supabase = serviceClient();
