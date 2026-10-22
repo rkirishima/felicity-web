@@ -72,7 +72,7 @@ The Square Web Payments SDK integration has been **successfully completed, built
 ```
 NEXT_PUBLIC_SQUARE_APP_ID=sq0idp-7eraFqCSbK9HxHYhqyZrWg
 NEXT_PUBLIC_SQUARE_LOCATION_ID=L490B21JFZZNG
-SQUARE_ACCESS_TOKEN=EAAAl7xA9fJ4rEpOfvM7xVOmOVWmpJK6QbNlUc_ZyUtdk9Z_g0Q7-Dib4OmsHvdr
+SQUARE_ACCESS_TOKEN=<set in Vercel env — never commit>
 ```
 
 ---
