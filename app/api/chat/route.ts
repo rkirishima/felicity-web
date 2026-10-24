@@ -168,6 +168,16 @@ const CHECK_AVAILABILITY_TOOL: Anthropic.Tool = {
   },
 };
 
+function systemPromptWithDate(): string {
+  const now = new Date();
+  const ymd = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Tokyo' }).format(now);
+  const wd = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Tokyo', weekday: 'long' }).format(now);
+  return `${SYSTEM_PROMPT}
+
+## Today
+Today is ${ymd} (${wd}), Japan time. Resolve relative dates ("today", "tomorrow", "this Saturday", "10/24") against this date, always use the year ${ymd.slice(0, 4)} or later, and pass dates as YYYY-MM-DD.`;
+}
+
 interface Message {
   role: 'user' | 'assistant';
   content: string;
@@ -191,7 +201,7 @@ export async function POST(request: NextRequest) {
           const response = await anthropic.messages.create({
             model: 'claude-haiku-4-5-20251001',
             max_tokens: 512,
-            system: SYSTEM_PROMPT,
+            system: systemPromptWithDate(),
             tools: [CHECK_AVAILABILITY_TOOL, RESERVATION_TOOL],
             messages: currentMessages,
             stream: true,

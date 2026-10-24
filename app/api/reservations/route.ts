@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getAvailability } from '../../lib/capacity';
+import { onReservationCreated } from '@/lib/reservation-notify';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,6 +15,15 @@ export async function POST(request: NextRequest) {
     if (!name || !date || !time || !party_size || !contact) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // --- Date sanity: reject past dates (the chatbot once saved 2024 for 2026) ---
+    const todayJST = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Tokyo' }).format(new Date());
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < todayJST) {
+      return NextResponse.json(
+        { error: `Invalid or past date: ${date}. Today is ${todayJST} (JST).` },
         { status: 400 }
       );
     }
@@ -64,6 +74,9 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Telegram notice + Google Calendar entry (awaited so serverless doesn't cut it off; never throws)
+    await onReservationCreated(data);
 
     return NextResponse.json({ success: true, reservation: data });
   } catch (err: any) {
