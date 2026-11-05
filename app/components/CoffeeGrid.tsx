@@ -13,6 +13,27 @@ interface CoffeeBean {
   price: string;
   priceYen: number;
   key: string;
+  /** Sale price in yen. When set, this is charged and the regular price is shown struck through. */
+  salePriceYen?: number;
+}
+
+const fmtYen = (n: number) => `¥${n.toLocaleString('ja-JP')}`;
+
+function PriceLabel({ bean }: { bean: CoffeeBean }) {
+  return (
+    <p className="font-mono text-[12px] tracking-[0.06em] text-[#2C2416]">
+      200g{'\u00A0'}{'\u2014'}{'\u00A0'}
+      {bean.salePriceYen ? (
+        <>
+          <span className="line-through text-[#8C7B6B] mr-1.5">{bean.price}</span>
+          <span className="text-[#C4553A] font-semibold">{fmtYen(bean.salePriceYen)}</span>
+          <span className="ml-1.5 text-[9px] tracking-[0.12em] text-[#C4553A]">SALE 50% OFF</span>
+        </>
+      ) : (
+        <span className="text-[#7AAFC4] font-semibold">{bean.price}</span>
+      )}
+    </p>
+  );
 }
 
 const COFFEE_BEANS: CoffeeBean[] = [
@@ -34,6 +55,7 @@ const COFFEE_BEANS: CoffeeBean[] = [
     ],
     price: '¥3,000',
     priceYen: 3000,
+    salePriceYen: 1500,
     key: 'guatemalaFincaGualvador',
   },
   {
@@ -160,10 +182,7 @@ function DescriptionModal({
               {description}
             </p>
             <div className="pt-4 border-t border-[#DDD5C5]">
-              <p className="font-mono text-[12px] tracking-[0.06em] text-[#2C2416]">
-                200g{'\u00A0'}{'\u2014'}{'\u00A0'}
-                <span className="text-[#7AAFC4] font-semibold">{bean.price}</span>
-              </p>
+              <PriceLabel bean={bean} />
             </div>
           </div>
         </div>
@@ -195,7 +214,7 @@ export function CoffeeGrid({ locale = 'ja' }: CoffeeGridProps) {
     addItem({
       id: itemId,
       name: `${bean.name} 200g`,
-      price: bean.priceYen,
+      price: bean.salePriceYen ?? bean.priceYen,
       quantity: 1,
       grind,
     });
@@ -286,10 +305,7 @@ export function CoffeeGrid({ locale = 'ja' }: CoffeeGridProps) {
 
                 {/* Price */}
                 <div className="pt-3 border-t border-[#DDD5C5] mb-4">
-                  <p className="font-mono text-[12px] tracking-[0.06em] text-[#2C2416]">
-                    200g{'\u00A0'}{'\u2014'}{'\u00A0'}
-                    <span className="text-[#7AAFC4] font-semibold">{bean.price}</span>
-                  </p>
+                  <PriceLabel bean={bean} />
                 </div>
 
                 {/* Grind selector */}
