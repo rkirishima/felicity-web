@@ -26,8 +26,8 @@ function PriceLabel({ bean }: { bean: CoffeeBean }) {
       {bean.salePriceYen ? (
         <>
           <span className="line-through text-[#8C7B6B] mr-1.5">{bean.price}</span>
-          <span className="text-[#C4553A] font-semibold">{fmtYen(bean.salePriceYen)}</span>
-          <span className="ml-1.5 text-[9px] tracking-[0.12em] text-[#C4553A]">SALE 50% OFF</span>
+          <span className="text-[#C4553A] font-bold text-[18px]">{fmtYen(bean.salePriceYen)}</span>
+          <span className="sale-blink ml-2 inline-block align-middle bg-[#C4553A] text-white text-[10px] font-bold tracking-[0.1em] px-1.5 py-0.5 rounded-sm">50% OFF</span>
         </>
       ) : (
         <span className="text-[#7AAFC4] font-semibold">{bean.price}</span>
@@ -245,10 +245,15 @@ export function CoffeeGrid({ locale = 'ja' }: CoffeeGridProps) {
           return (
             <div
               key={bean.name}
-              className="group block h-auto overflow-hidden bg-[#EDE5D8] flex flex-col p-3 md:p-6 transition-all duration-300 ease-out hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
+              className={`group block h-auto overflow-hidden bg-[#EDE5D8] flex flex-col p-3 md:p-6 transition-all duration-300 ease-out hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] ${bean.salePriceYen ? 'sale-card' : ''}`}
             >
               {/* Image placeholder */}
               <div className="w-full h-48 bg-[#DDD5C5] flex items-center justify-center mb-4 relative overflow-hidden rounded-sm">
+                {bean.salePriceYen && (
+                  <div className="sale-blink absolute top-2 left-2 z-10 bg-[#C4553A] text-white font-mono font-bold text-[12px] md:text-[14px] tracking-[0.12em] px-2.5 py-1 rounded-sm shadow-md">
+                    SALE 半額
+                  </div>
+                )}
                 <Image
                   src={`/beans-${((COFFEE_BEANS.indexOf(bean) % 8) + 1)}.jpg`}
                   alt={bean.name}
