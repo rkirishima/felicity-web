@@ -167,6 +167,26 @@ export default function HomePageEN() {
                 </tbody>
               </table>
 
+              <div className="mb-8">
+                <p className="font-mono text-[9px] tracking-[0.3em] text-[#7AAFC4] uppercase mb-4">
+                  {homepage.visit.parking.label}
+                </p>
+                <table className="w-full text-sm">
+                  <tbody className="divide-y divide-[#DDD5C5]">
+                    {homepage.visit.parking.items.map(({ name, detail }) => (
+                      <tr key={name}>
+                        <td className="font-mono text-[10px] tracking-[0.1em] text-[#8C7B6B] py-3 pr-8 w-32">
+                          {name}
+                        </td>
+                        <td className="text-[13px] font-light text-[#2C2416] py-3">
+                          {detail}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
               <a
                 href="https://www.instagram.com/felicity_hayama"
                 target="_blank"
@@ -178,16 +198,46 @@ export default function HomePageEN() {
             </div>
 
             {/* Right: Google Maps */}
-            <div className="h-64 rounded-lg overflow-hidden">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3254.567!2d139.6102834!3d35.2673650!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6019d1234567%3A0xfelicity!2sFelicity%20Cafe!5e0!3m2!1sen!2sjp!4v1711270800000"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen={true}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
+            <div className="space-y-8">
+              <div className="h-64 rounded-lg overflow-hidden">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3254.567!2d139.6102834!3d35.2673650!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6019d1234567%3A0xfelicity!2sFelicity%20Cafe!5e0!3m2!1sen!2sjp!4v1711270800000"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen={true}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-baseline justify-between mb-3">
+                  <p className="font-mono text-[9px] tracking-[0.3em] text-[#7AAFC4] uppercase">
+                    {homepage.visit.parking.mapLabel}
+                  </p>
+                  <a
+                    href="https://maps.app.goo.gl/XSB8Ay73emN32Pu68"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-[10px] tracking-[0.1em] text-[#7AAFC4] hover:text-[#2C2416] transition-colors"
+                  >
+                    {homepage.visit.parking.openLabel}
+                  </a>
+                </div>
+                <div className="h-56 rounded-lg overflow-hidden">
+                  <iframe
+                    src="https://maps.google.com/maps?q=35.2667048,139.6084713&z=17&output=embed"
+                    title={homepage.visit.parking.mapLabel}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen={true}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>

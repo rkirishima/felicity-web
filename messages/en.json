@@ -613,7 +613,22 @@
           "day": "Closed",
           "hours": "Friday"
         }
-      ]
+      ],
+      "parking": {
+        "label": "Parking",
+        "items": [
+          {
+            "name": "In front of shop",
+            "detail": "2 spaces"
+          },
+          {
+            "name": "Lot 2",
+            "detail": "10 spaces (2 min walk)"
+          }
+        ],
+        "mapLabel": "Parking Lot 2",
+        "openLabel": "Open in Google Maps →"
+      }
     },
     "nav": {
       "coffee": "Coffee",

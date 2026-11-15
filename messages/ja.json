@@ -613,7 +613,22 @@
           "day": "定休日",
           "hours": "金"
         }
-      ]
+      ],
+      "parking": {
+        "label": "駐車場",
+        "items": [
+          {
+            "name": "店舗前",
+            "detail": "2台"
+          },
+          {
+            "name": "第2駐車場",
+            "detail": "10台（店舗まで徒歩2分）"
+          }
+        ],
+        "mapLabel": "第2駐車場",
+        "openLabel": "Google マップで開く →"
+      }
     },
     "nav": {
       "coffee": "Coffee",
