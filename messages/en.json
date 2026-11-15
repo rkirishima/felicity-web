@@ -626,9 +626,10 @@
             "detail": "10 spaces (2 min walk)"
           }
         ],
-        "mapLabel": "Parking Lot 2",
+        "mapLabel": "Parking Lot 2 (2 min walk)",
         "openLabel": "Open in Google Maps →"
-      }
+      },
+      "shopMapLabel": "Shop"
     },
     "nav": {
       "coffee": "Coffee",

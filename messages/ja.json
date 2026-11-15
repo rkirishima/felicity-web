@@ -626,9 +626,10 @@
             "detail": "10台（店舗まで徒歩2分）"
           }
         ],
-        "mapLabel": "第2駐車場",
+        "mapLabel": "第2駐車場（店舗まで徒歩2分）",
         "openLabel": "Google マップで開く →"
-      }
+      },
+      "shopMapLabel": "店舗"
     },
     "nav": {
       "coffee": "Coffee",

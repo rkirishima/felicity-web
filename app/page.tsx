@@ -201,8 +201,13 @@ export default function Home() {
 
             {/* Right: Google Maps */}
             <div className="space-y-8">
-              <div className="h-64 rounded-lg overflow-hidden">
+              <div>
+                <p className="font-mono text-[9px] tracking-[0.3em] text-[#7AAFC4] uppercase mb-3">
+                  {homepage.visit.shopMapLabel}
+                </p>
+                <div className="h-64 rounded-lg overflow-hidden">
                 <iframe
+                  title={homepage.visit.shopMapLabel}
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3254.567!2d139.6102834!3d35.2673650!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6019d1234567%3A0xfelicity!2sFelicity%20Cafe!5e0!3m2!1sen!2sjp!4v1711270800000"
                   width="100%"
                   height="100%"
@@ -211,6 +216,7 @@ export default function Home() {
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                 />
+              </div>
               </div>
 
               <div>
