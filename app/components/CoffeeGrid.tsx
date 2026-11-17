@@ -55,7 +55,6 @@ const COFFEE_BEANS: CoffeeBean[] = [
     ],
     price: '¥3,000',
     priceYen: 3000,
-    salePriceYen: 1500,
     key: 'guatemalaFincaGualvador',
   },
   {
