@@ -86,7 +86,7 @@ const beansLine = hasSantos
   : 'シングルオリジン10銘柄をご用意しています。';
 
 const orderPoints = [
-  `最低ロット：1回${minKg}kgから（1銘柄につき1kgから）`,
+  `最低ロット：1回${minKg}kgから（1銘柄につき100gから）`,
   ...deliveryLines,
   '挽き方や個包装のご希望は、備考欄にご記入ください（追加料金はいただきません）',
   'ご注文からお届けまで、約3日いただいております',
@@ -107,7 +107,7 @@ const textBody = [
   '初回ログイン時に、パスワードのご変更をお願いしております。',
   '',
   '▼ ご注文方法',
-  'ログインすると、お取り扱い銘柄と卸価格が並んだページが開きます。ご希望の銘柄の数量を1kg単位でご指定いただき、そのままご注文ください。',
+  'ログインすると、お取り扱い銘柄と卸価格が並んだページが開きます。ご希望の銘柄の数量を100g単位でご指定いただき、そのままご注文ください。',
   '',
   ...orderPoints.map((p) => `・${p}`),
   '',
@@ -149,7 +149,7 @@ const htmlBody = `<!DOCTYPE html>
   <p style="font-size: 14px; color: #8C7B6B;">初回ログイン時に、パスワードのご変更をお願いしております。</p>
 
   <h2 style="font-size: 13px; letter-spacing: 0.12em; color: #8C7B6B; margin-top: 32px; text-transform: uppercase;">ご注文方法</h2>
-  <p style="font-size: 15px;">ログインすると、お取り扱い銘柄と卸価格が並んだページが開きます。ご希望の銘柄の数量を1kg単位でご指定いただき、そのままご注文ください。</p>
+  <p style="font-size: 15px;">ログインすると、お取り扱い銘柄と卸価格が並んだページが開きます。ご希望の銘柄の数量を100g単位でご指定いただき、そのままご注文ください。</p>
   <ul style="font-size: 15px; padding-left: 20px;">
     ${orderPoints.map((p) => `<li style="margin-bottom: 6px;">${esc(p)}</li>`).join('\n    ')}
   </ul>

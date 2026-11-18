@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { yen } from '@/app/lib/wholesale';
+import { formatKg, yen } from '@/app/lib/wholesale';
 import { currentAccount, serviceClient } from '@/app/lib/wholesale-server';
 import { eyebrow, panel } from '../sections';
 
@@ -97,8 +97,8 @@ export default async function WholesaleOrdersPage() {
                   </div>
 
                   <p className="mt-4 text-[13px] text-[#2C2416] font-light leading-relaxed">
-                    {o.items.map((it) => `${it.nameJa ?? it.name} ${it.kg}kg`).join('、')}
-                    <span className="text-[#8C7B6B]">　計 {o.total_kg}kg</span>
+                    {o.items.map((it) => `${it.nameJa ?? it.name} ${formatKg(Number(it.kg))}`).join('、')}
+                    <span className="text-[#8C7B6B]">　計 {formatKg(Number(o.total_kg))}</span>
                   </p>
 
                   <div className="mt-5 pt-4 border-t border-[#DDD5C5] flex flex-wrap gap-x-6 gap-y-2 text-[12px] font-mono tracking-[0.06em]">

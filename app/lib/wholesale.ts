@@ -319,8 +319,33 @@ export function minOrderKg(accountMinKg?: number | null): number {
     : DEFAULT_MIN_ORDER_KG;
 }
 
-/** 1銘柄あたりの最低数量。 */
-export const MIN_KG_PER_BEAN = 1;
+/** 数量の刻み。100g（0.1kg）単位で注文できる。 */
+export const ORDER_STEP_KG = 0.1;
+/** 1銘柄あたりの最低数量。刻みと同じ100g。 */
+export const MIN_KG_PER_BEAN = ORDER_STEP_KG;
+
+// はじめてのご注文は「お試し」として合計の最低ロットをかけず、100gから
+// 受ける。2回目からは取引先の最低ロット（既定3kg）に戻る。
+export function effectiveMinOrderKg(accountMinKg: number | null | undefined, firstOrder: boolean): number {
+  return firstOrder ? MIN_KG_PER_BEAN : minOrderKg(accountMinKg);
+}
+
+/** 浮動小数の誤差を落として、100g単位に揃える（端数は切り捨て）。 */
+export function toOrderKg(value: unknown): number {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return Math.floor(n * 10 + 1e-6) / 10;
+}
+
+/** 合計など、すでに100g単位の値を足したものの誤差だけを落とす。 */
+function roundKg(n: number): number {
+  return Math.round(n * 10) / 10;
+}
+
+/** 表示用。1kg未満は「300g」、それ以上は「1.5kg」。 */
+export function formatKg(kg: number): string {
+  return kg > 0 && kg < 1 ? `${Math.round(kg * 1000)}g` : `${roundKg(kg)}kg`;
+}
 /** オリジナルブレンドの最低数量（フォーム外・ご相談ベース）。 */
 export const MIN_CUSTOM_BLEND_KG = 3;
 /** ご注文からお届けまでの目安。 */
@@ -455,12 +480,12 @@ export function quote(
   terms?: QuoteTerms | null,
 ): Quote {
   const cleaned = items
-    .map((it) => ({ bean: beanBySlug(it.slug), kg: Math.floor(Number(it.kg) || 0) }))
+    .map((it) => ({ bean: beanBySlug(it.slug), kg: toOrderKg(it.kg) }))
     .filter((it): it is { bean: WholesaleBean; kg: number } => Boolean(it.bean) && it.kg > 0)
     .map(({ bean, kg }) => ({ bean, kg, price: unitPrice(bean, special) }))
     .filter((it): it is { bean: WholesaleBean; kg: number; price: number } => it.price !== null);
 
-  const totalKg = cleaned.reduce((sum, it) => sum + it.kg, 0);
+  const totalKg = roundKg(cleaned.reduce((sum, it) => sum + it.kg, 0));
 
   const lines: QuoteLine[] = cleaned.map(({ bean, kg, price }) => ({
     slug: bean.slug,
@@ -469,7 +494,8 @@ export function quote(
     roast: bean.roast,
     kg,
     unitPrice: price,
-    amount: price * kg,
+    // 単価は100円単位なので100gでも割り切れるが、浮動小数の誤差は丸めておく。
+    amount: Math.round(price * kg),
     greenKg: Math.round(kg * bean.greenPerKg * 10) / 10,
   }));
 

@@ -13,6 +13,9 @@ import {
   MIN_CUSTOM_BLEND_KG,
   MIN_KG_PER_BEAN,
   minOrderKg,
+  effectiveMinOrderKg,
+  formatKg,
+  toOrderKg,
   SHIPPING_BOXES,
   beansFor,
   freeShippingHint,
@@ -43,6 +46,8 @@ export type WholesaleAccount = {
   specialPricing: BeanPrices | null;
   /** 1回のご注文の最低数量(kg)。取引先ごとに異なる。 */
   minOrderKg: number;
+  /** まだ一度も注文していない。お試しとして最低ロットをかけない。 */
+  firstOrder?: boolean;
   /** 価格表外で、この取引先にだけ出している銘柄の slug。 */
   extraBeans: string[];
   freeShipping: boolean;
@@ -91,7 +96,9 @@ export function WholesaleOrder({ account, preview = false }: { account: Wholesal
   );
   const handDelivery = account.deliveryMethod === 'hand_delivery';
   // サーバー側でも同じ値で弾く。ここは入力を止めるためだけのもの。
-  const minKg = minOrderKg(account.minOrderKg);
+  const firstOrder = account.firstOrder ?? false;
+  const minKg = effectiveMinOrderKg(account.minOrderKg, firstOrder);
+  const regularMinKg = minOrderKg(account.minOrderKg);
   const q = useMemo(() => quote(items, account.specialPricing, terms), [items, account.specialPricing, terms]);
   // 価格表の銘柄＋この取引先にだけ出している豆。
   const beans = useMemo(() => beansFor(account.extraBeans), [account.extraBeans]);
@@ -103,11 +110,12 @@ export function WholesaleOrder({ account, preview = false }: { account: Wholesal
   );
 
   // Both take an updater so two clicks landing in the same React batch each see
-  // the previous value — otherwise a fast double-tap on + only adds 1kg.
+  // the previous value — otherwise a fast double-tap on + only adds one step.
   function updateKg(slug: string, next: (current: number) => number) {
     setKgBySlug((prev) => {
       const updated = { ...prev };
-      const value = Math.max(0, Math.floor(next(prev[slug] ?? 0) || 0));
+      // 100g単位に揃える。端数の入力（0.25 など）は切り捨て。
+      const value = toOrderKg(next(prev[slug] ?? 0));
       if (value === 0) delete updated[slug];
       else updated[slug] = value;
       return updated;
@@ -115,10 +123,16 @@ export function WholesaleOrder({ account, preview = false }: { account: Wholesal
   }
 
   const setKg = (slug: string, kg: number) => updateKg(slug, () => kg);
-  const bumpKg = (slug: string, delta: number) => updateKg(slug, (current) => current + delta);
+  // ＋／− は1kg未満では100gずつ、1kg以上では1kgずつ動かす。お試しの少量も、
+  // いつもの数kgの注文も、押す回数が少なくて済むように。
+  const bumpKg = (slug: string, direction: 1 | -1) =>
+    updateKg(slug, (current) => {
+      const step = (direction > 0 ? current < 1 : current <= 1) ? 0.1 : 1;
+      return current + direction * step + 1e-9;
+    });
 
   function validate(): string | null {
-    if (q.totalKg < minKg) return `ご注文は合計${minKg}kgから承ります。`;
+    if (q.totalKg < minKg) return `ご注文は合計${formatKg(minKg)}から承ります。`;
     if (!contactName.trim()) return 'ご担当者名を入力してください。';
     if (!email.trim()) return 'メールアドレスを入力してください。';
     if (!handDelivery && (!postalCode.trim() || !prefecture || !city.trim() || !streetAddress.trim()))
@@ -240,9 +254,15 @@ export function WholesaleOrder({ account, preview = false }: { account: Wholesal
             産地とつくり手の個性を、一杯に。
           </h2>
           <p className="mt-4 max-w-2xl text-[14px] text-[#8C7B6B] font-light leading-relaxed">
-            価格はすべて1kgあたり・税抜です。{MIN_KG_PER_BEAN}kg単位でご指定いただけます
-            （1回のご注文は合計{minKg}kgから）。挽き・個包装の追加料金はいただきません。
+            価格はすべて1kgあたり・税抜です。{formatKg(MIN_KG_PER_BEAN)}単位でご指定いただけます
+            （1回のご注文は合計{regularMinKg}kgから）。挽き・個包装の追加料金はいただきません。
           </p>
+          {firstOrder && (
+            <p className="mt-4 max-w-2xl text-[14px] text-[#2E4A3E] font-light leading-relaxed">
+              はじめてのご注文は、お試しとして合計の最低数量なしで、1銘柄{formatKg(MIN_KG_PER_BEAN)}から承ります。
+              気になる豆を少しずつ選んで、お店の味に合うかお確かめください。
+            </p>
+          )}
 
           <div className="mt-10 space-y-px">
             {beans.map((bean) => (
@@ -253,13 +273,13 @@ export function WholesaleOrder({ account, preview = false }: { account: Wholesal
                 price={unitPrice(bean, account.specialPricing)}
                 pinned={account.specialPricing?.[bean.slug] !== undefined}
                 onSet={(kg) => setKg(bean.slug, kg)}
-                onBump={(delta) => bumpKg(bean.slug, delta)}
+                onBump={(direction) => bumpKg(bean.slug, direction)}
               />
             ))}
           </div>
         </section>
 
-        <OrderTerms minKg={minKg} freeShipping={account.freeShipping} handDelivery={handDelivery} />
+        <OrderTerms minKg={regularMinKg} freeShipping={account.freeShipping} handDelivery={handDelivery} />
 
         <section className="max-w-3xl mx-auto px-6 pt-20 space-y-10">
           <div>
@@ -398,7 +418,7 @@ function BeanCard({
   price: number | null;
   pinned: boolean;
   onSet: (kg: number) => void;
-  onBump: (delta: number) => void;
+  onBump: (direction: 1 | -1) => void;
 }) {
   const selected = kg > 0;
 
@@ -481,7 +501,7 @@ function BeanCard({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              aria-label={`${bean.name} を1kg減らす`}
+              aria-label={`${bean.name} を減らす`}
               onClick={() => onBump(-1)}
               className="w-9 h-9 border border-[#DDD5C5] bg-[#F4EFE4] text-[#8C7B6B] rounded-sm hover:text-[#2C2416] transition-colors"
             >
@@ -490,8 +510,8 @@ function BeanCard({
             <input
               type="number"
               min={0}
-              step={1}
-              inputMode="numeric"
+              step={0.1}
+              inputMode="decimal"
               aria-label={`${bean.name} の数量（kg）`}
               value={kg === 0 ? '' : kg}
               placeholder="0"
@@ -500,7 +520,7 @@ function BeanCard({
             />
             <button
               type="button"
-              aria-label={`${bean.name} を1kg増やす`}
+              aria-label={`${bean.name} を増やす`}
               onClick={() => onBump(1)}
               className="w-9 h-9 border border-[#DDD5C5] bg-[#F4EFE4] text-[#8C7B6B] rounded-sm hover:text-[#2C2416] transition-colors"
             >
@@ -512,7 +532,7 @@ function BeanCard({
 
         {price !== null && (
           <p className="text-[15px] text-[#2C2416] font-mono">
-            {selected ? yen(price * kg) : <span className="text-[#8C7B6B] text-[13px]">—</span>}
+            {selected ? yen(Math.round(price * kg)) : <span className="text-[#8C7B6B] text-[13px]">—</span>}
           </p>
         )}
       </div>
@@ -530,7 +550,10 @@ function OrderTerms({
   handDelivery: boolean;
 }) {
   const rows: { en: string; value: string }[] = [
-    { en: 'Minimum Order', value: `1回 ${minKg}kg 〜・1銘柄につき ${MIN_KG_PER_BEAN}kg 〜（月間最低量はありません）` },
+    {
+      en: 'Minimum Order',
+      value: `1回 ${minKg}kg 〜・1銘柄につき ${formatKg(MIN_KG_PER_BEAN)} 〜（はじめてのご注文はお試しとして ${formatKg(MIN_KG_PER_BEAN)} から。月間最低量はありません）`,
+    },
     { en: 'Custom Blend', value: `オリジナルブレンドは ${MIN_CUSTOM_BLEND_KG}kg 〜` },
     { en: 'Shipping', value: `ご注文から発送まで約${LEAD_TIME_DAYS}日` },
     {
@@ -594,7 +617,7 @@ function OrderSummary({ q, hint }: { q: ReturnType<typeof quote>; hint: FreeShip
               {q.lines.map((line) => (
                 <div key={line.slug} className="flex justify-between text-[14px] text-[#2C2416] font-light">
                   <span className="pr-4">
-                    {line.name} <span className="text-[#8C7B6B] font-mono">{line.kg}kg</span>
+                    {line.name} <span className="text-[#8C7B6B] font-mono">{formatKg(line.kg)}</span>
                   </span>
                   <span className="font-mono">{yen(line.amount)}</span>
                 </div>
@@ -602,7 +625,7 @@ function OrderSummary({ q, hint }: { q: ReturnType<typeof quote>; hint: FreeShip
             </div>
 
             <div className="space-y-2 pt-4 border-t border-[#DDD5C5] text-[14px]">
-              <Row label={`小計（${q.totalKg}kg・税抜）`} value={yen(q.subtotal)} />
+              <Row label={`小計（${formatKg(q.totalKg)}・税抜）`} value={yen(q.subtotal)} />
               <Row
                 label={`送料（税抜・${q.shippingLabel}）`}
                 value={q.shipping === 0 ? '無料' : yen(q.shipping)}

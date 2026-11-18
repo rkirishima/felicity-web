@@ -102,7 +102,7 @@ export async function sendApplicationReceivedEmail(a: Applicant): Promise<void> 
 
 export async function sendApplicationApprovedEmail(a: Applicant): Promise<void> {
   const points = [
-    `最低ロット：1回${DEFAULT_MIN_ORDER_KG}kgから（1銘柄につき1kgから）`,
+    `最低ロット：1回${DEFAULT_MIN_ORDER_KG}kgから（1銘柄につき100gから）。はじめてのご注文は、お試しとして100gから承ります`,
     `ご注文金額（税抜）${yen(FREE_SHIPPING_THRESHOLD)}以上で送料無料`,
     `ご注文からお届けまで、約${LEAD_TIME_DAYS}日いただいております`,
     'お支払いは銀行振込またはクレジットカード',
