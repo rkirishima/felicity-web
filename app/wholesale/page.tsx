@@ -24,7 +24,7 @@ import {
 export const metadata: Metadata = {
   title: '業販・卸売',
   description:
-    'カフェ・レストラン・ホテル・オフィスさま向けに、葉山の自社焙煎所からシングルオリジンのコーヒー豆を1kg単位でお届けします。焙煎度合いのご相談、オリジナルブレンドの開発、抽出レシピのご提案まで。',
+    'カフェ・レストラン・ホテル・オフィスさま向けに、葉山の自社焙煎所からシングルオリジンのコーヒー豆を100g単位からお届けします。焙煎度合いのご相談、オリジナルブレンドの開発、抽出レシピのご提案まで。',
   alternates: { canonical: 'https://felicity.cafe/wholesale' },
   robots: { index: true, follow: true },
   openGraph: {
@@ -65,7 +65,7 @@ const mailto =
   );
 
 const TERMS: { en: string; value: string }[] = [
-  { en: 'Minimum Order', value: '1回3kgから・1銘柄につき1kgから。月間の最低量はありません' },
+  { en: 'Minimum Order', value: '1回3kgから・1銘柄につき100gから。はじめてのご注文はお試しとして100gから承ります。月間の最低量はありません' },
   { en: 'Custom Blend', value: 'オリジナルブレンドの開発は3kgから。ヒアリングと試作を重ねて、そのお店の一杯を決めていきます' },
   { en: 'Lead Time', value: 'ご注文から発送まで約3日' },
   { en: 'Delivery', value: '宅配便でお届けします。ご注文金額に応じて送料無料になります' },
@@ -117,7 +117,7 @@ export default function WholesalePublicPage() {
           産地とつくり手の個性を、一杯に。
         </h2>
         <p className="mt-4 max-w-2xl text-[14px] text-[#8C7B6B] font-light leading-relaxed">
-          1kg単位でお届けしています。入荷状況により銘柄は入れ替わります。
+          100g単位でお届けしています。入荷状況により銘柄は入れ替わります。
           卸価格は、お申し込みいただいたあと取引先ページでご確認いただけます。
         </p>
 

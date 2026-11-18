@@ -76,6 +76,22 @@ export function extraBeansOf(account: AccountRecord): string[] {
     : [];
 }
 
+// はじめてのご注文かどうか。お試しとして最低ロットをかけないために使う。
+// カード決済を途中でやめた注文（pending_payment）は成立していないので数えない。
+export async function isFirstOrder(supabase: SupabaseClient, code: string): Promise<boolean> {
+  const { count, error } = await supabase
+    .from('wholesale_orders')
+    .select('id', { count: 'exact', head: true })
+    .eq('account_code', code)
+    .neq('status', 'pending_payment');
+  // 読めなかったときは、お試し扱いにせず通常の最低ロットに倒す。
+  if (error) {
+    console.error('[wholesale] order count failed:', error);
+    return false;
+  }
+  return (count ?? 0) === 0;
+}
+
 export function termsOf(account: AccountRecord): QuoteTerms {
   return { freeShipping: account.free_shipping, deliveryMethod: account.delivery_method };
 }
@@ -119,9 +135,12 @@ export async function createSquareWholesaleOrder(params: {
       ]
         .filter(Boolean)
         .join('\n'),
+      // 100g単位の注文があるので、数量はkg・小数1桁で持たせる。単位を付けないと
+      // Square は小数の数量を受け付けない。
       line_items: params.lines.map((l) => ({
         name: `【業販】${l.name}`,
         quantity: String(l.kg),
+        quantity_unit: { measurement_unit: { weight_unit: 'METRIC_KILOGRAM' }, precision: 1 },
         base_price_money: { amount: 0, currency: 'JPY' },
         note: `${l.kg}kg（業販・${methodLabel}）`,
       })),

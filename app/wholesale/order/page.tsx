@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { WHOLESALE_COOKIE, verifySession } from '@/app/lib/wholesale-auth';
 import { minOrderKg, type BeanPrices } from '@/app/lib/wholesale';
+import { isFirstOrder } from '@/app/lib/wholesale-server';
 import { WholesaleOrder, type WholesaleAccount } from '../WholesaleOrder';
 
 import type { Metadata } from 'next';
@@ -70,5 +71,5 @@ export default async function WholesalePage() {
     deliveryMethod: data.delivery_method === 'hand_delivery' ? 'hand_delivery' : 'shipping',
   };
 
-  return <WholesaleOrder account={account} />;
+  return <WholesaleOrder account={{ ...account, firstOrder: await isFirstOrder(supabase, data.code) }} />;
 }

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { beanBySlug, canOrderBean, isHandDelivery, isOrderable, minOrderKg, quote } from '@/app/lib/wholesale';
+import { beanBySlug, canOrderBean, effectiveMinOrderKg, formatKg, isHandDelivery, isOrderable, quote } from '@/app/lib/wholesale';
 import { notifyWholesaleOrderToTelegram } from '@/lib/telegram';
 import {
   createSquareWholesaleOrder,
   currentAccount,
   extraBeansOf,
+  isFirstOrder,
   serviceClient,
   specialPricingOf,
   termsOf,
@@ -81,9 +82,10 @@ export async function POST(request: NextRequest) {
   // sent about money is ignored.
   const q = quote(items, special, terms);
 
-  const minKg = minOrderKg(account.min_order_kg);
+  // はじめてのご注文はお試しとして100gから。2回目からは取引先の最低ロット。
+  const minKg = effectiveMinOrderKg(account.min_order_kg, await isFirstOrder(supabase, account.code));
   if (q.totalKg < minKg) {
-    return NextResponse.json({ error: `ご注文は合計${minKg}kgから承ります。` }, { status: 400 });
+    return NextResponse.json({ error: `ご注文は合計${formatKg(minKg)}から承ります。` }, { status: 400 });
   }
 
   const orderId = `WS-${account.code}-${Date.now().toString(36).toUpperCase()}`;
