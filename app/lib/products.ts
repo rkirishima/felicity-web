@@ -104,7 +104,7 @@ export const products: Product[] = [
     slug: "yemen-white-camel",
     country: "Yemen",
     process: "Natural",
-    roast: "Light-Medium",
+    roast: "Medium",
     gtin: "4595433537942",
     weight: "150g",
     price: "¥3,800",
