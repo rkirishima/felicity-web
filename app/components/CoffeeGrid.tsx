@@ -17,6 +17,8 @@ interface CoffeeBean {
   salePriceYen?: number;
   /** 実物の写真。未設定なら共通の /beans-N.jpg を使う。 */
   image?: string;
+  /** 売り切れ。写真の上に表示し、カートには入れさせない。 */
+  soldOut?: boolean;
 }
 
 const fmtYen = (n: number) => `¥${n.toLocaleString('ja-JP')}`;
@@ -95,6 +97,7 @@ const COFFEE_BEANS: CoffeeBean[] = [
     price: '¥8,500',
     priceYen: 8500,
     key: 'panamaGeisha',
+    soldOut: true,
   },
   {
     name: 'Yemen White Camel',
@@ -216,6 +219,7 @@ export function CoffeeGrid({ locale = 'ja' }: CoffeeGridProps) {
   const grindLabelKey = locale === 'en' ? 'en' : 'ja';
 
   const handleAddToCart = (bean: CoffeeBean) => {
+    if (bean.soldOut) return;
     const grind = grinds[bean.key] ?? DEFAULT_GRIND;
     const baseId = `coffee-${bean.name.toLowerCase().replace(/\s+/g, '-')}`;
     const itemId = `${baseId}-${grind}`;
@@ -270,6 +274,13 @@ export function CoffeeGrid({ locale = 'ja' }: CoffeeGridProps) {
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
+                {bean.soldOut && (
+                  <div className="absolute inset-0 z-10 bg-[#2C2416]/55 flex items-center justify-center">
+                    <span className="font-mono font-bold text-white text-[15px] md:text-[18px] tracking-[0.2em] border border-white/80 px-4 py-1.5">
+                      売り切れ
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Info */}
@@ -350,13 +361,16 @@ export function CoffeeGrid({ locale = 'ja' }: CoffeeGridProps) {
                 {/* Add to Cart Button */}
                 <button
                   onClick={() => handleAddToCart(bean)}
+                  disabled={bean.soldOut}
                   className={`w-full font-mono text-[10px] tracking-[0.08em] uppercase px-4 py-2 rounded-sm transition-all duration-300 ${
-                    isAdded
+                    bean.soldOut
+                      ? 'bg-[#DDD5C5] text-[#8C7B6B] opacity-60 cursor-not-allowed'
+                      : isAdded
                       ? 'bg-[#7AAFC4] text-[#2C2416]'
                       : 'bg-[#DDD5C5] text-[#8C7B6B] hover:bg-[#7AAFC4] hover:text-[#2C2416]'
                   }`}
                 >
-                  {isAdded ? '✓ Added' : 'Add to Cart'}
+                  {bean.soldOut ? 'Sold Out' : isAdded ? '✓ Added' : 'Add to Cart'}
                 </button>
               </div>
             </div>
