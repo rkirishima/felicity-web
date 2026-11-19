@@ -26,7 +26,7 @@ export const products: Product[] = [
     price: "¥2,800",
     roastProfile: "Charge 180°C → Drop 213°C → DTR 3:00",
     machine: "Probat P05iii",
-    image: "/images/brazil.jpg",
+    image: "/beans/brazil-santa-alina.jpg",
   },
   {
     id: 2,
@@ -40,7 +40,7 @@ export const products: Product[] = [
     price: "¥1,800",
     roastProfile: "FC 198–200°C → Drop 204–206°C → DTR 12%",
     machine: "Roest L100plus",
-    image: "/images/ethiopia.jpg",
+    image: "/beans/ethiopia-yirgacheffe.jpg",
   },
   {
     id: 3,
@@ -54,7 +54,7 @@ export const products: Product[] = [
     price: "¥2,200",
     roastProfile: "Fill 169.5°C → Drop 211.75°C → DTR ~110s",
     machine: "Probat P05iii",
-    image: "/images/papua.jpg",
+    image: "/beans/papua-new-guinea.jpg",
   },
   {
     id: 4,
@@ -68,7 +68,7 @@ export const products: Product[] = [
     price: "¥3,200",
     roastProfile: "Charge 175°C → Drop 215°C → DTR 2:50",
     machine: "Probat P05iii",
-    image: "/images/guatemala.jpg",
+    image: "/beans/guatemala-gualvador.jpg",
   },
   {
     id: 5,
@@ -82,7 +82,7 @@ export const products: Product[] = [
     price: "¥2,600",
     roastProfile: "Charge 182°C → Drop 212°C → DTR 2:45",
     machine: "Probat P05iii",
-    image: "/images/colombia-decaf.jpg",
+    image: "/beans/colombia-decaf.jpg",
   },
   {
     id: 6,
@@ -104,13 +104,13 @@ export const products: Product[] = [
     slug: "yemen-white-camel",
     country: "Yemen",
     process: "Natural",
-    roast: "Light-Medium",
+    roast: "Medium",
     gtin: "4595433537942",
     weight: "150g",
     price: "¥3,800",
     roastProfile: "FC 195–198°C → Drop 202–205°C → DTR 10%",
     machine: "Roest L100plus",
-    image: "/images/yemen-white-camel.jpg",
+    image: "/beans/yemen-white-camel.jpg",
   },
   {
     id: 8,
@@ -124,7 +124,7 @@ export const products: Product[] = [
     price: "¥4,200",
     roastProfile: "Charge 176°C → Drop 214°C → DTR 2:55",
     machine: "Probat P05iii",
-    image: "/images/blue-mountain.jpg",
+    image: "/beans/blue-mountain.jpg",
   },
   {
     id: 9,
@@ -138,6 +138,6 @@ export const products: Product[] = [
     price: "¥3,000",
     roastProfile: "Charge 179°C → Drop 216°C → DTR 2:40",
     machine: "Probat P05iii",
-    image: "/images/el-salvador.jpg",
+    image: "/beans/el-salvador-la-fany.jpg",
   },
 ];

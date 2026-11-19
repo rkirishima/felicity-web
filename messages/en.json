@@ -105,9 +105,9 @@
           "shortDesc": "Exotic spice notes, deep earthy tones, dried fruit",
           "description": "Yemen White Camel represents one of the world's most legendary and complex coffee origins. This naturally processed bean carries the ancient heritage of Yemeni coffee culture, where coffee was first cultivated over five centuries ago. The cup presents a sophisticated balance of exotic spice notes—cardamom, cinnamon—grounded by deep, earthy undertones reminiscent of leather and cedar. Dried fruit characteristics emerge as secondary notes, adding nuance and complexity. The body is wine-like and weighted, with a finish that lingers with spice warmth. Yemen White Camel demands slow appreciation; this is contemplative coffee for those seeking to explore coffee's historical and cultural roots.",
           "roastLevel": {
-            "level": "dark",
-            "dots": 3,
-            "label": "Full City (Dark)"
+            "level": "medium",
+            "dots": 2,
+            "label": "City+ (Medium)"
           }
         },
         "papuaNewGuinea": {
