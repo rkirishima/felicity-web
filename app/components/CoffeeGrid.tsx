@@ -48,6 +48,7 @@ const COFFEE_BEANS: CoffeeBean[] = [
     price: '¥1,600',
     priceYen: 1600,
     key: 'brazilSantaAlina',
+    image: '/beans/brazil-santa-alina.jpg',
   },
   {
     name: 'Guatemala Finca Gualvador (Anaerobic)',
@@ -58,6 +59,7 @@ const COFFEE_BEANS: CoffeeBean[] = [
     price: '¥3,000',
     priceYen: 3000,
     key: 'guatemalaFincaGualvador',
+    image: '/beans/guatemala-gualvador.jpg',
   },
   {
     name: 'Colombia Decaf',
@@ -69,6 +71,7 @@ const COFFEE_BEANS: CoffeeBean[] = [
     price: '¥2,200',
     priceYen: 2200,
     key: 'colombiaDecaf',
+    image: '/beans/colombia-decaf.jpg',
   },
   {
     name: 'Ethiopia Yirgacheffe',
@@ -80,6 +83,7 @@ const COFFEE_BEANS: CoffeeBean[] = [
     price: '¥2,400',
     priceYen: 2400,
     key: 'ethiopiaYirgacheffe',
+    image: '/beans/ethiopia-yirgacheffe.jpg',
   },
   {
     name: 'Panama Geisha',
@@ -102,6 +106,7 @@ const COFFEE_BEANS: CoffeeBean[] = [
     price: '¥3,000',
     priceYen: 3000,
     key: 'yemenWhiteCamel',
+    image: '/beans/yemen-white-camel.jpg',
   },
   {
     name: 'Papua New Guinea',
@@ -113,6 +118,7 @@ const COFFEE_BEANS: CoffeeBean[] = [
     price: '¥2,000',
     priceYen: 2000,
     key: 'papuaNewGuinea',
+    image: '/beans/papua-new-guinea.jpg',
   },
   {
     name: 'Blue Mountain No. 1',
@@ -124,6 +130,7 @@ const COFFEE_BEANS: CoffeeBean[] = [
     price: '¥7,000',
     priceYen: 7000,
     key: 'jamaicaBlueMountain',
+    image: '/beans/blue-mountain.jpg',
   },
   {
     name: 'El Salvador Finca La Fany',
