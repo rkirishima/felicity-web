@@ -15,6 +15,8 @@ interface CoffeeBean {
   key: string;
   /** Sale price in yen. When set, this is charged and the regular price is shown struck through. */
   salePriceYen?: number;
+  /** 実物の写真。未設定なら共通の /beans-N.jpg を使う。 */
+  image?: string;
 }
 
 const fmtYen = (n: number) => `¥${n.toLocaleString('ja-JP')}`;
@@ -133,6 +135,7 @@ const COFFEE_BEANS: CoffeeBean[] = [
     price: '¥2,000',
     priceYen: 2000,
     key: 'elSalvadorFincaLaFany',
+    image: '/beans/el-salvador-la-fany.jpg',
   },
 ];
 
@@ -254,7 +257,7 @@ export function CoffeeGrid({ locale = 'ja' }: CoffeeGridProps) {
                   </div>
                 )}
                 <Image
-                  src={`/beans-${((COFFEE_BEANS.indexOf(bean) % 8) + 1)}.jpg`}
+                  src={bean.image ?? `/beans-${((COFFEE_BEANS.indexOf(bean) % 8) + 1)}.jpg`}
                   alt={bean.name}
                   fill
                   className="object-cover"

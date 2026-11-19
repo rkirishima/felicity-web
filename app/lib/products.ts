@@ -138,6 +138,6 @@ export const products: Product[] = [
     price: "¥3,000",
     roastProfile: "Charge 179°C → Drop 216°C → DTR 2:40",
     machine: "Probat P05iii",
-    image: "/images/el-salvador.jpg",
+    image: "/beans/el-salvador-la-fany.jpg",
   },
 ];
