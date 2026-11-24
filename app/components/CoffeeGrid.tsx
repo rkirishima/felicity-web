@@ -97,7 +97,6 @@ const COFFEE_BEANS: CoffeeBean[] = [
     price: '¥8,500',
     priceYen: 8500,
     key: 'panamaGeisha',
-    soldOut: true,
   },
   {
     name: 'Yemen White Camel',
@@ -133,6 +132,7 @@ const COFFEE_BEANS: CoffeeBean[] = [
     price: '¥7,000',
     priceYen: 7000,
     key: 'jamaicaBlueMountain',
+    soldOut: true,
     image: '/beans/blue-mountain.jpg',
   },
   {
