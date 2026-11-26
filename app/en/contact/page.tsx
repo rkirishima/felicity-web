@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { LanguageToggle } from '@/app/components/LanguageToggle';
 import { CafeChat } from '@/app/components/CafeChat';
-import { getBreadcrumbSchema } from '@/app/lib/schema';
+import { FAQ_ITEMS_EN, getBreadcrumbSchema, getFaqSchema } from '@/app/lib/schema';
 
 export const metadata: Metadata = {
   title: 'Contact | FELICITY COFFEE ROASTERS',
@@ -21,6 +21,10 @@ const breadcrumbSchema = getBreadcrumbSchema([
   { name: 'Home', url: 'https://felicity.cafe/en/' },
   { name: 'Contact', url: 'https://felicity.cafe/en/contact' },
 ]);
+
+// Visible FAQ (FAQ_ITEMS_EN) and the FAQPage JSON-LD share one source. Google
+// requires the structured data to match the on-page text, so render both.
+const faqSchema = getFaqSchema(FAQ_ITEMS_EN, 'https://felicity.cafe/en/contact');
 
 export default function ContactPageEN() {
   return (
@@ -144,6 +148,29 @@ export default function ContactPageEN() {
             <CafeChat locale="en" />
           </div>
         </div>
+
+        {/* FAQ — visible text and FAQPage schema both come from FAQ_ITEMS_EN. */}
+        <section id="faq" className="mt-20 scroll-mt-20 border-t border-[#DDD5C5] pt-16">
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+          />
+          <h2 className="font-mono text-[11px] tracking-[0.2em] text-[#8C7B6B] uppercase mb-8">
+            FAQ
+          </h2>
+          <dl className="divide-y divide-[#DDD5C5] border-t border-[#DDD5C5]">
+            {FAQ_ITEMS_EN.map((item) => (
+              <div key={item.q} className="py-6">
+                <dt className="text-[16px] font-light text-[#2C2416] leading-snug mb-2">
+                  {item.q}
+                </dt>
+                <dd className="text-[14px] text-[#8C7B6B] leading-relaxed">
+                  {item.a}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
 
         {/* Details live on /wholesale — keep this to a pointer. */}
         <section id="wholesale" className="mt-20 scroll-mt-20 border-t border-[#DDD5C5] pt-16">

@@ -57,6 +57,18 @@ const BUSINESS_INFO = {
 };
 
 /**
+ * Canonical "same business" links. AI search / local ranking leans on these to
+ * confirm this is one real business. Keep in sync with
+ * app/components/StructuredData.tsx (SAME_AS) and the Google Business Profile.
+ */
+export const SAME_AS = [
+  "https://www.instagram.com/felicity_hayama",
+  "https://line.me/R/ti/p/felicity_hayama",
+  "https://maps.app.goo.gl/iSc827DwNWg5ASz68",
+  "https://tabelog.com/kanagawa/A1406/A140602/14095646/",
+];
+
+/**
  * CafeOrCoffeeShop schema (main business)
  */
 export function getCafeSchema(locale: "en" | "ja" = "ja") {
@@ -125,10 +137,7 @@ export function getCafeSchema(locale: "en" | "ja" = "ja") {
         },
       ],
     },
-    sameAs: [
-      "https://www.instagram.com/felicity_hayama",
-      "https://line.me/R/ti/p/felicity_hayama",
-    ],
+    sameAs: SAME_AS,
   };
 }
 
@@ -250,10 +259,7 @@ export function getOrganizationSchema(locale: "en" | "ja" = "ja") {
     url: BUSINESS_INFO.url,
     logo: "https://felicity.cafe/og-image.jpg",
     description: BUSINESS_INFO.description[locale],
-    sameAs: [
-      "https://www.instagram.com/felicity_hayama",
-      "https://line.me/R/ti/p/felicity_hayama",
-    ],
+    sameAs: SAME_AS,
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "Customer Service",
@@ -311,6 +317,109 @@ export function getBreadcrumbSchema(items: Array<{ name: string; url: string }>)
       position: index + 1,
       name: item.name,
       item: item.url,
+    })),
+  };
+}
+
+/**
+ * FAQ content — single source of truth for both the visible FAQ on the contact
+ * page and the FAQPage JSON-LD. Google requires the structured data to match
+ * the on-page text, so always render these items visibly wherever this schema
+ * is emitted. AI search engines (AI Overviews / AI Mode) lean heavily on Q&A.
+ *
+ * Every answer here is a confirmed fact (owner, 2026-11). Do NOT add a question
+ * whose answer isn't visibly shown on the page.
+ */
+export const FAQ_ITEMS_JA: Array<{ q: string; a: string }> = [
+  {
+    q: "場所はどこですか？アクセス方法は？",
+    a: "神奈川県三浦郡葉山町上山口2432-3 です。「新沢」バス停の目の前で、JR逗子駅からバスで約20分。無料駐車場が10台分あります（店裏2台＋徒歩200m先に8台）。",
+  },
+  {
+    q: "営業時間と定休日を教えてください。",
+    a: "月〜木は11:00〜17:00、土・日・祝は10:00〜17:00です。金曜日が定休日です。",
+  },
+  {
+    q: "店内で飲めますか？席はありますか？",
+    a: "店内に約30席（禁煙）、喫煙できるテラス席が2席あります。コーヒーや焼き菓子を店内でお楽しみいただけます。",
+  },
+  {
+    q: "予約は必要ですか？",
+    a: "通常のご来店は予約不要です。席のご予約も承っていますので、お電話またはInstagramのDMからお気軽にどうぞ。",
+  },
+  {
+    q: "支払い方法は何が使えますか？",
+    a: "キャッシュレス専用店です（現金はお使いいただけません）。クレジットカード・交通系ICカード・各種QR決済（PayPayなど）に対応しています。",
+  },
+  {
+    q: "どんなコーヒーが買えますか？",
+    a: "シングルオリジンのスペシャルティコーヒー豆を自家焙煎で販売しています（ブラジル、エチオピア イルガチェフェ、パプアニューギニアなど）。店内でも一杯ずつご提供しています。",
+  },
+  {
+    q: "テイクアウトやWi-Fi、ペットの同伴はできますか？",
+    a: "テイクアウト可、フリーWi-Fiあり。ペットは1階席のみ同伴いただけます。",
+  },
+  {
+    q: "ワークショップやイベントはありますか？",
+    a: "焙煎を学べるワークショップを不定期で開催しています。また毎週火曜日の朝はピラティスも開催中です。最新の日程はInstagram（@felicity_hayama）でお知らせしています。",
+  },
+];
+
+/** English FAQ — mirror of FAQ_ITEMS_JA. Keep the facts identical. */
+export const FAQ_ITEMS_EN: Array<{ q: string; a: string }> = [
+  {
+    q: "Where are you located and how do I get there?",
+    a: "We're at 2432-3 Kamiyamaguchi, Hayama-cho, Kanagawa. We're right in front of the Shinzawa (新沢) bus stop, about 20 minutes by bus from JR Zushi Station. Free parking is available (10 spaces: 2 behind the shop and 8 a 200m walk away).",
+  },
+  {
+    q: "What are your opening hours and closing day?",
+    a: "Mon–Thu 11:00–17:00, and Sat, Sun and public holidays 10:00–17:00. We're closed on Fridays.",
+  },
+  {
+    q: "Can I drink in? Is there seating?",
+    a: "Yes — about 30 non-smoking seats indoors, plus 2 smoking seats on the terrace. You can enjoy coffee and baked goods in the shop.",
+  },
+  {
+    q: "Do I need a reservation?",
+    a: "No reservation is needed for a normal visit. Seat reservations are also welcome — just call us or send a DM on Instagram.",
+  },
+  {
+    q: "What payment methods do you accept?",
+    a: "We're cashless only (no cash). We accept credit cards, transit IC cards, and QR payments such as PayPay.",
+  },
+  {
+    q: "What coffee can I buy?",
+    a: "We sell single-origin specialty coffee beans roasted in-house (Brazil, Ethiopia Yirgacheffe, Papua New Guinea and more), and we also serve coffee by the cup in the shop.",
+  },
+  {
+    q: "Do you offer takeout, Wi-Fi, or allow pets?",
+    a: "Takeout is available, free Wi-Fi is available, and pets are welcome on the first floor only.",
+  },
+  {
+    q: "Do you hold workshops or events?",
+    a: "We hold coffee roasting workshops on an irregular schedule, and Pilates every Tuesday morning. Check Instagram (@felicity_hayama) for the latest dates.",
+  },
+];
+
+/**
+ * FAQPage schema. Emit only on a page that visibly renders the same items
+ * (currently /contact).
+ */
+export function getFaqSchema(
+  items: Array<{ q: string; a: string }> = FAQ_ITEMS_JA,
+  pageUrl = "https://felicity.cafe/contact"
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": `${pageUrl}#faq`,
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.a,
+      },
     })),
   };
 }
