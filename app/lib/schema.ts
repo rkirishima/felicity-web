@@ -365,6 +365,42 @@ export const FAQ_ITEMS_JA: Array<{ q: string; a: string }> = [
   },
 ];
 
+/** English FAQ — mirror of FAQ_ITEMS_JA. Keep the facts identical. */
+export const FAQ_ITEMS_EN: Array<{ q: string; a: string }> = [
+  {
+    q: "Where are you located and how do I get there?",
+    a: "We're at 2432-3 Kamiyamaguchi, Hayama-cho, Kanagawa. We're right in front of the Shinzawa (新沢) bus stop, about 20 minutes by bus from JR Zushi Station. Free parking is available (10 spaces: 2 behind the shop and 8 a 200m walk away).",
+  },
+  {
+    q: "What are your opening hours and closing day?",
+    a: "Mon–Thu 11:00–17:00, and Sat, Sun and public holidays 10:00–17:00. We're closed on Fridays.",
+  },
+  {
+    q: "Can I drink in? Is there seating?",
+    a: "Yes — about 30 non-smoking seats indoors, plus 2 smoking seats on the terrace. You can enjoy coffee and baked goods in the shop.",
+  },
+  {
+    q: "Do I need a reservation?",
+    a: "No reservation is needed for a normal visit. Seat reservations are also welcome — just call us or send a DM on Instagram.",
+  },
+  {
+    q: "What payment methods do you accept?",
+    a: "We're cashless only (no cash). We accept credit cards, transit IC cards, and QR payments such as PayPay.",
+  },
+  {
+    q: "What coffee can I buy?",
+    a: "We sell single-origin specialty coffee beans roasted in-house (Brazil, Ethiopia Yirgacheffe, Papua New Guinea and more), and we also serve coffee by the cup in the shop.",
+  },
+  {
+    q: "Do you offer takeout, Wi-Fi, or allow pets?",
+    a: "Takeout is available, free Wi-Fi is available, and pets are welcome on the first floor only.",
+  },
+  {
+    q: "Do you hold workshops or events?",
+    a: "We hold coffee roasting workshops on an irregular schedule, and Pilates every Tuesday morning. Check Instagram (@felicity_hayama) for the latest dates.",
+  },
+];
+
 /**
  * FAQPage schema. Emit only on a page that visibly renders the same items
  * (currently /contact).
