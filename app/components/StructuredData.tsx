@@ -45,7 +45,14 @@ const OPENING_HOURS = [
   },
 ] as const;
 
-const SAME_AS = ["https://www.instagram.com/felicity_hayama"];
+// AI検索・地図は「同じ店の情報が各所で一致」しているほど信用する(sameAs)。
+// app/lib/schema.ts の SAME_AS と必ず同じ内容にそろえること。
+const SAME_AS = [
+  "https://www.instagram.com/felicity_hayama",
+  "https://line.me/R/ti/p/felicity_hayama",
+  "https://maps.app.goo.gl/iSc827DwNWg5ASz68",
+  "https://tabelog.com/kanagawa/A1406/A140602/14095646/",
+];
 
 export const StructuredData = () => {
   const schema = {
@@ -65,7 +72,7 @@ export const StructuredData = () => {
         email: "info@felicity.cafe",
         priceRange: "¥¥",
         currenciesAccepted: "JPY",
-        paymentAccepted: "Credit Card, IC Card, PayPay",
+        paymentAccepted: "Credit Card, Transit IC Card, QR Code Payment (PayPay, etc.)",
         servesCuisine: "Specialty Coffee",
         address: ADDRESS,
         geo: {
@@ -73,8 +80,7 @@ export const StructuredData = () => {
           latitude: 35.26735426386272,
           longitude: 139.61026716170105,
         },
-        hasMap:
-          "https://www.google.com/maps/search/?api=1&query=35.26735426386272,139.61026716170105",
+        hasMap: "https://maps.app.goo.gl/iSc827DwNWg5ASz68",
         openingHoursSpecification: OPENING_HOURS,
         areaServed: [
           { "@type": "City", name: "葉山町" },

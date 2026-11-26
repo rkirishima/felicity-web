@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { LanguageToggle } from '@/app/components/LanguageToggle';
 import { CafeChat } from '@/app/components/CafeChat';
-import { getBreadcrumbSchema } from '@/app/lib/schema';
+import { FAQ_ITEMS_JA, getBreadcrumbSchema, getFaqSchema } from '@/app/lib/schema';
 
 export const metadata: Metadata = {
   title: 'お問い合わせ | FELICITY COFFEE ROASTERS',
@@ -21,6 +21,10 @@ const breadcrumbSchema = getBreadcrumbSchema([
   { name: 'ホーム', url: 'https://felicity.cafe/' },
   { name: 'お問い合わせ', url: 'https://felicity.cafe/contact' },
 ]);
+
+// FAQ の見える文言(FAQ_ITEMS_JA)と FAQPage 構造化データは同じソースから出す。
+// Google は構造化データとページ表示の一致を要求するので、必ず両方を出すこと。
+const faqSchema = getFaqSchema();
 
 export default function ContactPage() {
   return (
@@ -143,6 +147,29 @@ export default function ContactPage() {
             <CafeChat locale="ja" />
           </div>
         </div>
+
+        {/* FAQ — 見える文言と FAQPage 構造化データは schema.ts の FAQ_ITEMS_JA が真。 */}
+        <section id="faq" className="mt-20 scroll-mt-20 border-t border-[#DDD5C5] pt-16">
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+          />
+          <h2 className="font-mono text-[11px] tracking-[0.2em] text-[#8C7B6B] uppercase mb-8">
+            よくある質問
+          </h2>
+          <dl className="divide-y divide-[#DDD5C5] border-t border-[#DDD5C5]">
+            {FAQ_ITEMS_JA.map((item) => (
+              <div key={item.q} className="py-6">
+                <dt className="text-[16px] font-light text-[#2C2416] leading-snug mb-2">
+                  {item.q}
+                </dt>
+                <dd className="text-[14px] text-[#8C7B6B] leading-relaxed">
+                  {item.a}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
 
         {/* 業販の詳細は /wholesale にまとめてあるので、ここは導線だけ。 */}
         <section id="wholesale" className="mt-20 scroll-mt-20 border-t border-[#DDD5C5] pt-16">
