@@ -333,7 +333,7 @@ export function getBreadcrumbSchema(items: Array<{ name: string; url: string }>)
 export const FAQ_ITEMS_JA: Array<{ q: string; a: string }> = [
   {
     q: "場所はどこですか？アクセス方法は？",
-    a: "神奈川県三浦郡葉山町上山口2432-3 です。「新沢」バス停の目の前で、JR逗子駅からバスで約20分。無料の駐車場もあります。",
+    a: "神奈川県三浦郡葉山町上山口2432-3 です。「新沢」バス停の目の前で、JR逗子駅からバスで約20分。無料駐車場が10台分あります（店裏2台＋徒歩200m先に8台）。",
   },
   {
     q: "営業時間と定休日を教えてください。",
